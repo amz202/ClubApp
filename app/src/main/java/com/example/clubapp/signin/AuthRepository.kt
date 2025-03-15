@@ -11,3 +11,5 @@ class AuthRepositoryImpl(private val apiService: AuthApiService) : AuthRepositor
         return apiService.login("Bearer $token") //bearer is a REST API convention
     }
 }
+
+//Future Development, attach the token with very route with authenticate function
