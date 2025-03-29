@@ -14,6 +14,8 @@ import com.example.clubapp.data.Datastore.UserPreferences
 import com.example.clubapp.signin.GoogleAuthClient
 import com.example.clubapp.signin.SignInViewModel
 import com.example.clubapp.ui.theme.ClubAppTheme
+import com.example.clubapp.ui.viewModels.ClubViewModel
+import com.example.clubapp.ui.viewModels.EventViewModel
 
 class MainActivity : ComponentActivity() {
     private lateinit var userPreferences: UserPreferences
@@ -21,15 +23,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userPreferences = UserPreferences(this)
-        val viewModel: SignInViewModel = ViewModelProvider(this, SignInViewModel.Factory)
-            .get(SignInViewModel::class.java)
+        val authViewModel: SignInViewModel = ViewModelProvider(this, SignInViewModel.authFactory)[SignInViewModel::class.java]
+        val eventViewModel: EventViewModel = ViewModelProvider(this, EventViewModel.eventFactory)[EventViewModel::class.java]
+        val clubViewModel: ClubViewModel = ViewModelProvider(this, ClubViewModel.clubFactory)[ClubViewModel::class.java]
 
         enableEdgeToEdge()
         setContent {
             ClubAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
-                        SignInButton(viewModel, userPreferences)
+                        SignInButton(authViewModel, userPreferences)
                     }
                 }
             }

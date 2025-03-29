@@ -38,7 +38,7 @@ class GoogleAuthClient(
         }
 
         return token?.let {
-            println("GoogleAuthClient: Logging in with token = $it")
+//            println("GoogleAuthClient: Logging in with token = $it")
             authViewModel.login(it)
             true
         } ?: false

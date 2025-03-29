@@ -9,6 +9,7 @@ import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -20,10 +21,10 @@ interface ApiService {
     suspend fun getClubs(): List<ClubRequest>
 
     @POST("clubs")
-    suspend fun createClub(@Body club: ClubRequest): ClubResponse
+    suspend fun createClub(@Header("Authorization") token: String, @Body club: ClubRequest): ClubResponse
 
     @DELETE("clubs/{id}")
-    suspend fun deleteClub(@Path("id") id: String): ResponseBody //Raw message from server
+    suspend fun deleteClub(@Header("Authorization") token: String, @Path("id") id: String): ResponseBody //Raw message from server
 
     @GET("clubs/events")
     suspend fun getClubEvents(@Body clubEventsRequest: ClubEventsRequest): List<EventRequest>
@@ -35,9 +36,9 @@ interface ApiService {
     suspend fun getEvent(@Path("id") id:String): EventRequest
 
     @POST("events")
-    suspend fun createEvent(@Body event: EventRequest): EventResponse
+    suspend fun createEvent(@Header("Authorization") token: String, @Body event: EventRequest): EventResponse
 
     @DELETE("events/{id}")
-    suspend fun deleteEvent(@Path("id") id: String): ResponseBody
+    suspend fun deleteEvent(@Header("Authorization") token: String, @Path("id") id: String): ResponseBody
 }
 

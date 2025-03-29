@@ -11,47 +11,37 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.clubapp.ClubApplication
 import com.example.clubapp.data.Datastore.UserPreferences
 import com.example.clubapp.network.request.AuthUser
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.example.clubapp.ui.viewModels.BaseUiState
 import kotlinx.coroutines.launch
 
-sealed interface _uiState {
-    data class Success(val user: AuthUser) : _uiState
-    data object Error : _uiState
-    data object Loading : _uiState
-}
+typealias SignInUiState = BaseUiState<AuthUser>
 
 class SignInViewModel(
     private val authRepository: AuthRepository,
     private val userPreferences: UserPreferences
 ) : ViewModel() {
-    var uiState: _uiState by mutableStateOf(_uiState.Loading)
+    var uiState: SignInUiState by mutableStateOf(BaseUiState.Loading)
         private set
-
-    private val _user = MutableStateFlow<AuthUser?>(null)
-    val user: StateFlow<AuthUser?> = _user.asStateFlow()
 
     fun login(token: String) {
         viewModelScope.launch {
-            uiState = _uiState.Loading
+            uiState = BaseUiState.Loading
             try {
                 val userResponse = authRepository.login(token)
-                println("Server response: $userResponse") // Log the server response
+                println("Server response: $userResponse , token: $token") // Log the server response
 
-                _user.value = userResponse
-                userPreferences.saveUser(userResponse)
+                userPreferences.saveUser(userResponse, token)
 
-                uiState = _uiState.Success(userResponse)
+                uiState = BaseUiState.Success(userResponse)
             } catch (e: Exception) {
-                uiState = _uiState.Error
+                uiState = BaseUiState.Error
                 println("AuthViewModel: Login failed - ${e.message}")
             }
         }
     }
 
     companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
+        val authFactory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val app =
                     this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ClubApplication

@@ -20,14 +20,16 @@ class UserPreferences(private val context: Context) {
         private val ROLE_KEY = stringPreferencesKey("user_role")
         private val NAME_KEY = stringPreferencesKey("user_name")
         private val EMAIL_KEY = stringPreferencesKey("user_email")
+        private val TOKEN_KEY = stringPreferencesKey("user_token")
     }
 
     // Save user data
-    suspend fun saveUser(user: AuthUser) {
+    suspend fun saveUser(user: AuthUser, token: String) {
         context.dataStore.edit { preferences ->
             preferences[ROLE_KEY] = user.role
             preferences[NAME_KEY] = user.name
             preferences[EMAIL_KEY] = user.email
+            preferences[TOKEN_KEY] = token
         }
     }
 
