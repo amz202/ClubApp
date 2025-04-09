@@ -10,13 +10,20 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.clubapp.ClubApplication
 import com.example.clubapp.data.respositories.ClubRepository
+import com.example.clubapp.network.request.AuthUser
 import com.example.clubapp.network.request.ClubRequest
+import com.example.clubapp.network.request.RoleRequest
+import com.example.clubapp.network.response.ClubMemberResponse
 import kotlinx.coroutines.launch
 
 typealias ClubUiState = BaseUiState<List<ClubRequest>>
+typealias ClubMemberUiState = BaseUiState<List<ClubMemberResponse>>
 
 class ClubViewModel(private val clubRepository: ClubRepository): ViewModel() {
     var uiState: ClubUiState by mutableStateOf(BaseUiState.Loading)
+        private set
+
+    var clubMemberUiState: ClubMemberUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
     fun getClubs() {
@@ -68,6 +75,93 @@ class ClubViewModel(private val clubRepository: ClubRepository): ViewModel() {
             }
         }
     }
+
+    fun joinClub(token: String, clubId: String){
+        viewModelScope.launch {
+            uiState = BaseUiState.Loading
+            try {
+                clubRepository.joinClub(token, clubId)
+                val updatedClubs = clubRepository.getClubs()
+                uiState = BaseUiState.Success(updatedClubs)
+            } catch (e: Exception) {
+                uiState = BaseUiState.Error
+            }
+        }
+    }
+
+    fun leaveClub(token: String, clubId: String){
+        viewModelScope.launch {
+            uiState = BaseUiState.Loading
+            try {
+                clubRepository.leaveClub(token, clubId)
+                val updatedClubs = clubRepository.getClubs()
+                uiState = BaseUiState.Success(updatedClubs)
+            } catch (e: Exception) {
+                uiState = BaseUiState.Error
+            }
+        }
+    }
+
+    fun getClubsMembers(token: String, clubId: String) {
+        viewModelScope.launch {
+            clubMemberUiState = BaseUiState.Loading
+            try {
+                val members = clubRepository.getClubsMembers(token, clubId)
+                val authUsers = members.map { member ->
+                    ClubMemberResponse(
+                        clubId = member.clubId,
+                        userId = member.userId,
+                        clubRole = member.clubRole,
+                        joinedOn = member.joinedOn
+                    )
+                }
+                clubMemberUiState = BaseUiState.Success(authUsers)
+            } catch (e: Exception) {
+                clubMemberUiState = BaseUiState.Error
+            }
+        }
+    }
+
+    fun getUsersClubs(token: String, userId: String) {
+        viewModelScope.launch {
+            clubMemberUiState = BaseUiState.Loading
+            try {
+                val members = clubRepository.getUsersClubs(token, userId)
+                val authUsers = members.map { member ->
+                    ClubMemberResponse(
+                        clubId = member.clubId,
+                        userId = member.userId,
+                        clubRole = member.clubRole,
+                        joinedOn = member.joinedOn
+                    )
+                }
+                clubMemberUiState = BaseUiState.Success(authUsers)
+            } catch (e: Exception) {
+                clubMemberUiState = BaseUiState.Error
+            }
+        }
+    }
+
+    fun changeClubMemberRole(token: String, clubId: String, userId: String, request: RoleRequest) {
+        viewModelScope.launch {
+            clubMemberUiState = BaseUiState.Loading
+            try {
+                clubRepository.changeClubMemberRole(token, clubId, userId, request)
+                val updatedMembers = clubRepository.getClubsMembers(token, clubId)
+                val authUsers = updatedMembers.map { member ->
+                    ClubMemberResponse(
+                        clubId = member.clubId,
+                        userId = member.userId,
+                        clubRole = member.clubRole,
+                        joinedOn = member.joinedOn
+                    )
+                }
+                clubMemberUiState = BaseUiState.Success(authUsers)
+            } catch (e: Exception) {
+                clubMemberUiState = BaseUiState.Error
+            }
+        }
+    }
     companion object {
         val clubFactory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
@@ -78,3 +172,7 @@ class ClubViewModel(private val clubRepository: ClubRepository): ViewModel() {
         }
     }
 }
+//suspend fun joinClub(token: String, clubId: String): ResponseBody
+//suspend fun leaveClub(token: String, clubId: String): ResponseBody
+//suspend fun getUsersClubs(token: String, userId: String): List<ClubMemberResponse>
+//suspend fun changeClubMemberRole(token: String, clubId: String, userId: String, request: RoleRequest): ResponseBody

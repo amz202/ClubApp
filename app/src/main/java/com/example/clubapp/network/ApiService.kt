@@ -3,7 +3,10 @@ package com.example.clubapp.network
 import com.example.clubapp.network.request.ClubEventsRequest
 import com.example.clubapp.network.request.ClubRequest
 import com.example.clubapp.network.request.EventRequest
+import com.example.clubapp.network.request.RoleRequest
+import com.example.clubapp.network.response.ClubMemberResponse
 import com.example.clubapp.network.response.ClubResponse
+import com.example.clubapp.network.response.EventParticipantResponse
 import com.example.clubapp.network.response.EventResponse
 import okhttp3.ResponseBody
 import retrofit2.http.Body
@@ -21,24 +24,98 @@ interface ApiService {
     suspend fun getClubs(): List<ClubRequest>
 
     @POST("clubs")
-    suspend fun createClub(@Header("Authorization") token: String, @Body club: ClubRequest): ClubResponse
+    suspend fun createClub(
+        @Header("Authorization") token: String,
+        @Body club: ClubRequest
+    ): ClubResponse
 
     @DELETE("clubs/{id}")
-    suspend fun deleteClub(@Header("Authorization") token: String, @Path("id") id: String): ResponseBody //Raw message from server
+    suspend fun deleteClub(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): ResponseBody //Raw message from server
 
     @GET("clubs/events")
     suspend fun getClubEvents(@Body clubEventsRequest: ClubEventsRequest): List<EventRequest>
 
     @GET("events")
-    suspend fun getEvents():List<EventRequest>
+    suspend fun getEvents(): List<EventRequest>
 
     @GET("events/{id}")
-    suspend fun getEvent(@Path("id") id:String): EventRequest
+    suspend fun getEvent(@Path("id") id: String): EventRequest
 
     @POST("events")
-    suspend fun createEvent(@Header("Authorization") token: String, @Body event: EventRequest): EventResponse
+    suspend fun createEvent(
+        @Header("Authorization") token: String,
+        @Body event: EventRequest
+    ): EventResponse
 
     @DELETE("events/{id}")
-    suspend fun deleteEvent(@Header("Authorization") token: String, @Path("id") id: String): ResponseBody
+    suspend fun deleteEvent(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): ResponseBody
+
+    @GET("club/{clubId}/members")
+    suspend fun getClubsMembers(
+        @Header("Authorization") token: String,
+        @Path("clubId") clubId: String
+    ): List<ClubMemberResponse>
+
+    @POST("club/{clubId}/join")
+    suspend fun joinClub(
+        @Header("Authorization") token: String,
+        @Path("clubId") clubId: String
+    ): ResponseBody
+
+    @POST("club/{clubId}/leave")
+    suspend fun leaveClub(
+        @Header("Authorization") token: String,
+        @Path("clubId") clubId: String
+    ): ResponseBody
+
+    @GET("user/{userId}/clubs")
+    suspend fun getUsersClubs(
+        @Header("Authorization") token: String,
+        @Path("userId") userId: String
+    ): List<ClubMemberResponse>
+
+    @POST("club/{clubId}/user/{userId}/change-role")
+    suspend fun changeClubMemberRole(
+        @Header("Authorization") token: String,
+        @Path("clubId") clubId: String,
+        @Body request: RoleRequest
+    ): ResponseBody
+
+    @POST("events/{eventId}/join")
+    suspend fun joinEvent(
+        @Header("Authorization") token: String,
+        @Path("eventId") eventId: String
+    ): ResponseBody
+
+    @POST("events/{eventId}/leave")
+    suspend fun leaveEvent(
+        @Header("Authorization") token: String,
+        @Path("eventId") eventId: String
+    ): ResponseBody
+
+    @GET("events/{eventId}/participants")
+    suspend fun getEventParticipants(
+        @Header("Authorization") token: String,
+        @Path("eventId") eventId: String
+    ): List<EventParticipantResponse>
+
+    @GET("user/{userId}/events")
+    suspend fun getUserEvents(
+        @Header("Authorization") token: String,
+        @Path("userId") userId: String
+    ): List<EventParticipantResponse>
+
+    @POST("events/{eventId}/change-role")
+    suspend fun changeEventRole(
+        @Header("Authorization") token: String,
+        @Path("eventId") eventId: String,
+        @Body request: RoleRequest
+    ): ResponseBody
 }
 
