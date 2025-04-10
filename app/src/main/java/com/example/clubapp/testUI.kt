@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.sp
 import com.example.clubapp.network.request.AuthUser
 import com.example.clubapp.signin.GoogleAuthClient
 import com.example.clubapp.signin.SignInViewModel
-import com.example.clubapp.signin._uiState
 import androidx.lifecycle.viewModelScope
 import com.example.clubapp.data.Datastore.UserPreferences
 import kotlinx.coroutines.CoroutineScope

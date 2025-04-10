@@ -30,7 +30,7 @@ class SignInViewModel(
                 val userResponse = authRepository.login(token)
                 println("Server response: $userResponse , token: $token") // Log the server response
 
-                userPreferences.saveUser(userResponse, token)
+                userPreferences.saveUser(userResponse, token) //saves in the user prefs
 
                 uiState = BaseUiState.Success(userResponse)
             } catch (e: Exception) {

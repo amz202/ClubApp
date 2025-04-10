@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.clubapp.ClubApplication
+import com.example.clubapp.data.Datastore.UserPreferences
 import com.example.clubapp.data.respositories.EventRepository
 import com.example.clubapp.network.request.ClubEventsRequest
 import com.example.clubapp.network.request.EventRequest
@@ -19,7 +20,10 @@ import kotlinx.coroutines.launch
 typealias EventUiState = BaseUiState<List<EventRequest>>
 typealias EventParticipantUiState = BaseUiState<List<EventParticipantResponse>>
 
-class EventViewModel(private val eventRepository: EventRepository): ViewModel() {
+class EventViewModel(
+    private val eventRepository: EventRepository,
+    private val userPreferences: UserPreferences
+) : ViewModel() {
     var uiState: EventUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
@@ -62,10 +66,15 @@ class EventViewModel(private val eventRepository: EventRepository): ViewModel() 
         }
     }
 
-    fun createEvent(token: String, event: EventRequest) {
+    fun createEvent(event: EventRequest) {
         viewModelScope.launch {
             uiState = BaseUiState.Loading
             try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    uiState = BaseUiState.Error
+                    return@launch
+                }
                 eventRepository.createEvent(token, event)
                 val updatedEvents = eventRepository.getEvents()
                 uiState = BaseUiState.Success(updatedEvents)
@@ -75,10 +84,15 @@ class EventViewModel(private val eventRepository: EventRepository): ViewModel() 
         }
     }
 
-    fun deleteEvent(token: String, id: String) {
+    fun deleteEvent(id: String) {
         viewModelScope.launch {
             uiState = BaseUiState.Loading
             try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    uiState = BaseUiState.Error
+                    return@launch
+                }
                 eventRepository.deleteEvent(token, id)
                 val updatedEvents = eventRepository.getEvents()
                 uiState = BaseUiState.Success(updatedEvents)
@@ -88,10 +102,15 @@ class EventViewModel(private val eventRepository: EventRepository): ViewModel() 
         }
     }
 
-    fun joinEvent(token: String, eventId: String) {
+    fun joinEvent(eventId: String) {
         viewModelScope.launch {
             uiState = BaseUiState.Loading
             try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    uiState = BaseUiState.Error
+                    return@launch
+                }
                 eventRepository.joinEvent(token, eventId)
                 val updatedEvents = eventRepository.getEvents()
                 uiState = BaseUiState.Success(updatedEvents)
@@ -101,10 +120,15 @@ class EventViewModel(private val eventRepository: EventRepository): ViewModel() 
         }
     }
 
-    fun leaveEvent(token: String, eventId: String) {
+    fun leaveEvent(eventId: String) {
         viewModelScope.launch {
             uiState = BaseUiState.Loading
             try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    uiState = BaseUiState.Error
+                    return@launch
+                }
                 eventRepository.leaveEvent(token, eventId)
                 val updatedEvents = eventRepository.getEvents()
                 uiState = BaseUiState.Success(updatedEvents)
@@ -114,48 +138,49 @@ class EventViewModel(private val eventRepository: EventRepository): ViewModel() 
         }
     }
 
-    fun getEventParticipants(token: String, eventId: String) {
+    fun getEventParticipants(eventId: String) {
         viewModelScope.launch {
             eventParticipantUiState = BaseUiState.Loading
             try {
-                val participants = eventRepository.getEventParticipants(token, eventId)
-                val updatedParticipants = participants.map { EventParticipantResponse(
-                    eventId = it.eventId,
-                    userId = it.userId,
-                    eventRole = it.eventRole,
-                    joinedOn = it.joinedOn
-                ) }
-                eventParticipantUiState = BaseUiState.Success(updatedParticipants)
-            } catch (e: Exception) {
-                eventParticipantUiState = BaseUiState.Error
-            }
-        }
-    }
-
-    fun getUserEvents(token: String, userId: String) {
-        viewModelScope.launch {
-            eventParticipantUiState = BaseUiState.Loading
-            try {
-                val events = eventRepository.getUserEvents(token, userId)
-                val mappedEvents = events.map { eventResponse ->
-                    EventParticipantResponse(
-                        eventId = eventResponse.eventId,
-                        userId = userId,
-                        eventRole = eventResponse.eventRole,
-                        joinedOn = eventResponse.joinedOn
-                    )
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    uiState = BaseUiState.Error
+                    return@launch
                 }
-                eventParticipantUiState = BaseUiState.Success(mappedEvents)
+                val participants = eventRepository.getEventParticipants(token, eventId)
+                eventParticipantUiState = BaseUiState.Success(participants)
             } catch (e: Exception) {
                 eventParticipantUiState = BaseUiState.Error
             }
         }
     }
 
-    fun changeEventRole(token: String, eventId: String, request: RoleRequest) {
+    fun getUserEvents(userId: String) {
+        viewModelScope.launch {
+            eventParticipantUiState = BaseUiState.Loading
+            try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    uiState = BaseUiState.Error
+                    return@launch
+                }
+                val events = eventRepository.getUserEvents(token, userId)
+                eventParticipantUiState = BaseUiState.Success(events)
+            } catch (e: Exception) {
+                eventParticipantUiState = BaseUiState.Error
+            }
+        }
+    }
+
+    fun changeEventRole(eventId: String, request: RoleRequest) {
         viewModelScope.launch {
             uiState = BaseUiState.Loading
             try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    uiState = BaseUiState.Error
+                    return@launch
+                }
                 eventRepository.changeEventRole(token, eventId, request)
                 val updatedEvents = eventRepository.getEvents()
                 uiState = BaseUiState.Success(updatedEvents)
@@ -170,7 +195,7 @@ class EventViewModel(private val eventRepository: EventRepository): ViewModel() 
             initializer {
                 val app =
                     this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ClubApplication
-                EventViewModel(app.container.eventRepository)
+                EventViewModel(app.container.eventRepository, app.userPreferences)
             }
         }
     }
