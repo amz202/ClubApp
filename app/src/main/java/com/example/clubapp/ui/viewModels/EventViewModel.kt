@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 
 typealias EventUiState = BaseUiState<List<EventRequest>>
 typealias EventParticipantUiState = BaseUiState<List<EventParticipantResponse>>
+typealias EventRoleUiState = BaseUiState<String?>
 
 class EventViewModel(
     private val eventRepository: EventRepository,
@@ -28,6 +29,9 @@ class EventViewModel(
         private set
 
     var eventParticipantUiState: EventParticipantUiState by mutableStateOf(BaseUiState.Loading)
+        private set
+
+    var eventRoleUiState: EventRoleUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
     fun getClubEvents(clubEventsRequest: ClubEventsRequest) {
@@ -186,6 +190,23 @@ class EventViewModel(
                 uiState = BaseUiState.Success(updatedEvents)
             } catch (e: Exception) {
                 uiState = BaseUiState.Error
+            }
+        }
+    }
+
+    fun getEventRole(eventId: String, userId: String) {
+        viewModelScope.launch {
+            eventRoleUiState = BaseUiState.Loading
+            try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    uiState = BaseUiState.Error
+                    return@launch
+                }
+                val role = eventRepository.getEventRole(token, eventId, userId)
+                eventRoleUiState = BaseUiState.Success(role)
+            } catch (e: Exception) {
+                eventRoleUiState = BaseUiState.Error
             }
         }
     }

@@ -117,5 +117,19 @@ interface ApiService {
         @Path("eventId") eventId: String,
         @Body request: RoleRequest
     ): ResponseBody
+
+    @GET("/club/{clubId}/user/{userId}/role")
+    suspend fun getClubRole(
+        @Header("Authorization") token: String,
+        @Path("clubId") clubId: String,
+        @Path("userId") userId: String
+    ): String?
+
+    @GET("/events/{eventId}/user/{userId}/role")
+    suspend fun getEventRole(
+        @Header("Authorization") token: String,
+        @Path("eventId") eventId: String,
+        @Path("userId") userId: String
+    ): String?
 }
 

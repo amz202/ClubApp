@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 
 typealias ClubUiState = BaseUiState<List<ClubRequest>>
 typealias ClubMemberUiState = BaseUiState<List<ClubMemberResponse>>
+typealias ClubRoleUiState = BaseUiState<String?>
 
 class ClubViewModel(
     private val clubRepository: ClubRepository,
@@ -27,6 +28,9 @@ class ClubViewModel(
         private set
 
     var clubMemberUiState: ClubMemberUiState by mutableStateOf(BaseUiState.Loading)
+        private set
+
+    var clubRoleUiState: ClubRoleUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
     fun getClubs() {
@@ -176,6 +180,24 @@ class ClubViewModel(
             }
         }
     }
+
+    fun getClubRole(clubId: String, userId: String){
+        viewModelScope.launch {
+            clubRoleUiState = BaseUiState.Loading
+            try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    uiState = BaseUiState.Error
+                    return@launch
+                }
+                val role = clubRepository.getClubRole(token, clubId, userId)
+                clubRoleUiState = BaseUiState.Success(role)
+            } catch (e: Exception) {
+                clubRoleUiState = BaseUiState.Error
+            }
+        }
+    }
+
     companion object {
         val clubFactory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

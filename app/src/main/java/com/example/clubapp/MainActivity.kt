@@ -32,7 +32,12 @@ class MainActivity : ComponentActivity() {
             ClubAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
-                        SignInButton(authViewModel, userPreferences)
+                        TestScreen(
+                            signInViewModel = authViewModel,
+                            clubViewModel = clubViewModel,
+                            eventViewModel = eventViewModel,
+                            userPreferences = userPreferences
+                        )
                     }
                 }
             }
