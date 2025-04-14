@@ -5,5 +5,11 @@ import kotlinx.serialization.Serializer
 
 @Serializable
 data class ClubResponse(
-    val name: String
+    val name: String,
+    val description: String,
+    val id: String,
+    val createdBy:String,
+    val tags:String,
+    val createdAt: String,
+    val memberCount: Int
 )

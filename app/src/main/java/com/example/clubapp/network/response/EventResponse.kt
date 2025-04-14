@@ -11,5 +11,7 @@ data class EventResponse(
     val location: String,
     val capacity: String?,
     val organizedBy:String,
-    val id:String
+    val id:String,
+    val attendeeCount:Int,
+    val tags:String
 )

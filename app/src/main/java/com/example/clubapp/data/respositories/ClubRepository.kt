@@ -10,9 +10,9 @@ import com.example.clubapp.network.response.ClubResponse
 import okhttp3.ResponseBody
 
 interface ClubRepository {
-    suspend fun getClub(id:String): ClubRequest
-    suspend fun getClubs():List<ClubRequest>
-    suspend fun createClub(token:String, club: ClubRequest): ClubResponse
+    suspend fun getClub(id:String): ClubResponse
+    suspend fun getClubs():List<ClubResponse>
+    suspend fun createClub(token:String, club: ClubRequest): ResponseBody
     suspend fun deleteClub(token:String, id: String): ResponseBody
     suspend fun getClubsMembers(token: String, clubId: String): List<ClubMemberResponse>
     suspend fun joinClub(token: String, clubId: String): ResponseBody
@@ -23,11 +23,11 @@ interface ClubRepository {
 }
 
 class ClubRepositoryImpl(private val apiService: ApiService): ClubRepository{
-    override suspend fun getClub(id: String): ClubRequest = apiService.getClub(id)
+    override suspend fun getClub(id: String): ClubResponse = apiService.getClub(id)
 
-    override suspend fun getClubs(): List<ClubRequest> = apiService.getClubs()
+    override suspend fun getClubs(): List<ClubResponse> = apiService.getClubs()
 
-    override suspend fun createClub(token: String, club: ClubRequest): ClubResponse = apiService.createClub(token = "Bearer $token", club = club)
+    override suspend fun createClub(token: String, club: ClubRequest): ResponseBody = apiService.createClub(token = "Bearer $token", club = club)
 
     override suspend fun deleteClub(token: String, id: String): ResponseBody = apiService.deleteClub(token = "Bearer $token", id = id)
 

@@ -18,16 +18,16 @@ import retrofit2.http.Path
 
 interface ApiService {
     @GET("clubs/{id}")
-    suspend fun getClub(@Path("id") id: String): ClubRequest //@Path is used when the variable is part of the url path itself
+    suspend fun getClub(@Path("id") id: String): ClubResponse //@Path is used when the variable is part of the url path itself
 
     @GET("clubs")
-    suspend fun getClubs(): List<ClubRequest>
+    suspend fun getClubs(): List<ClubResponse>
 
     @POST("clubs")
     suspend fun createClub(
         @Header("Authorization") token: String,
         @Body club: ClubRequest
-    ): ClubResponse
+    ): ResponseBody
 
     @DELETE("clubs/{id}")
     suspend fun deleteClub(
@@ -36,19 +36,19 @@ interface ApiService {
     ): ResponseBody //Raw message from server
 
     @GET("clubs/events")
-    suspend fun getClubEvents(@Body clubEventsRequest: ClubEventsRequest): List<EventRequest>
+    suspend fun getClubEvents(@Body clubEventsRequest: ClubEventsRequest): List<EventResponse>
 
     @GET("events")
-    suspend fun getEvents(): List<EventRequest>
+    suspend fun getEvents(): List<EventResponse>
 
     @GET("events/{id}")
-    suspend fun getEvent(@Path("id") id: String): EventRequest
+    suspend fun getEvent(@Path("id") id: String): EventResponse
 
     @POST("events")
     suspend fun createEvent(
         @Header("Authorization") token: String,
         @Body event: EventRequest
-    ): EventResponse
+    ): ResponseBody
 
     @DELETE("events/{id}")
     suspend fun deleteEvent(

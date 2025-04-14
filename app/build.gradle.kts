@@ -85,5 +85,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     // ViewModel utilities for Compose
     implementation(libs.androidx.lifecycle.viewmodel.compose.v262)
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
 }

@@ -15,9 +15,10 @@ import com.example.clubapp.network.request.ClubEventsRequest
 import com.example.clubapp.network.request.EventRequest
 import com.example.clubapp.network.request.RoleRequest
 import com.example.clubapp.network.response.EventParticipantResponse
+import com.example.clubapp.network.response.EventResponse
 import kotlinx.coroutines.launch
 
-typealias EventUiState = BaseUiState<List<EventRequest>>
+typealias EventUiState = BaseUiState<List<EventResponse>>
 typealias EventParticipantUiState = BaseUiState<List<EventParticipantResponse>>
 typealias EventRoleUiState = BaseUiState<String?>
 

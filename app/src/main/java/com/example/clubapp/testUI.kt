@@ -90,7 +90,8 @@ fun TestScreen(
             clubViewModel.createClub(
                 ClubRequest(
                     name = "first",
-                    description = "ok"
+                    description = "ok",
+                    tags = "usaf"
                 )
             )
         }) {
@@ -135,7 +136,8 @@ fun TestScreen(
                     dateTime = "2025-05-01T10:00:00",
                     capacity = "2",
                     organizedBy = "yes",
-                    clubId = null
+                    clubId = null,
+                    tags = "akf",
                 )
             )
         }) {

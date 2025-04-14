@@ -14,9 +14,10 @@ import com.example.clubapp.data.respositories.ClubRepository
 import com.example.clubapp.network.request.ClubRequest
 import com.example.clubapp.network.request.RoleRequest
 import com.example.clubapp.network.response.ClubMemberResponse
+import com.example.clubapp.network.response.ClubResponse
 import kotlinx.coroutines.launch
 
-typealias ClubUiState = BaseUiState<List<ClubRequest>>
+typealias ClubUiState = BaseUiState<List<ClubResponse>>
 typealias ClubMemberUiState = BaseUiState<List<ClubMemberResponse>>
 typealias ClubRoleUiState = BaseUiState<String?>
 
@@ -67,7 +68,7 @@ class ClubViewModel(
                     return@launch
                 }
                 clubRepository.createClub(token, club)
-                val updatedClubs = clubRepository.getClubs()
+                val updatedClubs = clubRepository.getClubs()  //as a result, there is a GET request right after the POST request in event logs
                 uiState = BaseUiState.Success(updatedClubs)
             } catch (e: Exception) {
                 uiState = BaseUiState.Error

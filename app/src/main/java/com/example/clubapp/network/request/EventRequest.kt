@@ -11,5 +11,6 @@ data class EventRequest(
     val dateTime : String,
     val location: String,
     val capacity: String?,
-    val organizedBy:String
+    val organizedBy:String,
+    val tags:String
 )
