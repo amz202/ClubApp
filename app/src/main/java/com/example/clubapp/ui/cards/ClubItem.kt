@@ -91,7 +91,7 @@ fun ClubItem(
                         modifier = Modifier.size(22.dp)
                     )
                     Text(
-                        text = timeAgo(clubResponse.createdAt),
+                        text = timeAgo(clubResponse.createdOn),
                         modifier = Modifier.padding(start = 4.dp)
                     )
                 }
@@ -132,7 +132,7 @@ fun ClubItemPreview() {
         id = "1",
         createdBy = "admin",
         tags = "Photography, Art",
-        createdAt = "2023-10-01T12:34:56",
+        createdOn = "2023-10-01T12:34:56",
         memberCount = 120
     )
 

@@ -17,6 +17,8 @@ import com.example.clubapp.network.request.RoleRequest
 import com.example.clubapp.network.response.EventParticipantResponse
 import com.example.clubapp.network.response.EventResponse
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 typealias EventUiState = BaseUiState<List<EventResponse>>
 typealias EventParticipantUiState = BaseUiState<List<EventParticipantResponse>>
@@ -35,6 +37,13 @@ class EventViewModel(
     var eventRoleUiState: EventRoleUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
+    private val _events = MutableStateFlow<List<EventResponse>>(emptyList())
+    val events: StateFlow<List<EventResponse>> =_events
+
+    init {
+        getEvents()
+    }
+
     fun getClubEvents(clubEventsRequest: ClubEventsRequest) {
         viewModelScope.launch {
             uiState = BaseUiState.Loading
@@ -49,16 +58,21 @@ class EventViewModel(
 
     fun getEvents() {
         viewModelScope.launch {
-            uiState = BaseUiState.Loading
             try {
+                uiState = BaseUiState.Loading
                 val events = eventRepository.getEvents()
-                uiState = BaseUiState.Success(events)
+                if (events.isEmpty()) {
+                    uiState = BaseUiState.Error
+                } else {
+                    _events.value = events
+                    uiState = BaseUiState.Success(events)
+                }
             } catch (e: Exception) {
                 uiState = BaseUiState.Error
+                e.printStackTrace()
             }
         }
     }
-
     fun getEvent(id: String) {
         viewModelScope.launch {
             uiState = BaseUiState.Loading

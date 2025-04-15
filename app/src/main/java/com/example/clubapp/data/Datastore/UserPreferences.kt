@@ -22,6 +22,7 @@ class UserPreferences(private val context: Context) {
         private val NAME_KEY = stringPreferencesKey("user_name")
         private val EMAIL_KEY = stringPreferencesKey("user_email")
         private val TOKEN_KEY = stringPreferencesKey("user_token")
+        private val ID_KEY = stringPreferencesKey("id_key")
     }
 
     // Save user data
@@ -31,6 +32,7 @@ class UserPreferences(private val context: Context) {
             preferences[NAME_KEY] = user.name
             preferences[EMAIL_KEY] = user.email
             preferences[TOKEN_KEY] = token
+            preferences[ID_KEY] = user.id.toString()
         }
     }
 
@@ -40,4 +42,14 @@ class UserPreferences(private val context: Context) {
         }.first()
     }
 
+    suspend fun getUserInfo(): UserInfo {
+        return context.dataStore.data.map { preferences ->
+            UserInfo(
+                name = preferences[NAME_KEY],
+                email = preferences[EMAIL_KEY]
+            )
+        }.first()
+    }
+
+    data class UserInfo(val name: String?, val email: String?)
 }

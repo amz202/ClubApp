@@ -89,9 +89,9 @@ fun TestScreen(
         Button(onClick = {
             clubViewModel.createClub(
                 ClubRequest(
-                    name = "first",
-                    description = "ok",
-                    tags = "usaf"
+                    name = "Dynamic Club Name 3", // Replace with dynamic input if needed
+                    description = "This is also also a dynamically created club.",
+                    tags = "third,dynamic,example"
                 )
             )
         }) {
@@ -130,14 +130,14 @@ fun TestScreen(
         Button(onClick = {
             eventViewModel.createEvent(
                 EventRequest(
-                    name = "Test Event",
-                    description = "Sample event",
-                    location = "Auditorium",
-                    dateTime = "2025-05-01T10:00:00",
-                    capacity = "2",
-                    organizedBy = "yes",
-                    clubId = null,
-                    tags = "akf",
+                    name = "Dynamic Event Second", // Replace with dynamic input if needed
+                    description = "This is also dynamically created event.",
+                    location = "Conference Room B",
+                    dateTime = "2025-06-15T14:00:00", // Ensure proper ISO 8601 format
+                    capacity = "200",
+                    organizedBy = "Dynamic Organizer",
+                    clubId = null, // Replace with valid club ID
+                    tags = "second,dynamic,event"
                 )
             )
         }) {

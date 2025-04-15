@@ -15,6 +15,8 @@ import com.example.clubapp.network.request.ClubRequest
 import com.example.clubapp.network.request.RoleRequest
 import com.example.clubapp.network.response.ClubMemberResponse
 import com.example.clubapp.network.response.ClubResponse
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 typealias ClubUiState = BaseUiState<List<ClubResponse>>
@@ -34,14 +36,46 @@ class ClubViewModel(
     var clubRoleUiState: ClubRoleUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
+    private val _usersClub = MutableStateFlow<List<ClubResponse>>(emptyList())
+    val usersClub: StateFlow<List<ClubResponse>> = _usersClub
+
+    init{
+        getMyClubs()
+        getClubs()
+    }
+
     fun getClubs() {
         viewModelScope.launch {
-            uiState = BaseUiState.Loading
             try {
+                uiState = BaseUiState.Loading
                 val clubs = clubRepository.getClubs()
-                uiState = BaseUiState.Success(clubs)
+                if (clubs.isEmpty()) {
+                    uiState = BaseUiState.Error
+                } else {
+                    uiState = BaseUiState.Success(clubs)
+                }
             } catch (e: Exception) {
                 uiState = BaseUiState.Error
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun getMyClubs(){
+        viewModelScope.launch {
+            try {
+                uiState = BaseUiState.Loading
+                val token = userPreferences.getToken()
+                val myClubs = clubRepository.getMyClubs(token.toString())
+                if(myClubs.isNullOrEmpty()){
+                    uiState = BaseUiState.Error
+                } else {
+                    _usersClub.value = myClubs
+                    uiState = BaseUiState.Success(myClubs)
+                }
+            }catch (e: Exception) {
+                uiState = BaseUiState.Error
+                e.printStackTrace()
             }
         }
     }
@@ -147,23 +181,6 @@ class ClubViewModel(
         }
     }
 
-    fun getUsersClubs(userId: String) {
-        viewModelScope.launch {
-            clubMemberUiState = BaseUiState.Loading
-            try {
-                val token = userPreferences.getToken()
-                if (token == null) {
-                    uiState = BaseUiState.Error
-                    return@launch
-                }
-                val members = clubRepository.getUsersClubs(token, userId)
-                clubMemberUiState = BaseUiState.Success(members)
-            } catch (e: Exception) {
-                clubMemberUiState = BaseUiState.Error
-            }
-        }
-    }
-
     fun changeClubMemberRole(clubId: String, userId: String, request: RoleRequest) {
         viewModelScope.launch {
             clubMemberUiState = BaseUiState.Loading
@@ -198,7 +215,6 @@ class ClubViewModel(
             }
         }
     }
-
     companion object {
         val clubFactory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

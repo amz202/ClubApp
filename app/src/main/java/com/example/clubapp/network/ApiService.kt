@@ -111,6 +111,11 @@ interface ApiService {
         @Path("userId") userId: String
     ): List<EventParticipantResponse>
 
+    @GET("user/clubs")
+    suspend fun getMyClubs(
+        @Header("Authorization") token: String
+    ):List<ClubResponse>?
+
     @POST("events/{eventId}/change-role")
     suspend fun changeEventRole(
         @Header("Authorization") token: String,

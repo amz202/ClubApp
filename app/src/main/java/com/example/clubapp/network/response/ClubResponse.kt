@@ -10,6 +10,6 @@ data class ClubResponse(
     val id: String,
     val createdBy:String,
     val tags:String,
-    val createdAt: String,
+    val createdOn: String,
     val memberCount: Int
 )
