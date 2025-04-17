@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.clubapp.network.response.ClubResponse
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -113,9 +114,9 @@ fun timeAgo(createdAt: String): String {
 
         when {
             minutes < 1 -> "Just now"
-            minutes < 60 -> "$minutes minute${if (minutes > 1) "s" else ""}"
-            hours < 24 -> "$hours hour${if (hours > 1) "s" else ""}"
-            else -> "$days day${if (days > 1) "s" else ""}"
+            minutes < 60 -> "$minutes m"
+            hours < 24 -> "$hours h"
+            else -> "$days d"
         }
     } catch (e: Exception) {
         "Invalid date"

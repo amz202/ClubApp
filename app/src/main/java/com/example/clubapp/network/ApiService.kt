@@ -4,9 +4,9 @@ import com.example.clubapp.network.request.ClubEventsRequest
 import com.example.clubapp.network.request.ClubRequest
 import com.example.clubapp.network.request.EventRequest
 import com.example.clubapp.network.request.RoleRequest
-import com.example.clubapp.network.response.ClubMemberResponse
+import com.example.clubapp.network.response.ClubMembersResponse
 import com.example.clubapp.network.response.ClubResponse
-import com.example.clubapp.network.response.EventParticipantResponse
+import com.example.clubapp.network.response.EventParticipantsResponse
 import com.example.clubapp.network.response.EventResponse
 import okhttp3.ResponseBody
 import retrofit2.http.Body
@@ -60,7 +60,7 @@ interface ApiService {
     suspend fun getClubsMembers(
         @Header("Authorization") token: String,
         @Path("clubId") clubId: String
-    ): List<ClubMemberResponse>
+    ): List<ClubMembersResponse>
 
     @POST("club/{clubId}/join")
     suspend fun joinClub(
@@ -78,7 +78,7 @@ interface ApiService {
     suspend fun getUsersClubs(
         @Header("Authorization") token: String,
         @Path("userId") userId: String
-    ): List<ClubMemberResponse>
+    ): List<ClubMembersResponse>
 
     @POST("club/{clubId}/user/{userId}/change-role")
     suspend fun changeClubMemberRole(
@@ -103,18 +103,23 @@ interface ApiService {
     suspend fun getEventParticipants(
         @Header("Authorization") token: String,
         @Path("eventId") eventId: String
-    ): List<EventParticipantResponse>
+    ): List<EventParticipantsResponse>
 
     @GET("user/{userId}/events")
     suspend fun getUserEvents(
         @Header("Authorization") token: String,
         @Path("userId") userId: String
-    ): List<EventParticipantResponse>
+    ): List<EventParticipantsResponse>
 
     @GET("user/clubs")
     suspend fun getMyClubs(
         @Header("Authorization") token: String
     ):List<ClubResponse>?
+
+    @GET("user/events")
+    suspend fun getMyEvents(
+        @Header("Authorization") token: String
+    ):List<EventResponse>?
 
     @POST("events/{eventId}/change-role")
     suspend fun changeEventRole(

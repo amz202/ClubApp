@@ -145,7 +145,7 @@ fun TestScreen(
         }
 
         Button(onClick = {
-            eventViewModel.joinEvent("edc27ca8-8cab-4879-9790-e02b555503f3")
+            eventViewModel.joinEvent("9814f995-35f9-4d34-b5ec-3e52ac316c52")
         }) {
             Text("Join Event")
         }

@@ -116,14 +116,14 @@ fun timeUntilEvent(dateTime: String): String {
     return if (eventDateTime.isAfter(now)) {
         val days = ChronoUnit.DAYS.between(now, eventDateTime)
         if (days > 0) {
-            "$days days"
+            "$days d"
         } else {
             val hours = ChronoUnit.HOURS.between(now, eventDateTime)
             if (hours > 0) {
-                "$hours hours"
+                "$hours h"
             } else {
                 val minutes = ChronoUnit.MINUTES.between(now, eventDateTime)
-                "$minutes minutes"
+                "$minutes m"
             }
         }
     } else {

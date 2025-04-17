@@ -12,3 +12,16 @@ object ClubScreenNav
 
 @Serializable
 object EventScreenNav
+
+@Serializable
+object AddEventNavA
+
+@Serializable
+data class AddEventNavB(
+    val name: String,
+    val description: String,
+    val tags: String
+)
+
+@Serializable
+object AddClubNav

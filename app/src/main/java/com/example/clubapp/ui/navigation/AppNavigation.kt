@@ -6,10 +6,14 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.example.clubapp.data.Datastore.UserPreferences
 import com.example.clubapp.ui.screens.ClubListScreen
 import com.example.clubapp.ui.screens.EventListScreen
 import com.example.clubapp.ui.screens.HomeScreen
+import com.example.clubapp.ui.screens.addClub.AddClubScreen
+import com.example.clubapp.ui.screens.addEvent.AddEventScreenA
+import com.example.clubapp.ui.screens.addEvent.AddEventScreenB
 import com.example.clubapp.ui.viewModels.ClubMemberUiState
 import com.example.clubapp.ui.viewModels.ClubUiState
 import com.example.clubapp.ui.viewModels.ClubViewModel
@@ -56,6 +60,30 @@ fun AppNavigation(
             EventListScreen(
                 eventUiState,
                 navController, navigationViewModel = navigationViewModel
+            )
+        }
+
+        composable<AddEventNavA> {
+            AddEventScreenA(
+                navController = navController,
+            )
+        }
+
+        composable<AddEventNavB>{
+            val args = it.toRoute<AddEventNavB>()
+            AddEventScreenB(
+                navController = navController,
+                name = args.name,
+                description = args.description,
+                tags = args.tags,
+                eventViewModel = eventViewModel
+            )
+        }
+
+        composable<AddClubNav>{
+            AddClubScreen(
+                navController = navController,
+                clubViewModel = clubViewModel
             )
         }
     }

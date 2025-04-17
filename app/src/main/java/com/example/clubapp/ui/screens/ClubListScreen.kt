@@ -15,7 +15,10 @@ import androidx.compose.ui.Modifier
 import com.example.clubapp.network.response.ClubResponse
 import com.example.clubapp.ui.cards.ClubItem
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -34,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.clubapp.R
+import com.example.clubapp.ui.navigation.AddClubNav
 import com.example.clubapp.ui.navigation.ClubScreenNav
 import com.example.clubapp.ui.navigation.EventScreenNav
 import com.example.clubapp.ui.navigation.HomeScreenNav
@@ -48,12 +52,16 @@ import com.example.clubapp.ui.viewModels.NavigationViewModel
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ClubListScreen(
-    clubUiState: ClubUiState, navController: NavHostController, navigationViewModel: NavigationViewModel
+    clubUiState: ClubUiState,
+    navController: NavHostController,
+    navigationViewModel: NavigationViewModel
 ) {
     when (clubUiState) {
         is BaseUiState.Success -> ClubList(
             clubList = clubUiState.data,
-            modifier = Modifier, navController = navController, navigationViewModel = navigationViewModel
+            modifier = Modifier,
+            navController = navController,
+            navigationViewModel = navigationViewModel
         )
 
         is BaseUiState.Loading -> LoadingScreen()
@@ -69,11 +77,21 @@ fun ClubList(
     clubList: List<ClubResponse>,
     navController: NavHostController, navigationViewModel: NavigationViewModel
 ) {
+    navigationViewModel.updateSelectedItemIndex(2)
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var selectedItemIndex = navigationViewModel.selectedItemIndex
 
     val items = bottomNavItems
     Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate(AddClubNav) },
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Club")
+            }
+        },
         topBar = {
             TopAppBar(
                 title = {

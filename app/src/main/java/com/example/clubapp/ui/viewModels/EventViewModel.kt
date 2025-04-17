@@ -14,14 +14,14 @@ import com.example.clubapp.data.respositories.EventRepository
 import com.example.clubapp.network.request.ClubEventsRequest
 import com.example.clubapp.network.request.EventRequest
 import com.example.clubapp.network.request.RoleRequest
-import com.example.clubapp.network.response.EventParticipantResponse
+import com.example.clubapp.network.response.EventParticipantsResponse
 import com.example.clubapp.network.response.EventResponse
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 typealias EventUiState = BaseUiState<List<EventResponse>>
-typealias EventParticipantUiState = BaseUiState<List<EventParticipantResponse>>
+typealias EventParticipantUiState = BaseUiState<List<EventParticipantsResponse>>
 typealias EventRoleUiState = BaseUiState<String?>
 
 class EventViewModel(
@@ -37,11 +37,18 @@ class EventViewModel(
     var eventRoleUiState: EventRoleUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
+    private val _usersEvents = MutableStateFlow<List<EventResponse>>(emptyList())
+    val usersEvents: StateFlow<List<EventResponse>> =_usersEvents
+
     private val _events = MutableStateFlow<List<EventResponse>>(emptyList())
-    val events: StateFlow<List<EventResponse>> =_events
+    val events: StateFlow<List<EventResponse>> = _events
+
+    private val _eventParticipants = MutableStateFlow<List<EventParticipantsResponse>>(emptyList())
+    val eventParticipants: StateFlow<List<EventParticipantsResponse>> = _eventParticipants
 
     init {
         getEvents()
+        getMyEvents()
     }
 
     fun getClubEvents(clubEventsRequest: ClubEventsRequest) {
@@ -64,7 +71,7 @@ class EventViewModel(
                 if (events.isEmpty()) {
                     uiState = BaseUiState.Error
                 } else {
-                    _events.value = events
+                    _usersEvents.value = events
                     uiState = BaseUiState.Success(events)
                 }
             } catch (e: Exception) {
@@ -73,6 +80,24 @@ class EventViewModel(
             }
         }
     }
+
+    fun getMyEvents() {
+        viewModelScope.launch {
+            try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    return@launch
+                }
+                val events = eventRepository.getMyEvents(token)
+                if (!events.isNullOrEmpty()) {
+                    _usersEvents.value = events
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     fun getEvent(id: String) {
         viewModelScope.launch {
             uiState = BaseUiState.Loading
@@ -159,17 +184,17 @@ class EventViewModel(
 
     fun getEventParticipants(eventId: String) {
         viewModelScope.launch {
-            eventParticipantUiState = BaseUiState.Loading
             try {
                 val token = userPreferences.getToken()
                 if (token == null) {
-                    uiState = BaseUiState.Error
+                    _eventParticipants.value = emptyList()
                     return@launch
                 }
                 val participants = eventRepository.getEventParticipants(token, eventId)
-                eventParticipantUiState = BaseUiState.Success(participants)
+                _eventParticipants.value = participants
             } catch (e: Exception) {
-                eventParticipantUiState = BaseUiState.Error
+                e.printStackTrace()
+                _eventParticipants.value = emptyList()
             }
         }
     }

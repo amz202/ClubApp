@@ -31,14 +31,20 @@ import com.example.clubapp.ui.viewModels.NavigationViewModel
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.example.clubapp.data.Datastore.UserPreferences
 import com.example.clubapp.data.Datastore.UserPreferences.UserInfo
 import com.example.clubapp.ui.dialog.HomeScreenDetail
 import com.example.clubapp.ui.dialog.HomeScreenProfile
+import com.example.clubapp.ui.navigation.AddClubNav
+import com.example.clubapp.ui.navigation.AddEventNavA
 import com.example.clubapp.ui.viewModels.ClubViewModel
 import com.example.clubapp.ui.viewModels.EventViewModel
 
@@ -53,6 +59,7 @@ fun HomeScreen(
     clubViewModel: ClubViewModel,
     userPreferences: UserPreferences
 ) {
+    navigationViewModel.updateSelectedItemIndex(0)
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var selectedItemIndex = navigationViewModel.selectedItemIndex
@@ -65,7 +72,7 @@ fun HomeScreen(
     }
 
     val clubList by clubViewModel.usersClub.collectAsState(initial = emptyList())
-    val eventList by eventViewModel.events.collectAsState(initial = emptyList())
+    val eventList by eventViewModel.usersEvents.collectAsState(initial = emptyList())
 
     Scaffold(
         topBar = {

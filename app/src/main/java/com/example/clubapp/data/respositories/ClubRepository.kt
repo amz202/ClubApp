@@ -1,11 +1,9 @@
 package com.example.clubapp.data.respositories
 
 import com.example.clubapp.network.ApiService
-import com.example.clubapp.network.request.ClubEventsRequest
 import com.example.clubapp.network.request.ClubRequest
-import com.example.clubapp.network.request.EventRequest
 import com.example.clubapp.network.request.RoleRequest
-import com.example.clubapp.network.response.ClubMemberResponse
+import com.example.clubapp.network.response.ClubMembersResponse
 import com.example.clubapp.network.response.ClubResponse
 import okhttp3.ResponseBody
 
@@ -14,10 +12,10 @@ interface ClubRepository {
     suspend fun getClubs():List<ClubResponse>
     suspend fun createClub(token:String, club: ClubRequest): ResponseBody
     suspend fun deleteClub(token:String, id: String): ResponseBody
-    suspend fun getClubsMembers(token: String, clubId: String): List<ClubMemberResponse>
+    suspend fun getClubsMembers(token: String, clubId: String): List<ClubMembersResponse>
     suspend fun joinClub(token: String, clubId: String): ResponseBody
     suspend fun leaveClub(token: String, clubId: String): ResponseBody
-    suspend fun getUsersClubs(token: String, userId: String): List<ClubMemberResponse>
+    suspend fun getUsersClubs(token: String, userId: String): List<ClubMembersResponse>
     suspend fun changeClubMemberRole(token: String, clubId: String, userId: String, request: RoleRequest): ResponseBody
     suspend fun getClubRole(token:String, clubId:String, userId:String): String?
     suspend fun getMyClubs(token: String):List<ClubResponse>?
@@ -32,7 +30,7 @@ class ClubRepositoryImpl(private val apiService: ApiService): ClubRepository{
 
     override suspend fun deleteClub(token: String, id: String): ResponseBody = apiService.deleteClub(token = "Bearer $token", id = id)
 
-    override suspend fun getClubsMembers(token: String, clubId: String): List<ClubMemberResponse> {
+    override suspend fun getClubsMembers(token: String, clubId: String): List<ClubMembersResponse> {
         return apiService.getClubsMembers(token = "Bearer $token", clubId = clubId)
     }
 
@@ -44,7 +42,7 @@ class ClubRepositoryImpl(private val apiService: ApiService): ClubRepository{
         return apiService.leaveClub(token = "Bearer $token", clubId = clubId)
     }
 
-    override suspend fun getUsersClubs(token: String, userId: String): List<ClubMemberResponse> {
+    override suspend fun getUsersClubs(token: String, userId: String): List<ClubMembersResponse> {
         return apiService.getUsersClubs(token = "Bearer $token", userId = userId)
     }
 
