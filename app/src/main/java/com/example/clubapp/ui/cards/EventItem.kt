@@ -36,9 +36,10 @@ import java.time.temporal.ChronoUnit
 @Composable
 fun EventItem(
     eventResponse: EventResponse,
-    modifier: Modifier
+    modifier: Modifier,
+    onClick: () -> Unit
 ) {
-    Card(modifier = modifier, shape = RoundedCornerShape(8.dp)) {
+    Card(modifier = modifier, shape = RoundedCornerShape(8.dp), onClick = onClick) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -137,27 +138,27 @@ fun isEventInPast(dateTime: String): Boolean {
     return eventDateTime.isBefore(LocalDateTime.now())
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
-@Composable
-fun EventItemPreview() {
-    val sampleEvent = EventResponse(
-        name = "Sample Event",
-        description = "This is a sample event description.",
-        clubId = "1",
-        dateTime = "2025-12-25T18:00:00",
-        location = "Sample Location",
-        capacity = "100",
-        organizedBy = "Sample Organizer",
-        id = "1",
-        attendeeCount = 50,
-        tags = "Sample, Event"
-    )
-
-    EventItem(
-        eventResponse = sampleEvent,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    )
-}
+//@RequiresApi(Build.VERSION_CODES.O)
+//@Preview(showBackground = true)
+//@Composable
+//fun EventItemPreview() {
+//    val sampleEvent = EventResponse(
+//        name = "Sample Event",
+//        description = "This is a sample event description.",
+//        clubId = "1",
+//        dateTime = "2025-12-25T18:00:00",
+//        location = "Sample Location",
+//        capacity = "100",
+//        organizedBy = "Sample Organizer",
+//        id = "1",
+//        attendeeCount = 50,
+//        tags = "Sample, Event"
+//    )
+//
+//    EventItem(
+//        eventResponse = sampleEvent,
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(8.dp)
+//    )
+//}

@@ -47,7 +47,6 @@ class ClubViewModel(
 
     init{
         getClubs()
-        getMyClubs()
     }
 
     fun getClubs() {

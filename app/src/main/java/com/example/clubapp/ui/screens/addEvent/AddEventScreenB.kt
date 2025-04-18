@@ -36,10 +36,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.clubapp.network.request.EventRequest
-import com.example.clubapp.ui.navigation.AddEventNavB
 import com.example.clubapp.ui.navigation.EventScreenNav
 import com.example.clubapp.ui.screens.Common.DateTimePicker
-import com.example.clubapp.ui.screens.Common.TagInput
 import com.example.clubapp.ui.viewModels.EventViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

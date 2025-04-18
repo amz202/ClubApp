@@ -14,6 +14,8 @@ import com.example.clubapp.ui.screens.HomeScreen
 import com.example.clubapp.ui.screens.addClub.AddClubScreen
 import com.example.clubapp.ui.screens.addEvent.AddEventScreenA
 import com.example.clubapp.ui.screens.addEvent.AddEventScreenB
+import com.example.clubapp.ui.screens.detail.EventDetailScreen
+import com.example.clubapp.ui.screens.users.EventParticipantList
 import com.example.clubapp.ui.viewModels.ClubMemberUiState
 import com.example.clubapp.ui.viewModels.ClubUiState
 import com.example.clubapp.ui.viewModels.ClubViewModel
@@ -84,6 +86,25 @@ fun AppNavigation(
             AddClubScreen(
                 navController = navController,
                 clubViewModel = clubViewModel
+            )
+        }
+
+        composable<EventDetailNav>{
+            val args = it.toRoute<EventDetailNav>()
+            EventDetailScreen(
+                eventId = args.eventId,
+                eventViewModel = eventViewModel,
+                navController = navController
+            )
+        }
+
+        composable<EventParticipantsNav>{
+            val args = it.toRoute<EventParticipantsNav>()
+            EventParticipantList(
+                eventId = args.eventId,
+                eventViewModel = eventViewModel,
+                navController = navController,
+                eventName = args.eventName
             )
         }
     }

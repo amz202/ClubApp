@@ -37,20 +37,8 @@ class MainActivity : ComponentActivity() {
             ClubAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
-                        AppNavigation(
-                            clubUiState = clubViewModel.uiState,
-                            eventUiState = eventViewModel.uiState,
-                            navigationViewModel = navigationViewModel,
-                            clubViewModel = clubViewModel,
-                            eventViewModel = eventViewModel,
-                            userPreferences = userPreferences
-                        )
-//                        TestScreen(
-//                            signInViewModel = authViewModel,
-//                            clubViewModel = clubViewModel,
-//                            eventViewModel = eventViewModel,
-//                            userPreferences = userPreferences
-//                        )
+                        AppNavigation(clubUiState = clubViewModel.uiState, eventUiState = eventViewModel.uiState, navigationViewModel = navigationViewModel, clubViewModel = clubViewModel, eventViewModel = eventViewModel, userPreferences = userPreferences)
+//                        TestScreen(signInViewModel = authViewModel, clubViewModel = clubViewModel, eventViewModel = eventViewModel, userPreferences = userPreferences)
                     }
                 }
             }

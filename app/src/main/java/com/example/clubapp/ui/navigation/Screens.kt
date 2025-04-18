@@ -25,3 +25,14 @@ data class AddEventNavB(
 
 @Serializable
 object AddClubNav
+
+@Serializable
+data class EventDetailNav(
+    val eventId: String,
+)
+
+@Serializable
+data class EventParticipantsNav(
+    val eventId: String,
+    val eventName: String
+)

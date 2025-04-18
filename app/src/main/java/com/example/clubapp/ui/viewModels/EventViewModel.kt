@@ -43,12 +43,14 @@ class EventViewModel(
     private val _events = MutableStateFlow<List<EventResponse>>(emptyList())
     val events: StateFlow<List<EventResponse>> = _events
 
+    private val _eventOfId = MutableStateFlow<EventResponse?>(null)
+    val eventOfId: StateFlow<EventResponse?> = _eventOfId
+
     private val _eventParticipants = MutableStateFlow<List<EventParticipantsResponse>>(emptyList())
     val eventParticipants: StateFlow<List<EventParticipantsResponse>> = _eventParticipants
 
     init {
         getEvents()
-        getMyEvents()
     }
 
     fun getClubEvents(clubEventsRequest: ClubEventsRequest) {
@@ -100,12 +102,12 @@ class EventViewModel(
 
     fun getEvent(id: String) {
         viewModelScope.launch {
-            uiState = BaseUiState.Loading
             try {
                 val event = eventRepository.getEvent(id)
-                uiState = BaseUiState.Success(listOf(event))
+                _eventOfId.value = event
+
             } catch (e: Exception) {
-                uiState = BaseUiState.Error
+                _eventOfId.value = null
             }
         }
     }

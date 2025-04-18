@@ -14,9 +14,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,23 +26,15 @@ import com.example.clubapp.ui.navigation.EventScreenNav
 import com.example.clubapp.ui.navigation.HomeScreenNav
 import com.example.clubapp.ui.navigation.NavBar.bottomNavItems
 import com.example.clubapp.ui.viewModels.NavigationViewModel
-import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.example.clubapp.data.Datastore.UserPreferences
 import com.example.clubapp.data.Datastore.UserPreferences.UserInfo
 import com.example.clubapp.ui.dialog.HomeScreenDetail
-import com.example.clubapp.ui.dialog.HomeScreenProfile
-import com.example.clubapp.ui.navigation.AddClubNav
-import com.example.clubapp.ui.navigation.AddEventNavA
+import com.example.clubapp.ui.screens.users.HomeScreenProfile
 import com.example.clubapp.ui.viewModels.ClubViewModel
 import com.example.clubapp.ui.viewModels.EventViewModel
 
@@ -69,6 +59,8 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         userInfo = userPreferences.getUserInfo()
+        clubViewModel.getMyClubs()
+        eventViewModel.getMyEvents()
     }
 
     val clubList by clubViewModel.usersClub.collectAsState(initial = emptyList())
@@ -126,7 +118,10 @@ fun HomeScreen(
         )
         {
             HomeScreenProfile(userInfo?.name.toString(), userInfo?.email.toString())
-            HomeScreenDetail(clubList = clubList, eventList = eventList)
+            HomeScreenDetail(
+                clubList = clubList, eventList = eventList,
+                navController = navController
+            )
         }
     }
 }

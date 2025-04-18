@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,6 +22,7 @@ import com.example.clubapp.network.response.ClubResponse
 import com.example.clubapp.ui.cards.ClubItem
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,18 +32,19 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.clubapp.network.response.EventResponse
 import com.example.clubapp.ui.cards.EventItem
-import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.example.clubapp.ui.navigation.EventDetailNav
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreenDetail(
     modifier: Modifier = Modifier,
     clubList: List<ClubResponse>,
-    eventList: List<EventResponse>
+    eventList: List<EventResponse>,
+    navController: NavHostController
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
 
@@ -66,7 +67,7 @@ fun HomeScreenDetail(
             ) { page ->
                 when (page) {
                     0 -> MyClubs(clubList = clubList)
-                    1 -> MyEvent(eventList = eventList)
+                    1 -> MyEvent(eventList = eventList, navController = navController)
                 }
             }
 
@@ -130,7 +131,8 @@ fun MyClubs(
 @Composable
 fun MyEvent(
     modifier: Modifier = Modifier,
-    eventList: List<EventResponse>
+    eventList: List<EventResponse>,
+    navController: NavHostController
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -151,7 +153,14 @@ fun MyEvent(
             items(eventList) { event ->
                 EventItem(
                     modifier = Modifier.fillMaxWidth(),
-                    eventResponse = event
+                    eventResponse = event,
+                    onClick = {
+                        navController.navigate(
+                            EventDetailNav(
+                                eventId = event.id
+                            )
+                        )
+                    }
                 )
             }
         }
@@ -160,7 +169,7 @@ fun MyEvent(
 
 @Composable
 fun CustomHorizontalPagerIndicator(
-    pagerState: androidx.compose.foundation.pager.PagerState,
+    pagerState: PagerState,
     pageCount: Int,
     modifier: Modifier = Modifier
 ) {
@@ -185,72 +194,72 @@ fun CustomHorizontalPagerIndicator(
 
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenDetailPreview() {
-    val sampleClubs = listOf(
-        ClubResponse(
-            name = "Photography Club",
-            description = "A club for photography enthusiasts.",
-            id = "1",
-            createdBy = "admin",
-            tags = "Photography, Art",
-            createdOn = "2023-10-01T12:34:56",
-            memberCount = 120
-        ),
-        ClubResponse(
-            name = "Book Club",
-            description = "A club for book lovers.",
-            id = "2",
-            createdBy = "admin",
-            tags = "Books, Reading",
-            createdOn = "2023-09-15T10:00:00",
-            memberCount = 80
-        )
-    )
-
-    val sampleEvents = listOf(
-        EventResponse(
-            name = "Art Exhibition",
-            description = "Showcasing local artists' work.",
-            clubId = "3",
-            dateTime = "2023-11-15T18:00:00",
-            location = "Art Gallery",
-            capacity = "200",
-            organizedBy = "Art Club",
-            id = "3",
-            attendeeCount = 150,
-            tags = "Art, Exhibition"
-        ),
-        EventResponse(
-            name = "Tech Talk",
-            description = "Discussion on emerging technologies.",
-            clubId = "4",
-            dateTime = "2023-12-01T10:00:00",
-            location = "Auditorium",
-            capacity = "300",
-            organizedBy = "Tech Club",
-            id = "4",
-            attendeeCount = 250,
-            tags = "Technology, Talk"
-        ),
-        EventResponse(
-            name = "Music Night",
-            description = "An evening of live music performances.",
-            clubId = "5",
-            dateTime = "2023-12-20T19:00:00",
-            location = "Open Air Theater",
-            capacity = "500",
-            organizedBy = "Music Club",
-            id = "5",
-            attendeeCount = 400,
-            tags = "Music, Live"
-        )
-    )
-
-    HomeScreenDetail(
-        clubList = sampleClubs,
-        eventList = sampleEvents
-    )
-}
+//@RequiresApi(Build.VERSION_CODES.O)
+//@Preview(showBackground = true)
+//@Composable
+//fun HomeScreenDetailPreview() {
+//    val sampleClubs = listOf(
+//        ClubResponse(
+//            name = "Photography Club",
+//            description = "A club for photography enthusiasts.",
+//            id = "1",
+//            createdBy = "admin",
+//            tags = "Photography, Art",
+//            createdOn = "2023-10-01T12:34:56",
+//            memberCount = 120
+//        ),
+//        ClubResponse(
+//            name = "Book Club",
+//            description = "A club for book lovers.",
+//            id = "2",
+//            createdBy = "admin",
+//            tags = "Books, Reading",
+//            createdOn = "2023-09-15T10:00:00",
+//            memberCount = 80
+//        )
+//    )
+//
+//    val sampleEvents = listOf(
+//        EventResponse(
+//            name = "Art Exhibition",
+//            description = "Showcasing local artists' work.",
+//            clubId = "3",
+//            dateTime = "2023-11-15T18:00:00",
+//            location = "Art Gallery",
+//            capacity = "200",
+//            organizedBy = "Art Club",
+//            id = "3",
+//            attendeeCount = 150,
+//            tags = "Art, Exhibition"
+//        ),
+//        EventResponse(
+//            name = "Tech Talk",
+//            description = "Discussion on emerging technologies.",
+//            clubId = "4",
+//            dateTime = "2023-12-01T10:00:00",
+//            location = "Auditorium",
+//            capacity = "300",
+//            organizedBy = "Tech Club",
+//            id = "4",
+//            attendeeCount = 250,
+//            tags = "Technology, Talk"
+//        ),
+//        EventResponse(
+//            name = "Music Night",
+//            description = "An evening of live music performances.",
+//            clubId = "5",
+//            dateTime = "2023-12-20T19:00:00",
+//            location = "Open Air Theater",
+//            capacity = "500",
+//            organizedBy = "Music Club",
+//            id = "5",
+//            attendeeCount = 400,
+//            tags = "Music, Live"
+//        )
+//    )
+//
+//    HomeScreenDetail(
+//        clubList = sampleClubs,
+//        eventList = sampleEvents
+//    )
+//}
