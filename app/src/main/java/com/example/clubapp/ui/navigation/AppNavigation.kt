@@ -8,13 +8,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.clubapp.data.Datastore.UserPreferences
+import com.example.clubapp.signin.SignInViewModel
 import com.example.clubapp.ui.screens.ClubListScreen
 import com.example.clubapp.ui.screens.EventListScreen
 import com.example.clubapp.ui.screens.HomeScreen
 import com.example.clubapp.ui.screens.addClub.AddClubScreen
 import com.example.clubapp.ui.screens.addEvent.AddEventScreenA
 import com.example.clubapp.ui.screens.addEvent.AddEventScreenB
+import com.example.clubapp.ui.screens.detail.ClubDetailScreen
 import com.example.clubapp.ui.screens.detail.EventDetailScreen
+import com.example.clubapp.ui.screens.users.ClubMembersList
 import com.example.clubapp.ui.screens.users.EventParticipantList
 import com.example.clubapp.ui.viewModels.ClubMemberUiState
 import com.example.clubapp.ui.viewModels.ClubUiState
@@ -33,7 +36,8 @@ fun AppNavigation(
     eventViewModel: EventViewModel,
     clubViewModel: ClubViewModel,
     navigationViewModel: NavigationViewModel,
-    userPreferences: UserPreferences
+    userPreferences: UserPreferences,
+    signInViewModel: SignInViewModel
 ) {
     val navController = rememberNavController()
 
@@ -47,7 +51,8 @@ fun AppNavigation(
                 navigationViewModel = navigationViewModel,
                 eventViewModel = eventViewModel,
                 clubViewModel = clubViewModel,
-                userPreferences = userPreferences
+                userPreferences = userPreferences,
+                signInViewModel = signInViewModel
             )
         }
 
@@ -66,8 +71,10 @@ fun AppNavigation(
         }
 
         composable<AddEventNavA> {
+            val args = it.toRoute<AddEventNavA>()
             AddEventScreenA(
                 navController = navController,
+                clubId = args.clubId
             )
         }
 
@@ -78,7 +85,8 @@ fun AppNavigation(
                 name = args.name,
                 description = args.description,
                 tags = args.tags,
-                eventViewModel = eventViewModel
+                eventViewModel = eventViewModel,
+                clubId = args.clubId
             )
         }
 
@@ -105,6 +113,26 @@ fun AppNavigation(
                 eventViewModel = eventViewModel,
                 navController = navController,
                 eventName = args.eventName
+            )
+        }
+
+        composable<ClubDetailNav>{
+            val args = it.toRoute<ClubDetailNav>()
+            ClubDetailScreen(
+                clubId = args.clubId,
+                clubViewModel = clubViewModel,
+                navController = navController,
+                eventViewModel = eventViewModel
+            )
+        }
+
+        composable<ClubMembersNav>{
+            val args = it.toRoute<ClubMembersNav>()
+            ClubMembersList(
+                clubId = args.clubId,
+                clubName = args.clubName,
+                navController = navController,
+                clubViewModel = clubViewModel
             )
         }
     }

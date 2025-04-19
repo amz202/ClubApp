@@ -33,9 +33,10 @@ import java.time.temporal.ChronoUnit
 @Composable
 fun ClubItem(
     clubResponse: ClubResponse,
-    modifier: Modifier
+    modifier: Modifier= Modifier,
+    onClick: () -> Unit
 ) {
-    Card(modifier = modifier, shape = RoundedCornerShape(8.dp)) {
+    Card(modifier = modifier, shape = RoundedCornerShape(8.dp), onClick = onClick) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -123,22 +124,22 @@ fun timeAgo(createdAt: String): String {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
-@Composable
-fun ClubItemPreview() {
-    val sampleClub = ClubResponse(
-        name = "Photography Club",
-        description = "A club for photography enthusiasts.",
-        id = "1",
-        createdBy = "admin",
-        tags = "Photography, Art",
-        createdOn = "2023-10-01T12:34:56",
-        memberCount = 120
-    )
-
-    ClubItem(
-        clubResponse = sampleClub,
-        modifier = Modifier.padding(16.dp)
-    )
-}
+//@RequiresApi(Build.VERSION_CODES.O)
+//@Preview(showBackground = true)
+//@Composable
+//fun ClubItemPreview() {
+//    val sampleClub = ClubResponse(
+//        name = "Photography Club",
+//        description = "A club for photography enthusiasts.",
+//        id = "1",
+//        createdBy = "admin",
+//        tags = "Photography, Art",
+//        createdOn = "2023-10-01T12:34:56",
+//        memberCount = 120
+//    )
+//
+//    ClubItem(
+//        clubResponse = sampleClub,
+//        modifier = Modifier.padding(16.dp)
+//    )
+//}

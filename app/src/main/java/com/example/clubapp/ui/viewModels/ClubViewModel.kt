@@ -36,14 +36,17 @@ class ClubViewModel(
     var clubRoleUiState: ClubRoleUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
-    private val _usersClub = MutableStateFlow<List<ClubResponse>>(emptyList())
-    val usersClub: StateFlow<List<ClubResponse>> = _usersClub
+    private val _usersClub = MutableStateFlow<List<ClubResponse>?>(emptyList())
+    val usersClub: StateFlow<List<ClubResponse>?> = _usersClub
 
     private val _clubs = MutableStateFlow<List<ClubResponse>>(emptyList())
     val clubs: StateFlow<List<ClubResponse>> = _clubs
 
     private val _clubMembers = MutableStateFlow<List<ClubMembersResponse>>(emptyList())
     val clubMembers: StateFlow<List<ClubMembersResponse>> = _clubMembers
+
+    private val _clubOfId = MutableStateFlow<ClubResponse?>(null)
+    val clubOfId: StateFlow<ClubResponse?> = _clubOfId
 
     init{
         getClubs()
@@ -86,12 +89,11 @@ class ClubViewModel(
 
     fun getClub(id:String){
         viewModelScope.launch {
-            uiState = BaseUiState.Loading
             try {
                 val club = clubRepository.getClub(id)
-                uiState = BaseUiState.Success(listOf(club))
+                _clubOfId.value = club
             } catch (e: Exception) {
-                uiState = BaseUiState.Error
+                _clubOfId.value = null
             }
         }
     }
@@ -219,6 +221,7 @@ class ClubViewModel(
             }
         }
     }
+
     companion object {
         val clubFactory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

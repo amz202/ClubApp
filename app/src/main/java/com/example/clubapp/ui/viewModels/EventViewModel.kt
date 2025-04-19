@@ -37,8 +37,8 @@ class EventViewModel(
     var eventRoleUiState: EventRoleUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
-    private val _usersEvents = MutableStateFlow<List<EventResponse>>(emptyList())
-    val usersEvents: StateFlow<List<EventResponse>> =_usersEvents
+    private val _usersEvents = MutableStateFlow<List<EventResponse>?>(emptyList())
+    val usersEvents: StateFlow<List<EventResponse>?> =_usersEvents
 
     private val _events = MutableStateFlow<List<EventResponse>>(emptyList())
     val events: StateFlow<List<EventResponse>> = _events
@@ -49,18 +49,21 @@ class EventViewModel(
     private val _eventParticipants = MutableStateFlow<List<EventParticipantsResponse>>(emptyList())
     val eventParticipants: StateFlow<List<EventParticipantsResponse>> = _eventParticipants
 
+    private val _clubEvents = MutableStateFlow<List<EventResponse>?>(emptyList())
+    val clubEvents: StateFlow<List<EventResponse>?> = _clubEvents
+
+
     init {
         getEvents()
     }
 
-    fun getClubEvents(clubEventsRequest: ClubEventsRequest) {
+    fun getClubEvents(clubId: String) {
         viewModelScope.launch {
-            uiState = BaseUiState.Loading
             try {
-                val events = eventRepository.getClubEvents(clubEventsRequest)
-                uiState = BaseUiState.Success(events)
+                val events = eventRepository.getClubEvents(clubId)
+                _clubEvents.value = events
             } catch (e: Exception) {
-                uiState = BaseUiState.Error
+                _clubEvents.value = null
             }
         }
     }
@@ -73,7 +76,7 @@ class EventViewModel(
                 if (events.isEmpty()) {
                     uiState = BaseUiState.Error
                 } else {
-                    _usersEvents.value = events
+                    _events.value = events
                     uiState = BaseUiState.Success(events)
                 }
             } catch (e: Exception) {
@@ -95,6 +98,7 @@ class EventViewModel(
                     _usersEvents.value = events
                 }
             } catch (e: Exception) {
+                _usersEvents.value = emptyList()
                 e.printStackTrace()
             }
         }

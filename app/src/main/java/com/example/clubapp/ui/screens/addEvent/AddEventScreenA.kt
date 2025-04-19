@@ -40,7 +40,8 @@ import com.example.clubapp.ui.screens.Common.TagInput
 @Composable
 fun AddEventScreenA(
     modifier: Modifier = Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    clubId: String?
 ) {
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -129,7 +130,8 @@ fun AddEventScreenA(
                                 AddEventNavB(
                                     name = name,
                                     description = description,
-                                    tags = tags
+                                    tags = tags,
+                                    clubId = clubId
                                 )
                             )
                         }

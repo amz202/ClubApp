@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.clubapp.ui.navigation.AddClubNav
+import com.example.clubapp.ui.navigation.ClubDetailNav
 import com.example.clubapp.ui.navigation.ClubScreenNav
 import com.example.clubapp.ui.navigation.EventScreenNav
 import com.example.clubapp.ui.navigation.HomeScreenNav
@@ -133,7 +134,14 @@ fun ClubList(
                 items(clubList) { club ->
                     ClubItem(
                         clubResponse = club,
-                        modifier = modifier.padding(bottom = 16.dp)
+                        modifier = modifier.padding(bottom = 16.dp),
+                        onClick = {
+                            navController.navigate(
+                                ClubDetailNav(
+                                    clubId = club.id
+                                )
+                            )
+                        }
                     )
                 }
             }

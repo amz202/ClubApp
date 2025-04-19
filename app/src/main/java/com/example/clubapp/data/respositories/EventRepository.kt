@@ -13,7 +13,7 @@ interface EventRepository {
     suspend fun getEvents():List<EventResponse>
     suspend fun createEvent(token:String, event: EventRequest): ResponseBody
     suspend fun deleteEvent(token:String, id: String): ResponseBody
-    suspend fun getClubEvents(clubEventsRequest: ClubEventsRequest): List<EventResponse>
+    suspend fun getClubEvents(id: String): List<EventResponse>?
     suspend fun joinEvent(token: String, eventId: String): ResponseBody
     suspend fun leaveEvent(token: String, eventId: String): ResponseBody
     suspend fun getEventParticipants(token: String, eventId: String): List<EventParticipantsResponse>
@@ -32,7 +32,7 @@ class EventRepositoryImpl(private val apiService: ApiService): EventRepository{
 
     override suspend fun deleteEvent(token:String, id: String): ResponseBody = apiService.deleteEvent(token = "Bearer $token", id = id)
 
-    override suspend fun getClubEvents(clubEventsRequest: ClubEventsRequest): List<EventResponse> = apiService.getClubEvents(clubEventsRequest)
+    override suspend fun getClubEvents(id: String): List<EventResponse>? = apiService.getClubEvents(id)
 
     override suspend fun joinEvent(token: String, eventId: String): ResponseBody {
         return apiService.joinEvent(token = "Bearer $token", eventId = eventId)

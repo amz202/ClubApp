@@ -77,7 +77,7 @@ fun EventList(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(AddEventNavA) },
+                onClick = { navController.navigate(AddEventNavA()) },
                 modifier = Modifier.padding(16.dp)
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Item")

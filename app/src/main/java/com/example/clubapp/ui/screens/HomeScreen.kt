@@ -28,15 +28,25 @@ import com.example.clubapp.ui.navigation.NavBar.bottomNavItems
 import com.example.clubapp.ui.viewModels.NavigationViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import com.example.clubapp.data.Datastore.UserPreferences
 import com.example.clubapp.data.Datastore.UserPreferences.UserInfo
+import com.example.clubapp.signin.GoogleAuthClient
+import com.example.clubapp.signin.SignInViewModel
 import com.example.clubapp.ui.dialog.HomeScreenDetail
 import com.example.clubapp.ui.screens.users.HomeScreenProfile
 import com.example.clubapp.ui.viewModels.ClubViewModel
 import com.example.clubapp.ui.viewModels.EventViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,14 +57,16 @@ fun HomeScreen(
     navigationViewModel: NavigationViewModel,
     eventViewModel: EventViewModel,
     clubViewModel: ClubViewModel,
-    userPreferences: UserPreferences
+    userPreferences: UserPreferences,
+    signInViewModel: SignInViewModel
 ) {
     navigationViewModel.updateSelectedItemIndex(0)
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var selectedItemIndex = navigationViewModel.selectedItemIndex
     val items = bottomNavItems
-
+    val context = LocalContext.current
+    val authClient = remember { GoogleAuthClient(context) }
     var userInfo by remember { mutableStateOf<UserInfo?>(null) }
 
     LaunchedEffect(Unit) {
@@ -65,6 +77,7 @@ fun HomeScreen(
 
     val clubList by clubViewModel.usersClub.collectAsState(initial = emptyList())
     val eventList by eventViewModel.usersEvents.collectAsState(initial = emptyList())
+    val isUserSignedIn = userInfo != null
 
     Scaffold(
         topBar = {
@@ -75,6 +88,41 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        if (isUserSignedIn) {
+                            // Sign out functionality
+                            CoroutineScope(Dispatchers.Main).launch {
+                                authClient.signOut()
+                                // Optionally navigate or refresh
+                                userInfo = null
+                            }
+                        } else {
+                            // No action or different action when not signed in
+                        }
+                    }) {
+                        if (isUserSignedIn) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Logout,
+                                contentDescription = "Sign Out"
+                            )
+                        }
+                    }
+                },
+                actions = {
+                    if (!isUserSignedIn) {
+                        IconButton(onClick = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                authClient.signIn(signInViewModel)
+                            }
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Login,
+                                contentDescription = "Sign In"
+                            )
+                        }
+                    }
                 }
             )
         },

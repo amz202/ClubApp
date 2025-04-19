@@ -36,7 +36,7 @@ import java.time.temporal.ChronoUnit
 @Composable
 fun EventItem(
     eventResponse: EventResponse,
-    modifier: Modifier,
+    modifier: Modifier= Modifier,
     onClick: () -> Unit
 ) {
     Card(modifier = modifier, shape = RoundedCornerShape(8.dp), onClick = onClick) {

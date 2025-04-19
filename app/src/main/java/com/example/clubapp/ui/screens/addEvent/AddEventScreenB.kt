@@ -51,7 +51,8 @@ fun AddEventScreenB(
     name:String,
     description:String,
     tags:String,
-    eventViewModel: EventViewModel
+    eventViewModel: EventViewModel,
+    clubId:String?
 ) {
     var location by remember { mutableStateOf("") }
     var organizedBy by remember { mutableStateOf("") }
@@ -139,7 +140,7 @@ fun AddEventScreenB(
                                 dateTime = selectedDateTime.format(DateTimeFormatter.ISO_DATE_TIME),
                                 capacity = null,
                                 organizedBy = organizedBy,
-                                clubId = null
+                                clubId = clubId
                             )
                             eventViewModel.createEvent(event)
                             navController.navigate(EventScreenNav)

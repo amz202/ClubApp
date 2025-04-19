@@ -3,21 +3,28 @@ package com.example.clubapp.ui.screens.detail
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -37,33 +44,35 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.clubapp.network.response.EventResponse
-import com.example.clubapp.ui.navigation.EventParticipantsNav
+import com.example.clubapp.ui.cards.EventItem
+import com.example.clubapp.ui.navigation.AddEventNavA
+import com.example.clubapp.ui.navigation.ClubMembersNav
+import com.example.clubapp.ui.navigation.EventDetailNav
+import com.example.clubapp.ui.viewModels.ClubViewModel
 import com.example.clubapp.ui.viewModels.EventViewModel
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import androidx.compose.runtime.getValue
-
+import androidx.compose.foundation.rememberScrollState
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EventDetailScreen(
-    eventId: String,
-    modifier: Modifier = Modifier,
+fun ClubDetailScreen(
+    clubId: String,
+    clubViewModel: ClubViewModel,
     eventViewModel: EventViewModel,
-    navController: NavHostController
-){
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    LaunchedEffect(eventId) {
-        eventViewModel.getEvent(eventId)
+    LaunchedEffect(clubId) {
+        clubViewModel.getClub(clubId)
+        eventViewModel.getClubEvents(clubId)
     }
 
-    val eventState = eventViewModel.eventOfId.collectAsState()
-    val event = eventState.value
+    val club = clubViewModel.clubOfId.collectAsState().value
+    val clubEvents = eventViewModel.clubEvents.collectAsState().value
 
-    if (event == null) {
+    if (club == null) {
         return
     }
 
@@ -71,7 +80,7 @@ fun EventDetailScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    eventViewModel.joinEvent(event.id)
+                    clubViewModel.joinClub(clubId)
                 }
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
@@ -81,9 +90,9 @@ fun EventDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Event",
+                        "Club",
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Start
                     )
                 },
                 navigationIcon = {
@@ -99,15 +108,28 @@ fun EventDetailScreen(
                 actions = {
                     IconButton(onClick = {
                         navController.navigate(
-                            EventParticipantsNav(
-                                eventId = event.id,
-                                eventName = event.name
+                            ClubMembersNav(
+                                clubId = clubId,
+                                clubName = club.name
                             )
                         )
                     }) {
                         Icon(
                             imageVector = Icons.Default.Groups,
-                            contentDescription = "Back"
+                            contentDescription = "Members"
+                        )
+                    }
+
+                    IconButton(onClick = {
+                        navController.navigate(
+                            AddEventNavA(
+                                clubId = club.id
+                            )
+                        )
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.EventRepeat,
+                            contentDescription = "Members"
                         )
                     }
                 }
@@ -116,22 +138,27 @@ fun EventDetailScreen(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection)
-    ){paddingValues ->
+    ) { paddingValues ->
         Box(
             modifier = modifier
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            Column {
-                // Event header with image and name
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())  // Make the column scrollable
+            ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(modifier = Modifier
-                        .background(color = Color.DarkGray)
-                        .fillMaxWidth()
-                        .height(96.dp))
+                    Box(
+                        modifier = Modifier
+                            .background(color = Color.DarkGray)
+                            .fillMaxWidth()
+                            .height(96.dp)
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = event.name,
+                        text = club.name,
                         modifier = Modifier
                             .padding(16.dp)
                             .fillMaxWidth(),
@@ -141,26 +168,70 @@ fun EventDetailScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Event description
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),     color = Color(0xFFE3F2FD)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    color = Color(0xFFE3F2FD)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Description",
-                            modifier = Modifier.padding(bottom = 8.dp))
-                        Text(event.description)
+                        Text(
+                            "Description",
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(club.description)
                     }
                 }
 
-                // Event details container
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),     color = Color(0xFFE3F2FD)
+                        .padding(16.dp),
+                    color = Color(0xFFE3F2FD)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Tag,
+                                contentDescription = "Tags",
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                            Text(text = club.tags)
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Groups,
+                                contentDescription = "Members",
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                            Text(text = "${club.memberCount} members")
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "Created By",
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                            Text(text = "Created by ${club.createdBy}")
+                        }
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -172,97 +243,50 @@ fun EventDetailScreen(
                                 contentDescription = "Date and Time",
                                 modifier = Modifier.padding(end = 8.dp)
                             )
-                            Text(text = formatDateTimeString(event.dateTime))
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.LocationOn,
-                                contentDescription = "Location",
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text(text = event.location)
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Attendees",
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text(text = "${event.attendeeCount}${
-                                if (event.capacity != "null") "/${event.capacity}" else ""
-                            } attending")
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Groups,
-                                contentDescription = "Organizer",
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text(text = "Organized by ${event.organizedBy}")
+                            Text(text = formatDateTimeString(club.createdOn))
                         }
                     }
                 }
+
+                Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),     color = Color(0xFFE3F2FD)
+                ){
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Club Events",
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        if (clubEvents.isNullOrEmpty()) {
+                            Text(text = "No events scheduled")
+                        }else{
+                            Spacer(
+                                modifier = Modifier.height(20.dp)
+                            )
+                            Column(
+                                modifier = Modifier.padding(top = 20.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                clubEvents.forEach { event ->
+                                    EventItem(
+                                        eventResponse = event,
+                                        onClick = {
+                                            navController.navigate(
+                                                EventDetailNav(eventId = event.id)
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
             }
         }
-}}
-
-@RequiresApi(Build.VERSION_CODES.O)
-fun formatDateTimeString(isoDateString: String): String {
-    return try {
-        val dateTime = LocalDateTime.parse(isoDateString)
-        val dateFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy")
-        val timeFormatter = DateTimeFormatter.ofPattern("h:mm a")
-
-        val formattedDate = dateTime.format(dateFormatter)
-        val formattedTime = dateTime.format(timeFormatter)
-
-        "$formattedDate | $formattedTime"
-    } catch (e: Exception) {
-        isoDateString
     }
 }
-
-//@RequiresApi(Build.VERSION_CODES.O)
-//@Preview(showBackground = true)
-//@Composable
-//fun EventDetailScreenPreview() {
-//    val mockEvent = EventResponse(
-//        name = "Photography Workshop",
-//        description = "Learn the basics of photography and camera settings in this hands-on workshop. Bring your own camera!",
-//        clubId = "club123",
-//        dateTime = "May 15, 2024 | 2:00 PM",
-//        location = "Art Building, Room 302",
-//        capacity = "50",
-//        organizedBy = "Photography Club",
-//        id = "event123",
-//        attendeeCount = 28,
-//        tags = "photography,workshop,learning"
-//    )
-//
-//    // Using a stub ViewModel for previe
-//
-//
-//    MaterialTheme {
-//        EventDetailScreen(
-//            event = mockEvent
-//        )
-//    }
-//}

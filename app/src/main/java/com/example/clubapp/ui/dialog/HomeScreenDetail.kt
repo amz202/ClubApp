@@ -36,14 +36,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.clubapp.network.response.EventResponse
 import com.example.clubapp.ui.cards.EventItem
+import com.example.clubapp.ui.navigation.ClubDetailNav
 import com.example.clubapp.ui.navigation.EventDetailNav
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreenDetail(
     modifier: Modifier = Modifier,
-    clubList: List<ClubResponse>,
-    eventList: List<EventResponse>,
+    clubList: List<ClubResponse>?,
+    eventList: List<EventResponse>?,
     navController: NavHostController
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
@@ -66,8 +67,8 @@ fun HomeScreenDetail(
                 modifier = Modifier.weight(1f)
             ) { page ->
                 when (page) {
-                    0 -> MyClubs(clubList = clubList)
-                    1 -> MyEvent(eventList = eventList, navController = navController)
+                    0 -> MyClubs(clubList = clubList, navController = navController)
+                    1 -> MyEvents(eventList = eventList, navController = navController)
                 }
             }
 
@@ -100,7 +101,9 @@ fun HomeScreenDetail(
 @Composable
 fun MyClubs(
     modifier: Modifier = Modifier,
-    clubList: List<ClubResponse>
+    clubList: List<ClubResponse>?,
+    navController: NavHostController
+
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -113,31 +116,50 @@ fun MyClubs(
         Spacer(
             modifier = Modifier.height(20.dp)
         )
-        LazyColumn(
+        if (clubList.isNullOrEmpty()) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                Text(
+                    text = "You haven't joined any clubs yet",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        } else {LazyColumn(
             contentPadding = PaddingValues(bottom = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(clubList) { club ->
                 ClubItem(
                     modifier = Modifier.fillMaxWidth(),
-                    clubResponse = club
+                    clubResponse = club,
+                    onClick = {
+                        navController.navigate(
+                            ClubDetailNav(
+                                clubId = club.id
+                            )
+                        )
+                    }
                 )
             }
         }
     }
-}
+}}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MyEvent(
+fun MyEvents(
     modifier: Modifier = Modifier,
-    eventList: List<EventResponse>,
+    eventList: List<EventResponse>?,
     navController: NavHostController
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
-
     ) {
         Text(
             text = "Upcoming Events",
@@ -146,22 +168,38 @@ fun MyEvent(
         Spacer(
             modifier = Modifier.height(20.dp)
         )
-        LazyColumn(
-            contentPadding = PaddingValues(bottom = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(eventList) { event ->
-                EventItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    eventResponse = event,
-                    onClick = {
-                        navController.navigate(
-                            EventDetailNav(
-                                eventId = event.id
-                            )
-                        )
-                    }
+
+        if (eventList.isNullOrEmpty()) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                Text(
+                    text = "You haven't joined any events yet",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodyLarge
                 )
+            }
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(bottom = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(eventList) { event ->
+                    EventItem(
+                        modifier = Modifier.fillMaxWidth(),
+                        eventResponse = event,
+                        onClick = {
+                            navController.navigate(
+                                EventDetailNav(
+                                    eventId = event.id
+                                )
+                            )
+                        }
+                    )
+                }
             }
         }
     }
@@ -191,8 +229,8 @@ fun CustomHorizontalPagerIndicator(
             )
         }
     }
-
 }
+
 
 //@RequiresApi(Build.VERSION_CODES.O)
 //@Preview(showBackground = true)

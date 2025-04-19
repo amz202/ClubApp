@@ -35,8 +35,8 @@ interface ApiService {
         @Path("id") id: String
     ): ResponseBody //Raw message from server
 
-    @GET("clubs/events")
-    suspend fun getClubEvents(@Body clubEventsRequest: ClubEventsRequest): List<EventResponse>
+    @GET("/clubs/{id}/events")
+    suspend fun getClubEvents(@Path("id") id: String): List<EventResponse>?
 
     @GET("events")
     suspend fun getEvents(): List<EventResponse>
@@ -114,12 +114,12 @@ interface ApiService {
     @GET("user/clubs")
     suspend fun getMyClubs(
         @Header("Authorization") token: String
-    ):List<ClubResponse>?
+    ): List<ClubResponse>?
 
     @GET("user/events")
     suspend fun getMyEvents(
         @Header("Authorization") token: String
-    ):List<EventResponse>?
+    ): List<EventResponse>?
 
     @POST("events/{eventId}/change-role")
     suspend fun changeEventRole(
