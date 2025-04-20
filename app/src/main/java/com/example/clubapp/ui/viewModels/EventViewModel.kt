@@ -19,6 +19,7 @@ import com.example.clubapp.network.response.EventResponse
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import android.util.Log
 
 typealias EventUiState = BaseUiState<List<EventResponse>>
 typealias EventParticipantUiState = BaseUiState<List<EventParticipantsResponse>>
@@ -52,6 +53,10 @@ class EventViewModel(
     private val _clubEvents = MutableStateFlow<List<EventResponse>?>(emptyList())
     val clubEvents: StateFlow<List<EventResponse>?> = _clubEvents
 
+    private val eventCache = mutableMapOf<String, EventResponse>()
+    private val participantsCache = mutableMapOf<String, List<EventParticipantsResponse>>()
+    private val userEventsCache = mutableMapOf<String, List<EventResponse>>()
+    private val clubEventsCache = mutableMapOf<String, List<EventResponse>>()
 
     init {
         getEvents()
@@ -59,9 +64,15 @@ class EventViewModel(
 
     fun getClubEvents(clubId: String) {
         viewModelScope.launch {
+            if (clubEventsCache.containsKey(clubId)) {
+                _clubEvents.value = clubEventsCache[clubId]
+                return@launch
+            }
+            _clubEvents.value = emptyList()
             try {
                 val events = eventRepository.getClubEvents(clubId)
                 _clubEvents.value = events
+                clubEventsCache[clubId] = events ?: emptyList()
             } catch (e: Exception) {
                 _clubEvents.value = null
             }
@@ -93,9 +104,15 @@ class EventViewModel(
                 if (token == null) {
                     return@launch
                 }
+                val cacheKey = token
+                if (userEventsCache.containsKey(cacheKey)) {
+                    _usersEvents.value = userEventsCache[cacheKey]
+                    return@launch
+                }
                 val events = eventRepository.getMyEvents(token)
                 if (!events.isNullOrEmpty()) {
                     _usersEvents.value = events
+                    userEventsCache[cacheKey] = events
                 }
             } catch (e: Exception) {
                 _usersEvents.value = emptyList()
@@ -106,10 +123,15 @@ class EventViewModel(
 
     fun getEvent(id: String) {
         viewModelScope.launch {
+            if (eventCache.containsKey(id)) {
+                _eventOfId.value = eventCache[id]
+                return@launch
+            }
+            _eventOfId.value = null
             try {
                 val event = eventRepository.getEvent(id)
                 _eventOfId.value = event
-
+                eventCache[id] = event
             } catch (e: Exception) {
                 _eventOfId.value = null
             }
@@ -190,6 +212,11 @@ class EventViewModel(
 
     fun getEventParticipants(eventId: String) {
         viewModelScope.launch {
+            if (participantsCache.containsKey(eventId)) {
+                _eventParticipants.value = participantsCache[eventId] ?: emptyList()
+                return@launch
+            }
+            _eventParticipants.value = emptyList()
             try {
                 val token = userPreferences.getToken()
                 if (token == null) {
@@ -198,6 +225,7 @@ class EventViewModel(
                 }
                 val participants = eventRepository.getEventParticipants(token, eventId)
                 _eventParticipants.value = participants
+                participantsCache[eventId]=participants
             } catch (e: Exception) {
                 e.printStackTrace()
                 _eventParticipants.value = emptyList()

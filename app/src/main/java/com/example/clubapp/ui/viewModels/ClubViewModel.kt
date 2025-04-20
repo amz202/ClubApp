@@ -15,9 +15,12 @@ import com.example.clubapp.network.request.ClubRequest
 import com.example.clubapp.network.request.RoleRequest
 import com.example.clubapp.network.response.ClubMembersResponse
 import com.example.clubapp.network.response.ClubResponse
+import com.example.clubapp.network.response.EventParticipantsResponse
+import com.example.clubapp.network.response.EventResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import android.util.Log
 
 typealias ClubUiState = BaseUiState<List<ClubResponse>>
 typealias ClubMemberUiState = BaseUiState<List<ClubMembersResponse>>
@@ -48,6 +51,10 @@ class ClubViewModel(
     private val _clubOfId = MutableStateFlow<ClubResponse?>(null)
     val clubOfId: StateFlow<ClubResponse?> = _clubOfId
 
+    private val clubCache = mutableMapOf<String, ClubResponse>()
+    private val membersCache = mutableMapOf<String, List<ClubMembersResponse>>()
+    private val userClubsCache = mutableMapOf<String, List<ClubResponse>>()
+
     init{
         getClubs()
     }
@@ -77,9 +84,15 @@ class ClubViewModel(
                 if (token == null) {
                     return@launch
                 }
+                val cacheKey = token
+                if (userClubsCache.containsKey(cacheKey)) {
+                    _usersClub.value = userClubsCache[cacheKey]
+                    return@launch
+                }
                 val myClubs = clubRepository.getMyClubs(token.toString())
                 if(!myClubs.isNullOrEmpty()){
                     _usersClub.value = myClubs
+                    userClubsCache[cacheKey] = myClubs
                 }
             }catch (e: Exception) {
                 e.printStackTrace()
@@ -89,9 +102,15 @@ class ClubViewModel(
 
     fun getClub(id:String){
         viewModelScope.launch {
+            if(clubCache.containsKey(id)){
+                _clubOfId.value = clubCache[id]
+                return@launch
+            }
+            _clubOfId.value = null
             try {
                 val club = clubRepository.getClub(id)
                 _clubOfId.value = club
+                clubCache[id] = club
             } catch (e: Exception) {
                 _clubOfId.value = null
             }
@@ -172,6 +191,11 @@ class ClubViewModel(
 
     fun getClubMembers(clubId: String) {
         viewModelScope.launch {
+            if (membersCache.containsKey(clubId)) {
+                _clubMembers.value = membersCache[clubId] ?:emptyList()
+                return@launch
+            }
+            _clubMembers.value = emptyList()
             try {
                 val token = userPreferences.getToken()
                 if (token == null) {
@@ -180,6 +204,7 @@ class ClubViewModel(
                 }
                 val members = clubRepository.getClubsMembers(token, clubId)
                 _clubMembers.value = members // Update the StateFlow with the new members
+                membersCache[clubId] = members // Cache the members
             } catch (e: Exception) {
                 e.printStackTrace()
                 _clubMembers.value = emptyList() // Clear members on error

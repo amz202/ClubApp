@@ -28,6 +28,14 @@ import com.example.clubapp.ui.navigation.NavBar.bottomNavItems
 import com.example.clubapp.ui.viewModels.NavigationViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -36,6 +44,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.example.clubapp.data.Datastore.UserPreferences
 import com.example.clubapp.data.Datastore.UserPreferences.UserInfo
 import com.example.clubapp.signin.GoogleAuthClient
@@ -122,12 +131,16 @@ fun HomeScreen(
                                 contentDescription = "Sign In"
                             )
                         }
+                    }else{
+                        Box(modifier = Modifier.width(32.dp)) { }
                     }
-                }
+                },
+                modifier = Modifier
+                    .windowInsetsPadding(WindowInsets.statusBars),
             )
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar() {
                 items.forEachIndexed { index, item ->
                     NavigationBarItem(
                         selected = selectedItemIndex.value == index,
@@ -157,6 +170,7 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .padding(vertical = 8.dp)
     ) { paddingValues ->
         Column(
             modifier = modifier
@@ -166,6 +180,7 @@ fun HomeScreen(
         )
         {
             HomeScreenProfile(userInfo?.name.toString(), userInfo?.email.toString())
+            Spacer(modifier= Modifier.height(24.dp))
             HomeScreenDetail(
                 clubList = clubList, eventList = eventList,
                 navController = navController

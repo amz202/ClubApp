@@ -116,6 +116,8 @@ fun EventDetailScreen(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .padding(vertical = 8.dp)
+
     ){paddingValues ->
         Box(
             modifier = modifier

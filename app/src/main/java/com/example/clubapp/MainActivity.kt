@@ -31,19 +31,15 @@ class MainActivity : ComponentActivity() {
         val eventViewModel: EventViewModel = ViewModelProvider(this, EventViewModel.eventFactory)[EventViewModel::class.java]
         val clubViewModel: ClubViewModel = ViewModelProvider(this, ClubViewModel.clubFactory)[ClubViewModel::class.java]
         val navigationViewModel: NavigationViewModel = ViewModelProvider(this)[NavigationViewModel::class.java]
-
         enableEdgeToEdge()
         setContent {
             ClubAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Box(modifier = Modifier.padding(innerPadding)) {
-                        AppNavigation(clubUiState = clubViewModel.uiState, eventUiState = eventViewModel.uiState, navigationViewModel = navigationViewModel, clubViewModel = clubViewModel, eventViewModel = eventViewModel, userPreferences = userPreferences, signInViewModel = authViewModel)
-//                        TestScreen(signInViewModel = authViewModel, clubViewModel = clubViewModel, eventViewModel = eventViewModel, userPreferences = userPreferences)
-                    }
-                }
+                AppNavigation(clubUiState = clubViewModel.uiState, eventUiState = eventViewModel.uiState, navigationViewModel = navigationViewModel, clubViewModel = clubViewModel, eventViewModel = eventViewModel, userPreferences = userPreferences, signInViewModel = authViewModel)
+//              TestScreen(signInViewModel = authViewModel, clubViewModel = clubViewModel, eventViewModel = eventViewModel, userPreferences = userPreferences)
             }
         }
     }
+
 }
 
 

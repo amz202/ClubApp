@@ -20,7 +20,7 @@ interface AppContainer{
 }
 
 class DefaultAppContainer:AppContainer{
-    val BASE_URL = "http://192.168.208.28:5432/"
+    val BASE_URL = "http://192.168.18.67:5432/"
     val json = Json{
         this.ignoreUnknownKeys = true
         coerceInputValues = true

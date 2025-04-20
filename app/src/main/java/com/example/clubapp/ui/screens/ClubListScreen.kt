@@ -124,6 +124,7 @@ fun ClubList(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .padding(vertical = 8.dp)
     ) { paddingValues ->
         Column(modifier = modifier.padding(paddingValues)) {
             LazyColumn(

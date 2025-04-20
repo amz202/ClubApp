@@ -74,7 +74,8 @@ fun AddClubScreen(
                     Box(modifier = Modifier.width(32.dp)) { }
                 }
             )
-        }
+        },
+        modifier = Modifier.padding(vertical = 8.dp)
     ) { paddingValues ->
         Box(
             modifier = Modifier
