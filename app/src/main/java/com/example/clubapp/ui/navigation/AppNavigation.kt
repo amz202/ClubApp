@@ -112,7 +112,8 @@ fun AppNavigation(
                 eventId = args.eventId,
                 eventViewModel = eventViewModel,
                 navController = navController,
-                eventName = args.eventName
+                eventName = args.eventName,
+                navViewModel = navigationViewModel
             )
         }
 
@@ -132,7 +133,8 @@ fun AppNavigation(
                 clubId = args.clubId,
                 clubName = args.clubName,
                 navController = navController,
-                clubViewModel = clubViewModel
+                clubViewModel = clubViewModel,
+                navViewModel = navigationViewModel
             )
         }
     }

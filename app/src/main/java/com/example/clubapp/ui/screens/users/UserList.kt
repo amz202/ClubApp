@@ -1,5 +1,6 @@
 package com.example.clubapp.ui.screens.users
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,7 +28,10 @@ import androidx.compose.runtime.collectAsState
 import com.example.clubapp.network.response.EventParticipantsResponse
 import com.example.clubapp.ui.viewModels.ClubViewModel
 import androidx.compose.runtime.getValue
+import com.example.clubapp.ui.dialog.ClubRoleDialog
+import com.example.clubapp.ui.dialog.EventRoleDialog
 import com.example.clubapp.ui.viewModels.EventViewModel
+import com.example.clubapp.ui.viewModels.NavigationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,18 +40,24 @@ fun ClubMembersList(
     clubId: String,
     clubName: String,
     navController: NavHostController,
-    clubViewModel: ClubViewModel
+    clubViewModel: ClubViewModel,
+    navViewModel: NavigationViewModel
 ) {
     LaunchedEffect(clubId) {
         clubViewModel.getClubMembers(clubId)
+        clubViewModel.getClubRole(clubId)
     }
     val members by clubViewModel.clubMembers.collectAsState(initial = emptyList())
+    val showClubDialog by navViewModel.showClubRoleDialog.collectAsState(false)
+    val clubRoleUser by navViewModel.clubRoleUser.collectAsState(null)
+    val ownClubRole by clubViewModel.userClubRole.collectAsState(null)
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        clubName,
+                        "Club Members",
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
@@ -63,7 +73,7 @@ fun ClubMembersList(
                     }
                 },
                 actions = {
-                    Box(modifier = Modifier.width(32.dp)) { }
+                    Box(modifier = Modifier.width(32.dp)) {}
                 }
             )
         }
@@ -82,11 +92,27 @@ fun ClubMembersList(
                     HomeScreenProfile(
                         name = member.name,
                         email = member.email,
-                        role = member.clubRole
+                        role = member.clubRole,
+                        modifier = Modifier.clickable{
+                            navViewModel.showClubRoleDialog(member.id)
+                        }
                     )
+                    if(showClubDialog && clubRoleUser == member.id){
+                        ClubRoleDialog(
+                            clubId = clubId,
+                            userName = member.name,
+                            userEmail = member.email,
+                            currentRole = member.clubRole,
+                            navViewModel = navViewModel,
+                            clubViewModel = clubViewModel,
+                            userId = member.id,
+                            ownRole = ownClubRole?.role ?: "member"
+                        )
+                    }
                 }
             }
         }
+        //
     }
 }
 
@@ -97,18 +123,24 @@ fun EventParticipantList(
     eventId: String,
     eventName: String,
     navController: NavHostController,
-    eventViewModel: EventViewModel
+    eventViewModel: EventViewModel,
+    navViewModel: NavigationViewModel
 ) {
     LaunchedEffect(eventId) {
         eventViewModel.getEventParticipants(eventId)
+        eventViewModel.getEventRole(eventId)
     }
     val members by eventViewModel.eventParticipants.collectAsState(initial = emptyList())
+    val showEventRoleDialog by navViewModel.showEventRoleDialog.collectAsState(false)
+    val eventRoleUser by navViewModel.eventRoleUser.collectAsState(null)
+    val ownEventRole by eventViewModel.userEventRole.collectAsState(null)
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        eventName,
+                        "Event Participants",
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
@@ -124,7 +156,7 @@ fun EventParticipantList(
                     }
                 },
                 actions = {
-                    Box(modifier = Modifier.width(32.dp)) { }
+                    Box(modifier = Modifier.width(32.dp)) {}
                 }
             )
         }
@@ -143,8 +175,23 @@ fun EventParticipantList(
                     HomeScreenProfile(
                         name = member.name,
                         email = member.email,
-                        role = member.eventRole
+                        role = member.eventRole,
+                        modifier = Modifier.clickable{
+                            navViewModel.showEventRoleDialog(member.id)
+                        }
                     )
+                    if(showEventRoleDialog && eventRoleUser == member.id){
+                        EventRoleDialog(
+                            eventId = eventId,
+                            userName = member.name,
+                            userEmail = member.email,
+                            currentRole = member.eventRole,
+                            navViewModel = navViewModel,
+                            eventViewModel = eventViewModel,
+                            userId = member.id,
+                            ownRole = ownEventRole?.role?: "attendee"
+                        )
+                    }
                 }
             }
         }

@@ -5,6 +5,7 @@ import com.example.clubapp.network.request.ClubRequest
 import com.example.clubapp.network.request.RoleRequest
 import com.example.clubapp.network.response.ClubMembersResponse
 import com.example.clubapp.network.response.ClubResponse
+import com.example.clubapp.network.response.RoleResponse
 import okhttp3.ResponseBody
 
 interface ClubRepository {
@@ -17,7 +18,7 @@ interface ClubRepository {
     suspend fun leaveClub(token: String, clubId: String): ResponseBody
     suspend fun getUsersClubs(token: String, userId: String): List<ClubMembersResponse>
     suspend fun changeClubMemberRole(token: String, clubId: String, userId: String, request: RoleRequest): ResponseBody
-    suspend fun getClubRole(token:String, clubId:String, userId:String): String?
+    suspend fun getClubRole(token:String, clubId:String): RoleResponse?
     suspend fun getMyClubs(token: String):List<ClubResponse>?
 }
 
@@ -47,11 +48,11 @@ class ClubRepositoryImpl(private val apiService: ApiService): ClubRepository{
     }
 
     override suspend fun changeClubMemberRole(token: String, clubId: String, userId: String, request: RoleRequest): ResponseBody {
-        return apiService.changeClubMemberRole(token = "Bearer $token", clubId = clubId, request = request)
+        return apiService.changeClubMemberRole(token = "Bearer $token", clubId = clubId, request = request, userId = userId)
     }
 
-    override suspend fun getClubRole(token: String, clubId: String, userId: String): String? {
-        return apiService.getClubRole(token = "Bearer $token", clubId = clubId, userId = userId)
+    override suspend fun getClubRole(token: String, clubId: String): RoleResponse? {
+        return apiService.getClubRole(token = "Bearer $token", clubId = clubId)
     }
 
     override suspend fun getMyClubs(token: String): List<ClubResponse>? {

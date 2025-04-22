@@ -11,15 +11,14 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.clubapp.ClubApplication
 import com.example.clubapp.data.Datastore.UserPreferences
 import com.example.clubapp.data.respositories.EventRepository
-import com.example.clubapp.network.request.ClubEventsRequest
 import com.example.clubapp.network.request.EventRequest
 import com.example.clubapp.network.request.RoleRequest
 import com.example.clubapp.network.response.EventParticipantsResponse
 import com.example.clubapp.network.response.EventResponse
+import com.example.clubapp.network.response.RoleResponse
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import android.util.Log
 
 typealias EventUiState = BaseUiState<List<EventResponse>>
 typealias EventParticipantUiState = BaseUiState<List<EventParticipantsResponse>>
@@ -53,10 +52,14 @@ class EventViewModel(
     private val _clubEvents = MutableStateFlow<List<EventResponse>?>(emptyList())
     val clubEvents: StateFlow<List<EventResponse>?> = _clubEvents
 
+    private val _userEventRole = MutableStateFlow<RoleResponse?>(null)
+    val userEventRole: StateFlow<RoleResponse?> = _userEventRole
+
     private val eventCache = mutableMapOf<String, EventResponse>()
     private val participantsCache = mutableMapOf<String, List<EventParticipantsResponse>>()
     private val userEventsCache = mutableMapOf<String, List<EventResponse>>()
     private val clubEventsCache = mutableMapOf<String, List<EventResponse>>()
+    private val userEventRoleCache = mutableMapOf<String, RoleResponse?>()
 
     init {
         getEvents()
@@ -187,7 +190,12 @@ class EventViewModel(
                 val updatedEvents = eventRepository.getEvents()
                 uiState = BaseUiState.Success(updatedEvents)
             } catch (e: Exception) {
-                uiState = BaseUiState.Error
+                val currentEvents = _events.value
+                if (currentEvents.isNotEmpty()) {
+                    uiState = BaseUiState.Success(currentEvents)
+                } else {
+                    uiState = BaseUiState.Error
+                }
             }
         }
     }
@@ -250,7 +258,7 @@ class EventViewModel(
         }
     }
 
-    fun changeEventRole(eventId: String, request: RoleRequest) {
+    fun changeEventParticipantRole(eventId: String, request: RoleRequest, userId: String) {
         viewModelScope.launch {
             uiState = BaseUiState.Loading
             try {
@@ -259,7 +267,9 @@ class EventViewModel(
                     uiState = BaseUiState.Error
                     return@launch
                 }
-                eventRepository.changeEventRole(token, eventId, request)
+                eventRepository.changeEventRole(token, eventId, request, userId)
+                participantsCache.remove(eventId)
+                getEventParticipants(eventId)
                 val updatedEvents = eventRepository.getEvents()
                 uiState = BaseUiState.Success(updatedEvents)
             } catch (e: Exception) {
@@ -268,19 +278,24 @@ class EventViewModel(
         }
     }
 
-    fun getEventRole(eventId: String, userId: String) {
+    fun getEventRole(eventId: String) {
         viewModelScope.launch {
-            eventRoleUiState = BaseUiState.Loading
+            if(userEventRoleCache.containsKey(eventId)) {
+                _userEventRole.value = userEventRoleCache[eventId]
+                return@launch
+            }
             try {
                 val token = userPreferences.getToken()
                 if (token == null) {
                     uiState = BaseUiState.Error
                     return@launch
                 }
-                val role = eventRepository.getEventRole(token, eventId, userId)
-                eventRoleUiState = BaseUiState.Success(role)
+                val role = eventRepository.getEventRole(token, eventId)
+                _userEventRole.value = role
+                userEventRoleCache[eventId] = role
             } catch (e: Exception) {
-                eventRoleUiState = BaseUiState.Error
+                _userEventRole.value = null
+                e.printStackTrace()
             }
         }
     }

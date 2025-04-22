@@ -1,6 +1,5 @@
 package com.example.clubapp.network
 
-import com.example.clubapp.network.request.ClubEventsRequest
 import com.example.clubapp.network.request.ClubRequest
 import com.example.clubapp.network.request.EventRequest
 import com.example.clubapp.network.request.RoleRequest
@@ -8,6 +7,7 @@ import com.example.clubapp.network.response.ClubMembersResponse
 import com.example.clubapp.network.response.ClubResponse
 import com.example.clubapp.network.response.EventParticipantsResponse
 import com.example.clubapp.network.response.EventResponse
+import com.example.clubapp.network.response.RoleResponse
 import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -80,10 +80,11 @@ interface ApiService {
         @Path("userId") userId: String
     ): List<ClubMembersResponse>
 
-    @POST("club/{clubId}/user/{userId}/change-role")
+    @POST("club/{clubId}/{userId}/change-role")
     suspend fun changeClubMemberRole(
         @Header("Authorization") token: String,
         @Path("clubId") clubId: String,
+        @Path("userId") userId: String,
         @Body request: RoleRequest
     ): ResponseBody
 
@@ -121,25 +122,24 @@ interface ApiService {
         @Header("Authorization") token: String
     ): List<EventResponse>?
 
-    @POST("events/{eventId}/change-role")
-    suspend fun changeEventRole(
+    @POST("/events/{eventId}/{userId}/change-role")
+    suspend fun changeEventParticipantRole(
         @Header("Authorization") token: String,
         @Path("eventId") eventId: String,
+        @Path("userId") userId: String,
         @Body request: RoleRequest
     ): ResponseBody
 
-    @GET("/club/{clubId}/user/{userId}/role")
+    @GET("/club/{clubId}/role")
     suspend fun getClubRole(
         @Header("Authorization") token: String,
-        @Path("clubId") clubId: String,
-        @Path("userId") userId: String
-    ): String?
+        @Path("clubId") clubId: String
+    ): RoleResponse?
 
-    @GET("/events/{eventId}/user/{userId}/role")
+    @GET("/events/{eventId}/role")
     suspend fun getEventRole(
         @Header("Authorization") token: String,
         @Path("eventId") eventId: String,
-        @Path("userId") userId: String
-    ): String?
+    ): RoleResponse?
 }
 

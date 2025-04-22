@@ -1,11 +1,11 @@
 package com.example.clubapp.data.respositories
 
 import com.example.clubapp.network.ApiService
-import com.example.clubapp.network.request.ClubEventsRequest
 import com.example.clubapp.network.request.EventRequest
 import com.example.clubapp.network.request.RoleRequest
 import com.example.clubapp.network.response.EventParticipantsResponse
 import com.example.clubapp.network.response.EventResponse
+import com.example.clubapp.network.response.RoleResponse
 import okhttp3.ResponseBody
 
 interface EventRepository {
@@ -18,8 +18,8 @@ interface EventRepository {
     suspend fun leaveEvent(token: String, eventId: String): ResponseBody
     suspend fun getEventParticipants(token: String, eventId: String): List<EventParticipantsResponse>
     suspend fun getUserEvents(token: String, userId: String): List<EventParticipantsResponse>
-    suspend fun changeEventRole(token: String, eventId: String, request: RoleRequest): ResponseBody
-    suspend fun getEventRole(token: String, eventId: String, userId: String): String?
+    suspend fun changeEventRole(token: String, eventId: String, request: RoleRequest, userId: String): ResponseBody
+    suspend fun getEventRole(token: String, eventId: String): RoleResponse?
     suspend fun getMyEvents(token: String): List<EventResponse>?
 }
 
@@ -54,11 +54,11 @@ class EventRepositoryImpl(private val apiService: ApiService): EventRepository{
         return apiService.getUserEvents(token = "Bearer $token", userId = userId)
     }
 
-    override suspend fun changeEventRole(token: String, eventId: String, request: RoleRequest): ResponseBody {
-        return apiService.changeEventRole(token = "Bearer $token", eventId = eventId, request = request)
+    override suspend fun changeEventRole(token: String, eventId: String, request: RoleRequest, userId: String): ResponseBody {
+        return apiService.changeEventParticipantRole(token = "Bearer $token", eventId = eventId, request = request, userId = userId)
     }
 
-    override suspend fun getEventRole(token: String, eventId: String, userId: String): String? {
-        return apiService.getEventRole(token = "Bearer $token", eventId = eventId, userId = userId)
+    override suspend fun getEventRole(token: String, eventId: String): RoleResponse? {
+        return apiService.getEventRole(token = "Bearer $token", eventId = eventId)
     }
 }
