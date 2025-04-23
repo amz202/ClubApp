@@ -17,7 +17,7 @@ interface ClubRepository {
     suspend fun joinClub(token: String, clubId: String): ResponseBody
     suspend fun leaveClub(token: String, clubId: String): ResponseBody
     suspend fun getUsersClubs(token: String, userId: String): List<ClubMembersResponse>
-    suspend fun changeClubMemberRole(token: String, clubId: String, userId: String, request: RoleRequest): ResponseBody
+    suspend fun changeClubMemberRole(token: String, clubId: String, userId: String, request: RoleRequest, ownRole: String): ResponseBody
     suspend fun getClubRole(token:String, clubId:String): RoleResponse?
     suspend fun getMyClubs(token: String):List<ClubResponse>?
 }
@@ -47,8 +47,8 @@ class ClubRepositoryImpl(private val apiService: ApiService): ClubRepository{
         return apiService.getUsersClubs(token = "Bearer $token", userId = userId)
     }
 
-    override suspend fun changeClubMemberRole(token: String, clubId: String, userId: String, request: RoleRequest): ResponseBody {
-        return apiService.changeClubMemberRole(token = "Bearer $token", clubId = clubId, request = request, userId = userId)
+    override suspend fun changeClubMemberRole(token: String, clubId: String, userId: String, request: RoleRequest, ownRole: String): ResponseBody {
+        return apiService.changeClubMemberRole(token = "Bearer $token", clubId = clubId, request = request, userId = userId, ownRole = ownRole)
     }
 
     override suspend fun getClubRole(token: String, clubId: String): RoleResponse? {

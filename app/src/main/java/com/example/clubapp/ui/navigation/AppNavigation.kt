@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.clubapp.data.Datastore.UserPreferences
+import com.example.clubapp.network.response.RoleResponse
 import com.example.clubapp.signin.SignInViewModel
 import com.example.clubapp.ui.screens.ClubListScreen
 import com.example.clubapp.ui.screens.EventListScreen
@@ -113,7 +114,8 @@ fun AppNavigation(
                 eventViewModel = eventViewModel,
                 navController = navController,
                 eventName = args.eventName,
-                navViewModel = navigationViewModel
+                navViewModel = navigationViewModel,
+                ownEventRole = args.ownRole
             )
         }
 
@@ -134,7 +136,8 @@ fun AppNavigation(
                 clubName = args.clubName,
                 navController = navController,
                 clubViewModel = clubViewModel,
-                navViewModel = navigationViewModel
+                navViewModel = navigationViewModel,
+                ownClubRole = args.ownRole
             )
         }
     }

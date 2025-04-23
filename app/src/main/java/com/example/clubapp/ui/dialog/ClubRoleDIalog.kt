@@ -148,7 +148,7 @@ fun ClubRoleDialog(
 
                         Button(
                             onClick = {
-                                clubViewModel.changeClubMemberRole(clubId = clubId, request = roleRequest, userId = userId)
+                                clubViewModel.changeClubMemberRole(clubId = clubId, request = roleRequest, userId = userId, ownRole = ownRole)
                                 navViewModel.hideClubRoleDialog()
                             },
                             enabled = selectedRole != currentRole

@@ -258,7 +258,7 @@ class EventViewModel(
         }
     }
 
-    fun changeEventParticipantRole(eventId: String, request: RoleRequest, userId: String) {
+    fun changeEventParticipantRole(eventId: String, request: RoleRequest, userId: String, ownRole: String) {
         viewModelScope.launch {
             uiState = BaseUiState.Loading
             try {
@@ -267,7 +267,7 @@ class EventViewModel(
                     uiState = BaseUiState.Error
                     return@launch
                 }
-                eventRepository.changeEventRole(token, eventId, request, userId)
+                eventRepository.changeEventRole(token, eventId, request, userId, ownRole)
                 participantsCache.remove(eventId)
                 getEventParticipants(eventId)
                 val updatedEvents = eventRepository.getEvents()

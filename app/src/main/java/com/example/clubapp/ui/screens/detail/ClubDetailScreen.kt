@@ -51,6 +51,12 @@ import com.example.clubapp.ui.navigation.EventDetailNav
 import com.example.clubapp.ui.viewModels.ClubViewModel
 import com.example.clubapp.ui.viewModels.EventViewModel
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.example.clubapp.ui.dialog.ClubActionMenu
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,10 +73,13 @@ fun ClubDetailScreen(
     LaunchedEffect(clubId) {
         clubViewModel.getClub(clubId)
         eventViewModel.getClubEvents(clubId)
+        clubViewModel.getClubRole(clubId)
     }
 
     val club = clubViewModel.clubOfId.collectAsState().value
     val clubEvents = eventViewModel.clubEvents.collectAsState().value
+    val ownClubRole by clubViewModel.userClubRole.collectAsState(null)
+    val isMember = ownClubRole?.role != null
 
     if (club == null) {
         return
@@ -78,12 +87,14 @@ fun ClubDetailScreen(
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    clubViewModel.joinClub(clubId)
+            if (!isMember) {
+                FloatingActionButton(
+                    onClick = {
+                        clubViewModel.joinClub(clubId)
+                    }
+                ) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
                 }
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
             }
         },
         topBar = {
@@ -110,7 +121,8 @@ fun ClubDetailScreen(
                         navController.navigate(
                             ClubMembersNav(
                                 clubId = clubId,
-                                clubName = club.name
+                                clubName = club.name,
+                                ownRole = ownClubRole?.role
                             )
                         )
                     }) {
@@ -120,17 +132,35 @@ fun ClubDetailScreen(
                         )
                     }
 
-                    IconButton(onClick = {
-                        navController.navigate(
-                            AddEventNavA(
-                                clubId = club.id
+                    if (isMember) {
+                        var showMenu by remember { mutableStateOf(false) }
+                        Box{
+                            IconButton(onClick = { showMenu = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "More options"
+                                )
+                            }
+
+                            ClubActionMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false },
+                                onAddEventClick = {
+                                    navController.navigate(
+                                        AddEventNavA(
+                                            clubId = club?.id ?: ""
+                                        )
+                                    )
+                                    showMenu = false
+                                },
+                                canAddEvent = ownClubRole?.role == "admin" || ownClubRole?.role == "creator",
+                                isMember = isMember,
+                                onLeaveClub = {
+                                    clubViewModel.leaveClub(clubId)
+                                    navController.popBackStack()
+                                }
                             )
-                        )
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.EventRepeat,
-                            contentDescription = "Members"
-                        )
+                        }
                     }
                 }
             )

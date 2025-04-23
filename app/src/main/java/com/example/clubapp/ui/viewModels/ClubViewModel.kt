@@ -219,7 +219,7 @@ class ClubViewModel(
         }
     }
 
-    fun changeClubMemberRole(clubId: String, userId: String, request: RoleRequest) {
+    fun changeClubMemberRole(clubId: String, userId: String, request: RoleRequest, ownRole: String) {
         viewModelScope.launch {
             clubMemberUiState = BaseUiState.Loading
             try {
@@ -228,7 +228,7 @@ class ClubViewModel(
                     uiState = BaseUiState.Error
                     return@launch
                 }
-                clubRepository.changeClubMemberRole(token, clubId=clubId, userId=userId, request)
+                clubRepository.changeClubMemberRole(token, clubId=clubId, userId=userId, request, ownRole)
                 membersCache.remove(clubId)
                 getClubMembers(clubId)
                 val updatedMembers = clubRepository.getClubsMembers(token, clubId)

@@ -28,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import com.example.clubapp.network.response.EventParticipantsResponse
 import com.example.clubapp.ui.viewModels.ClubViewModel
 import androidx.compose.runtime.getValue
+import com.example.clubapp.network.response.RoleResponse
 import com.example.clubapp.ui.dialog.ClubRoleDialog
 import com.example.clubapp.ui.dialog.EventRoleDialog
 import com.example.clubapp.ui.viewModels.EventViewModel
@@ -41,16 +42,15 @@ fun ClubMembersList(
     clubName: String,
     navController: NavHostController,
     clubViewModel: ClubViewModel,
-    navViewModel: NavigationViewModel
+    navViewModel: NavigationViewModel,
+    ownClubRole: String?
 ) {
     LaunchedEffect(clubId) {
         clubViewModel.getClubMembers(clubId)
-        clubViewModel.getClubRole(clubId)
     }
     val members by clubViewModel.clubMembers.collectAsState(initial = emptyList())
     val showClubDialog by navViewModel.showClubRoleDialog.collectAsState(false)
     val clubRoleUser by navViewModel.clubRoleUser.collectAsState(null)
-    val ownClubRole by clubViewModel.userClubRole.collectAsState(null)
 
     Scaffold(
         topBar = {
@@ -106,7 +106,7 @@ fun ClubMembersList(
                             navViewModel = navViewModel,
                             clubViewModel = clubViewModel,
                             userId = member.id,
-                            ownRole = ownClubRole?.role ?: "member"
+                            ownRole = ownClubRole?: "member"
                         )
                     }
                 }
@@ -124,16 +124,15 @@ fun EventParticipantList(
     eventName: String,
     navController: NavHostController,
     eventViewModel: EventViewModel,
-    navViewModel: NavigationViewModel
+    navViewModel: NavigationViewModel,
+    ownEventRole: String?
 ) {
     LaunchedEffect(eventId) {
         eventViewModel.getEventParticipants(eventId)
-        eventViewModel.getEventRole(eventId)
     }
     val members by eventViewModel.eventParticipants.collectAsState(initial = emptyList())
     val showEventRoleDialog by navViewModel.showEventRoleDialog.collectAsState(false)
     val eventRoleUser by navViewModel.eventRoleUser.collectAsState(null)
-    val ownEventRole by eventViewModel.userEventRole.collectAsState(null)
 
     Scaffold(
         topBar = {
@@ -189,7 +188,7 @@ fun EventParticipantList(
                             navViewModel = navViewModel,
                             eventViewModel = eventViewModel,
                             userId = member.id,
-                            ownRole = ownEventRole?.role?: "attendee"
+                            ownRole = ownEventRole?: "attendee"
                         )
                     }
                 }

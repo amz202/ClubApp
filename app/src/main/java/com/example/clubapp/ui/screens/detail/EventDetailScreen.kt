@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -43,6 +44,12 @@ import com.example.clubapp.ui.viewModels.EventViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.example.clubapp.ui.cards.isEventInPast
+import com.example.clubapp.ui.dialog.EventActionMenu
+import kotlin.math.exp
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -53,15 +60,18 @@ fun EventDetailScreen(
     modifier: Modifier = Modifier,
     eventViewModel: EventViewModel,
     navController: NavHostController
-){
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     LaunchedEffect(eventId) {
         eventViewModel.getEvent(eventId)
+        eventViewModel.getEventRole(eventId)
     }
 
     val eventState = eventViewModel.eventOfId.collectAsState()
     val event = eventState.value
+    val ownEventRole by eventViewModel.userEventRole.collectAsState(null)
+    val isMember = ownEventRole?.role != null
 
     if (event == null) {
         return
@@ -69,12 +79,14 @@ fun EventDetailScreen(
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    eventViewModel.joinEvent(event.id)
+            if (!isMember) {
+                FloatingActionButton(
+                    onClick = {
+                        eventViewModel.joinEvent(event.id)
+                    }
+                ) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
                 }
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
             }
         },
         topBar = {
@@ -101,14 +113,35 @@ fun EventDetailScreen(
                         navController.navigate(
                             EventParticipantsNav(
                                 eventId = event.id,
-                                eventName = event.name
+                                eventName = event.name,
+                                ownRole = ownEventRole?.role
                             )
                         )
                     }) {
                         Icon(
                             imageVector = Icons.Default.Groups,
-                            contentDescription = "Back"
+                            contentDescription = "Participants"
                         )
+                    }
+                    if (isMember && !isEventInPast(event.dateTime)) {
+                        var showMenu by remember { mutableStateOf(false) }
+                        Box {
+                            IconButton(onClick = { showMenu = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "More options"
+                                )
+                            }
+                            EventActionMenu(
+                                expanded = showMenu,
+                                onDismissRequest = { showMenu = false },
+                                isMember = isMember,
+                                onLeaveEvent = {
+                                    eventViewModel.leaveEvent(eventId)
+                                    navController.popBackStack()
+                                }
+                            )
+                        }
                     }
                 }
             )
@@ -118,7 +151,7 @@ fun EventDetailScreen(
             .nestedScroll(scrollBehavior.nestedScrollConnection)
             .padding(vertical = 8.dp)
 
-    ){paddingValues ->
+    ) { paddingValues ->
         Box(
             modifier = modifier
                 .padding(paddingValues)
@@ -127,10 +160,12 @@ fun EventDetailScreen(
             Column {
                 // Event header with image and name
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(modifier = Modifier
-                        .background(color = Color.DarkGray)
-                        .fillMaxWidth()
-                        .height(96.dp))
+                    Box(
+                        modifier = Modifier
+                            .background(color = Color.DarkGray)
+                            .fillMaxWidth()
+                            .height(96.dp)
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = event.name,
@@ -147,11 +182,13 @@ fun EventDetailScreen(
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),     color = Color(0xFFE3F2FD)
+                        .padding(horizontal = 16.dp, vertical = 8.dp), color = Color(0xFFE3F2FD)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Description",
-                            modifier = Modifier.padding(bottom = 8.dp))
+                        Text(
+                            "Description",
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
                         Text(event.description)
                     }
                 }
@@ -160,7 +197,7 @@ fun EventDetailScreen(
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),     color = Color(0xFFE3F2FD)
+                        .padding(16.dp), color = Color(0xFFE3F2FD)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(
@@ -202,9 +239,11 @@ fun EventDetailScreen(
                                 contentDescription = "Attendees",
                                 modifier = Modifier.padding(end = 8.dp)
                             )
-                            Text(text = "${event.attendeeCount}${
-                                if (event.capacity != "null") "/${event.capacity}" else ""
-                            } attending")
+                            Text(
+                                text = "${event.attendeeCount}${
+                                    if (event.capacity != "null") "/${event.capacity}" else ""
+                                } attending"
+                            )
                         }
 
                         Row(
@@ -224,7 +263,8 @@ fun EventDetailScreen(
                 }
             }
         }
-}}
+    }
+}
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun formatDateTimeString(isoDateString: String): String {

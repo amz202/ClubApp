@@ -46,7 +46,7 @@ fun EventRoleDialog(
     val roleRequest = RoleRequest(
         role = selectedRole
     )
-    val roles = listOf("attendee", "admin")
+    val roles = listOf("attendee", "admin","head")
     var expanded by remember { mutableStateOf(false) }
 
 
@@ -141,7 +141,7 @@ fun EventRoleDialog(
 
                         Button(
                             onClick = {
-                                eventViewModel.changeEventParticipantRole(eventId = eventId, request = roleRequest, userId = userId)
+                                eventViewModel.changeEventParticipantRole(eventId = eventId, request = roleRequest, userId = userId, ownRole = ownRole)
                                 navViewModel.hideEventRoleDialog()
                             },
                             enabled = selectedRole != currentRole

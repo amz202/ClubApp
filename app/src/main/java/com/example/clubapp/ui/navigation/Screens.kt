@@ -37,7 +37,8 @@ data class EventDetailNav(
 @Serializable
 data class EventParticipantsNav(
     val eventId: String,
-    val eventName: String
+    val eventName: String,
+    val ownRole:String?
 )
 
 @Serializable
@@ -48,5 +49,6 @@ data class ClubDetailNav(
 @Serializable
 data class ClubMembersNav(
     val clubId: String,
-    val clubName: String
+    val clubName: String,
+    val ownRole:String?
 )
