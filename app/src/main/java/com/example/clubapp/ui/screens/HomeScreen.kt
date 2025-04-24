@@ -88,6 +88,9 @@ fun HomeScreen(
     val eventList by eventViewModel.usersEvents.collectAsState(initial = emptyList())
     val isUserSignedIn = userInfo != null
 
+    val usersClubState = clubViewModel.userClubsUiState
+    val userEventState = eventViewModel.userEventsUiState
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -183,7 +186,9 @@ fun HomeScreen(
             Spacer(modifier= Modifier.height(24.dp))
             HomeScreenDetail(
                 clubList = clubList, eventList = eventList,
-                navController = navController
+                navController = navController,
+                clubUiState = usersClubState,
+                eventUiState = userEventState
             )
         }
     }

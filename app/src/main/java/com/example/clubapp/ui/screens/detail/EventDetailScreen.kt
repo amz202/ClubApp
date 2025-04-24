@@ -49,8 +49,37 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.clubapp.ui.cards.isEventInPast
 import com.example.clubapp.ui.dialog.EventActionMenu
-import kotlin.math.exp
+import com.example.clubapp.ui.viewModels.BaseUiState
+import com.example.clubapp.ui.screens.Common.ErrorScreen
+import com.example.clubapp.ui.screens.Common.LoadingScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun EventDetailStateScreen(
+    eventId: String,
+    modifier: Modifier = Modifier,
+    eventViewModel: EventViewModel,
+    navController: NavHostController
+) {
+    LaunchedEffect(eventId) {
+        eventViewModel.getEvent(eventId)
+        eventViewModel.getEventRole(eventId)
+    }
+    val singleEventState = eventViewModel.singleEventUiState
+
+    when (singleEventState) {
+        is BaseUiState.Success -> {
+            EventDetailScreen(
+                eventId = eventId,
+                modifier = modifier,
+                eventViewModel = eventViewModel,
+                navController = navController
+            )
+        }
+        is BaseUiState.Loading -> LoadingScreen()
+        is BaseUiState.Error -> ErrorScreen()
+    }
+}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)

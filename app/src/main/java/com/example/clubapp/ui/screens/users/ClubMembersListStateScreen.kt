@@ -33,6 +33,43 @@ import com.example.clubapp.ui.dialog.ClubRoleDialog
 import com.example.clubapp.ui.dialog.EventRoleDialog
 import com.example.clubapp.ui.viewModels.EventViewModel
 import com.example.clubapp.ui.viewModels.NavigationViewModel
+import com.example.clubapp.ui.viewModels.BaseUiState
+import com.example.clubapp.ui.screens.Common.ErrorScreen
+import com.example.clubapp.ui.screens.Common.LoadingScreen
+
+
+@Composable
+fun ClubMembersListStateScreen(
+    modifier: Modifier = Modifier,
+    clubId: String,
+    clubName: String,
+    navController: NavHostController,
+    clubViewModel: ClubViewModel,
+    navViewModel: NavigationViewModel,
+    ownClubRole: String?
+) {
+    LaunchedEffect(clubId) {
+        clubViewModel.getClubMembers(clubId)
+    }
+
+    val membersState = clubViewModel.clubMemberUiState
+
+    when (membersState) {
+        is BaseUiState.Success -> {
+            ClubMembersList(
+                modifier = modifier,
+                clubId = clubId,
+                clubName = clubName,
+                navController = navController,
+                clubViewModel = clubViewModel,
+                navViewModel = navViewModel,
+                ownClubRole = ownClubRole
+            )
+        }
+        is BaseUiState.Loading -> LoadingScreen()
+        is BaseUiState.Error -> ErrorScreen()
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,86 +150,5 @@ fun ClubMembersList(
             }
         }
         //
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EventParticipantList(
-    modifier: Modifier = Modifier,
-    eventId: String,
-    eventName: String,
-    navController: NavHostController,
-    eventViewModel: EventViewModel,
-    navViewModel: NavigationViewModel,
-    ownEventRole: String?
-) {
-    LaunchedEffect(eventId) {
-        eventViewModel.getEventParticipants(eventId)
-    }
-    val members by eventViewModel.eventParticipants.collectAsState(initial = emptyList())
-    val showEventRoleDialog by navViewModel.showEventRoleDialog.collectAsState(false)
-    val eventRoleUser by navViewModel.eventRoleUser.collectAsState(null)
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        "Event Participants",
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        navController.popBackStack()
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                actions = {
-                    Box(modifier = Modifier.width(32.dp)) {}
-                }
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp)
-            ) {
-                items(members) { member ->
-                    HomeScreenProfile(
-                        name = member.name,
-                        email = member.email,
-                        role = member.eventRole,
-                        modifier = Modifier.clickable{
-                            navViewModel.showEventRoleDialog(member.id)
-                        }
-                    )
-                    if(showEventRoleDialog && eventRoleUser == member.id){
-                        EventRoleDialog(
-                            eventId = eventId,
-                            userName = member.name,
-                            userEmail = member.email,
-                            currentRole = member.eventRole,
-                            navViewModel = navViewModel,
-                            eventViewModel = eventViewModel,
-                            userId = member.id,
-                            ownRole = ownEventRole?: "attendee"
-                        )
-                    }
-                }
-            }
-        }
     }
 }

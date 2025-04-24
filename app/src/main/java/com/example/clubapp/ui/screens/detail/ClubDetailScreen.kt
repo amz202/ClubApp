@@ -57,6 +57,40 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.clubapp.ui.dialog.ClubActionMenu
+import com.example.clubapp.ui.viewModels.BaseUiState
+import com.example.clubapp.ui.screens.Common.ErrorScreen
+import com.example.clubapp.ui.screens.Common.LoadingScreen
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun ClubDetailStateScreen(
+    clubId: String,
+    clubViewModel: ClubViewModel,
+    eventViewModel: EventViewModel,
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    LaunchedEffect(clubId) {
+        clubViewModel.getClub(clubId)
+        clubViewModel.getClubRole(clubId)
+    }
+
+    val clubState = clubViewModel.singleClubUiState
+
+    when (clubState) {
+        is BaseUiState.Success -> {
+            ClubDetailScreen(
+                clubId = clubId,
+                clubViewModel = clubViewModel,
+                eventViewModel = eventViewModel,
+                navController = navController,
+                modifier = modifier
+            )
+        }
+        is BaseUiState.Loading -> LoadingScreen()
+        is BaseUiState.Error -> ErrorScreen()
+    }
+}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,6 +114,8 @@ fun ClubDetailScreen(
     val clubEvents = eventViewModel.clubEvents.collectAsState().value
     val ownClubRole by clubViewModel.userClubRole.collectAsState(null)
     val isMember = ownClubRole?.role != null
+
+    val clubEventState = eventViewModel.clubEventsUiState
 
     if (club == null) {
         return
@@ -292,31 +328,34 @@ fun ClubDetailScreen(
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
-                        if (clubEvents.isNullOrEmpty()) {
-                            Text(text = "No events scheduled")
-                        }else{
-                            Spacer(
-                                modifier = Modifier.height(20.dp)
-                            )
-                            Column(
-                                modifier = Modifier.padding(top = 20.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                clubEvents.forEach { event ->
-                                    EventItem(
-                                        eventResponse = event,
-                                        onClick = {
-                                            navController.navigate(
-                                                EventDetailNav(eventId = event.id)
-                                            )
-                                        }
-                                    )
+                        when (clubEventState) {
+                            is BaseUiState.Success -> {
+                                val clubEvents = eventViewModel.clubEvents.collectAsState().value
+                                Column(
+                                    modifier = Modifier.padding(top = 20.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    clubEvents?.forEach { event ->
+                                        EventItem(
+                                            eventResponse = event,
+                                            onClick = {
+                                                navController.navigate(
+                                                    EventDetailNav(eventId = event.id)
+                                                )
+                                            }
+                                        )
+                                    }
                                 }
+                            }
+                            is BaseUiState.Loading -> {
+                                Text(text = "Loading events...")
+                            }
+                            is BaseUiState.Error -> {
+                                Text(text = "No events scheduled")
                             }
                         }
                     }
                 }
-
             }
         }
     }

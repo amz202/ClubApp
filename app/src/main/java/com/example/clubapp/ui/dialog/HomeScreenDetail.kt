@@ -38,6 +38,12 @@ import com.example.clubapp.network.response.EventResponse
 import com.example.clubapp.ui.cards.EventItem
 import com.example.clubapp.ui.navigation.ClubDetailNav
 import com.example.clubapp.ui.navigation.EventDetailNav
+import com.example.clubapp.ui.viewModels.BaseUiState
+import com.example.clubapp.ui.viewModels.ClubUiState
+import com.example.clubapp.ui.viewModels.EventUiState
+import com.example.clubapp.ui.viewModels.UserClubsUiState
+import com.example.clubapp.ui.viewModels.UserEventsUiState
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -45,7 +51,9 @@ fun HomeScreenDetail(
     modifier: Modifier = Modifier,
     clubList: List<ClubResponse>?,
     eventList: List<EventResponse>?,
-    navController: NavHostController
+    navController: NavHostController,
+    clubUiState: UserClubsUiState,
+    eventUiState: UserEventsUiState
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
 
@@ -67,8 +75,8 @@ fun HomeScreenDetail(
                 modifier = Modifier.weight(1f)
             ) { page ->
                 when (page) {
-                    0 -> MyClubs(clubList = clubList, navController = navController)
-                    1 -> MyEvents(eventList = eventList, navController = navController)
+                    0 -> MyClubs(clubList = clubList, navController = navController, clubUiState = clubUiState)
+                    1 -> MyEvents(eventList = eventList, navController = navController, eventUiState = eventUiState)
                 }
             }
 
@@ -102,8 +110,8 @@ fun HomeScreenDetail(
 fun MyClubs(
     modifier: Modifier = Modifier,
     clubList: List<ClubResponse>?,
-    navController: NavHostController
-
+    navController: NavHostController,
+    clubUiState: UserClubsUiState
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -116,46 +124,83 @@ fun MyClubs(
         Spacer(
             modifier = Modifier.height(20.dp)
         )
-        if (clubList.isNullOrEmpty()) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                Text(
-                    text = "You haven't joined any clubs yet",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        } else {LazyColumn(
-            contentPadding = PaddingValues(bottom = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(clubList) { club ->
-                ClubItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    clubResponse = club,
-                    onClick = {
-                        navController.navigate(
-                            ClubDetailNav(
-                                clubId = club.id
-                            )
+
+        when (clubUiState) {
+            is BaseUiState.Success -> {
+                if (clubList.isNullOrEmpty()) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
+                        Text(
+                            text = "You haven't joined any clubs yet",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyLarge
                         )
                     }
-                )
+                } else {
+                    LazyColumn(
+                        contentPadding = PaddingValues(bottom = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(clubList) { club ->
+                            ClubItem(
+                                modifier = Modifier.fillMaxWidth(),
+                                clubResponse = club,
+                                onClick = {
+                                    navController.navigate(
+                                        ClubDetailNav(
+                                            clubId = club.id
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
             }
+            is BaseUiState.Loading -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = "Loading your clubs...",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+            is BaseUiState.Error -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = "You haven't joined any clubs yet",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+
         }
     }
-}}
+}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MyEvents(
     modifier: Modifier = Modifier,
     eventList: List<EventResponse>?,
-    navController: NavHostController
+    navController: NavHostController,
+    eventUiState: UserEventsUiState
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -169,35 +214,67 @@ fun MyEvents(
             modifier = Modifier.height(20.dp)
         )
 
-        if (eventList.isNullOrEmpty()) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            ) {
-                Text(
-                    text = "You haven't joined any events yet",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        } else {
-            LazyColumn(
-                contentPadding = PaddingValues(bottom = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(eventList) { event ->
-                    EventItem(
-                        modifier = Modifier.fillMaxWidth(),
-                        eventResponse = event,
-                        onClick = {
-                            navController.navigate(
-                                EventDetailNav(
-                                    eventId = event.id
-                                )
+        when (eventUiState) {
+            is BaseUiState.Success -> {
+                if (eventList.isNullOrEmpty()) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    ) {
+                        Text(
+                            text = "You haven't joined any events yet",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        contentPadding = PaddingValues(bottom = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(eventList) { event ->
+                            EventItem(
+                                modifier = Modifier.fillMaxWidth(),
+                                eventResponse = event,
+                                onClick = {
+                                    navController.navigate(
+                                        EventDetailNav(
+                                            eventId = event.id
+                                        )
+                                    )
+                                }
                             )
                         }
+                    }
+                }
+            }
+            is BaseUiState.Loading -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = "Loading events...",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+            is BaseUiState.Error -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = "You haven't joined any events yet",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }

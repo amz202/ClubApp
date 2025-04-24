@@ -17,9 +17,13 @@ import com.example.clubapp.ui.screens.addClub.AddClubScreen
 import com.example.clubapp.ui.screens.addEvent.AddEventScreenA
 import com.example.clubapp.ui.screens.addEvent.AddEventScreenB
 import com.example.clubapp.ui.screens.detail.ClubDetailScreen
+import com.example.clubapp.ui.screens.detail.ClubDetailStateScreen
 import com.example.clubapp.ui.screens.detail.EventDetailScreen
+import com.example.clubapp.ui.screens.detail.EventDetailStateScreen
 import com.example.clubapp.ui.screens.users.ClubMembersList
+import com.example.clubapp.ui.screens.users.ClubMembersListStateScreen
 import com.example.clubapp.ui.screens.users.EventParticipantList
+import com.example.clubapp.ui.screens.users.EventParticipantListStateScreen
 import com.example.clubapp.ui.viewModels.ClubMemberUiState
 import com.example.clubapp.ui.viewModels.ClubUiState
 import com.example.clubapp.ui.viewModels.ClubViewModel
@@ -100,7 +104,7 @@ fun AppNavigation(
 
         composable<EventDetailNav>{
             val args = it.toRoute<EventDetailNav>()
-            EventDetailScreen(
+            EventDetailStateScreen(
                 eventId = args.eventId,
                 eventViewModel = eventViewModel,
                 navController = navController
@@ -109,7 +113,7 @@ fun AppNavigation(
 
         composable<EventParticipantsNav>{
             val args = it.toRoute<EventParticipantsNav>()
-            EventParticipantList(
+            EventParticipantListStateScreen(
                 eventId = args.eventId,
                 eventViewModel = eventViewModel,
                 navController = navController,
@@ -121,7 +125,7 @@ fun AppNavigation(
 
         composable<ClubDetailNav>{
             val args = it.toRoute<ClubDetailNav>()
-            ClubDetailScreen(
+            ClubDetailStateScreen(
                 clubId = args.clubId,
                 clubViewModel = clubViewModel,
                 navController = navController,
@@ -131,7 +135,7 @@ fun AppNavigation(
 
         composable<ClubMembersNav>{
             val args = it.toRoute<ClubMembersNav>()
-            ClubMembersList(
+            ClubMembersListStateScreen(
                 clubId = args.clubId,
                 clubName = args.clubName,
                 navController = navController,
