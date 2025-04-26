@@ -1,5 +1,6 @@
 package com.example.clubapp.ui.viewModels
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -16,6 +17,7 @@ import com.example.clubapp.network.request.RoleRequest
 import com.example.clubapp.network.response.EventParticipantsResponse
 import com.example.clubapp.network.response.EventResponse
 import com.example.clubapp.network.response.RoleResponse
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -270,6 +272,14 @@ class EventViewModel(
 
                 _events.value = updatedEvents
                 uiState = BaseUiState.Success(updatedEvents)
+                FirebaseMessaging.getInstance().subscribeToTopic("event_${eventId}")
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.d("FCM", "Subscribed to event_$eventId")
+                        } else {
+                            Log.e("FCM", "Failed to subscribe to event_$eventId")
+                        }
+                    }
             } catch (e: Exception) {
                 joinEventUiState = BaseUiState.Error
                 val currentEvents = _events.value
@@ -305,6 +315,7 @@ class EventViewModel(
 
                 _events.value = updatedEvents
                 uiState = BaseUiState.Success(updatedEvents)
+                FirebaseMessaging.getInstance().unsubscribeFromTopic("event_${eventId}")
             } catch (e: Exception) {
                 leaveEventUiState = BaseUiState.Error
                 uiState = BaseUiState.Error

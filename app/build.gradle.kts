@@ -60,6 +60,9 @@ dependencies {
     implementation(libs.androidx.datastore.core.android)
 
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.firebase.messaging)
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation("com.google.firebase:firebase-messaging")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
