@@ -276,7 +276,6 @@ class EventViewModel(
     fun joinEvent(eventId: String) {
         viewModelScope.launch {
             joinEventUiState = BaseUiState.Loading
-            uiState = BaseUiState.Loading
             try {
                 val token = userPreferences.getToken()
                 if (token == null) {
@@ -284,33 +283,22 @@ class EventViewModel(
                     uiState = BaseUiState.Error
                     return@launch
                 }
-                // Join event
                 eventRepository.joinEvent(token, eventId)
 
-                // Get updated events list and update main events list
                 val updatedEvents = eventRepository.getEvents()
                 _events.value = updatedEvents
 
-                // Update the event in cache if it exists
                 val updatedEvent = updatedEvents.find { it.id == eventId }
                 if (updatedEvent != null && eventCache.containsKey(eventId)) {
                     eventCache[eventId] = updatedEvent
                     _eventOfId.value = updatedEvent
                 }
-
-                // Clear affected caches
                 userEventsCache.remove(token)
                 participantsCache.remove(eventId)
 
-                // Refresh user events
-                getMyEvents()
-
                 // Set success states
                 joinEventUiState = BaseUiState.Success(true)
-                uiState = BaseUiState.Success(updatedEvents)
 
-                _events.value = updatedEvents
-                uiState = BaseUiState.Success(updatedEvents)
                 FirebaseMessaging.getInstance().subscribeToTopic("event_${eventId}")
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
@@ -321,12 +309,6 @@ class EventViewModel(
                     }
             } catch (e: Exception) {
                 joinEventUiState = BaseUiState.Error
-                val currentEvents = _events.value
-                if (currentEvents.isNotEmpty()) {
-                    uiState = BaseUiState.Success(currentEvents)
-                } else {
-                    uiState = BaseUiState.Error
-                }
                 e.printStackTrace()
             }
         }

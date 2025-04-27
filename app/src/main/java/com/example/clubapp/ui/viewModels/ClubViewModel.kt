@@ -208,8 +208,6 @@ class ClubViewModel(
                 val cacheKey = token
                 userClubsCache.remove(cacheKey)
 
-                // Update UI state
-                uiState = BaseUiState.Success(updatedClubs)
             } catch (e: Exception) {
                 joinClubUiState = BaseUiState.Error
                 e.printStackTrace()
