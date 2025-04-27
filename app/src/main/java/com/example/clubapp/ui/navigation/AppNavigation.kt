@@ -107,7 +107,8 @@ fun AppNavigation(
             EventDetailStateScreen(
                 eventId = args.eventId,
                 eventViewModel = eventViewModel,
-                navController = navController
+                navController = navController,
+                navViewModel = navigationViewModel
             )
         }
 

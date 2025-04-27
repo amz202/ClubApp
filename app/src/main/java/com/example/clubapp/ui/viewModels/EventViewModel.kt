@@ -12,8 +12,10 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.clubapp.ClubApplication
 import com.example.clubapp.data.Datastore.UserPreferences
 import com.example.clubapp.data.respositories.EventRepository
+import com.example.clubapp.network.request.EventNewsRequest
 import com.example.clubapp.network.request.EventRequest
 import com.example.clubapp.network.request.RoleRequest
+import com.example.clubapp.network.response.EventNewsResponse
 import com.example.clubapp.network.response.EventParticipantsResponse
 import com.example.clubapp.network.response.EventResponse
 import com.example.clubapp.network.response.RoleResponse
@@ -22,6 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.collections.containsKey
+import kotlin.collections.remove
 import kotlin.text.get
 
 typealias EventUiState = BaseUiState<List<EventResponse>>
@@ -31,6 +34,7 @@ typealias SingleEventUiState = BaseUiState<EventResponse>
 typealias UserEventsUiState = BaseUiState<List<EventResponse>>
 typealias ClubEventsUiState = BaseUiState<List<EventResponse>>
 typealias EventActionUiState = BaseUiState<Boolean>
+typealias EventNewsUiState = BaseUiState<List<EventNewsResponse>>
 
 class EventViewModel(
     private val eventRepository: EventRepository,
@@ -57,6 +61,9 @@ class EventViewModel(
     var leaveEventUiState: EventActionUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
+    var eventNewsUiState: EventNewsUiState by mutableStateOf(BaseUiState.Loading)
+        private set
+
     private val _usersEvents = MutableStateFlow<List<EventResponse>?>(emptyList())
     val usersEvents: StateFlow<List<EventResponse>?> =_usersEvents
 
@@ -75,11 +82,15 @@ class EventViewModel(
     private val _userEventRole = MutableStateFlow<RoleResponse?>(null)
     val userEventRole: StateFlow<RoleResponse?> = _userEventRole
 
+    private val _eventNews = MutableStateFlow<List<EventNewsResponse>?>(emptyList())
+    val eventNews: StateFlow<List<EventNewsResponse>?> = _eventNews
+
     private val eventCache = mutableMapOf<String, EventResponse>()
     private val participantsCache = mutableMapOf<String, List<EventParticipantsResponse>>()
     private val userEventsCache = mutableMapOf<String, List<EventResponse>>()
     private val clubEventsCache = mutableMapOf<String, List<EventResponse>>()
     private val userEventRoleCache = mutableMapOf<String, RoleResponse?>()
+    private val eventNewsCache = mutableMapOf<String, List<EventNewsResponse>>()
 
     init {
         getEvents()
@@ -115,6 +126,18 @@ class EventViewModel(
                 eventRepository.createEvent(token, event)
                 val updatedEvents = eventRepository.getEvents()
                 uiState = BaseUiState.Success(updatedEvents)
+                val newEvent = updatedEvents.firstOrNull { it.name == event.name }
+                if (newEvent != null) {
+                    // Subscribe to event notifications
+                    FirebaseMessaging.getInstance().subscribeToTopic("event_${newEvent.id}")
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Log.d("FCM", "Subscribed to event_${newEvent.id}")
+                            } else {
+                                Log.e("FCM", "Failed to subscribe to event_${newEvent.id}")
+                            }
+                        }
+                }
             } catch (e: Exception) {
                 uiState = BaseUiState.Error
             }
@@ -261,14 +284,30 @@ class EventViewModel(
                     uiState = BaseUiState.Error
                     return@launch
                 }
+                // Join event
                 eventRepository.joinEvent(token, eventId)
-                val updatedEvents = eventRepository.getEvents()
-                joinEventUiState = BaseUiState.Success(true)
 
-                // Clear cache entries
-                val cacheKey = token
-                userEventsCache.remove(cacheKey)
+                // Get updated events list and update main events list
+                val updatedEvents = eventRepository.getEvents()
+                _events.value = updatedEvents
+
+                // Update the event in cache if it exists
+                val updatedEvent = updatedEvents.find { it.id == eventId }
+                if (updatedEvent != null && eventCache.containsKey(eventId)) {
+                    eventCache[eventId] = updatedEvent
+                    _eventOfId.value = updatedEvent
+                }
+
+                // Clear affected caches
+                userEventsCache.remove(token)
                 participantsCache.remove(eventId)
+
+                // Refresh user events
+                getMyEvents()
+
+                // Set success states
+                joinEventUiState = BaseUiState.Success(true)
+                uiState = BaseUiState.Success(updatedEvents)
 
                 _events.value = updatedEvents
                 uiState = BaseUiState.Success(updatedEvents)
@@ -378,6 +417,56 @@ class EventViewModel(
             }
         }
     }
+
+    fun getEventNews(eventId: String) {
+        viewModelScope.launch {
+            eventNewsUiState = BaseUiState.Loading
+            if (eventNewsCache.containsKey(eventId)) {
+                _eventNews.value = eventNewsCache[eventId] ?: emptyList()
+                eventNewsUiState = BaseUiState.Success(eventNewsCache[eventId] ?: emptyList())
+                return@launch
+            }
+            _eventNews.value = emptyList()
+            try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    eventNewsUiState = BaseUiState.Error
+                    return@launch
+                }
+                val news = eventRepository.getEventNews(token, eventId)
+                _eventNews.value = news
+                eventNewsCache[eventId] = news ?: emptyList()
+                eventNewsUiState = BaseUiState.Success(news ?: emptyList())
+            } catch (e: Exception) {
+                _eventNews.value = emptyList()
+                eventNewsUiState = BaseUiState.Error
+            }
+        }
+    }
+
+    fun createEventNews(eventId: String, news: EventNewsRequest){
+        viewModelScope.launch {
+            eventNewsUiState = BaseUiState.Loading
+            try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    eventNewsUiState = BaseUiState.Error
+                    return@launch
+                }
+                eventRepository.createEventNews(token, eventId, news)
+                val updatedNews = eventRepository.getEventNews(token, eventId)
+                if (updatedNews != null) {
+                    _eventNews.value = updatedNews
+                }
+                eventNewsCache[eventId] = updatedNews ?: emptyList()
+                eventNewsUiState = BaseUiState.Success(updatedNews ?: emptyList())
+            } catch (e: Exception) {
+                _eventNews.value = emptyList()
+                eventNewsUiState = BaseUiState.Error
+            }
+        }
+    }
+
 
     companion object {
         val eventFactory: ViewModelProvider.Factory = viewModelFactory {

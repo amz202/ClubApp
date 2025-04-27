@@ -1,10 +1,12 @@
 package com.example.clubapp.network
 
 import com.example.clubapp.network.request.ClubRequest
+import com.example.clubapp.network.request.EventNewsRequest
 import com.example.clubapp.network.request.EventRequest
 import com.example.clubapp.network.request.RoleRequest
 import com.example.clubapp.network.response.ClubMembersResponse
 import com.example.clubapp.network.response.ClubResponse
+import com.example.clubapp.network.response.EventNewsResponse
 import com.example.clubapp.network.response.EventParticipantsResponse
 import com.example.clubapp.network.response.EventResponse
 import com.example.clubapp.network.response.RoleResponse
@@ -143,5 +145,24 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("eventId") eventId: String,
     ): RoleResponse?
+
+    @POST("/events/{eventId}/news")
+    suspend fun createEventNews(
+        @Header("Authorization") token: String,
+        @Path("eventId") eventId: String,
+        @Body news: EventNewsRequest
+    ): ResponseBody
+
+    @GET("events/{eventId}/news")
+    suspend fun getEventNews(
+        @Header("Authorization") token: String,
+        @Path("eventId") eventId: String
+    ): List<EventNewsResponse>
+
+    @GET("/events/news/{eventNewsId}")
+    suspend fun getEventNewsById(
+        @Header("Authorization") token: String,
+        @Path("eventNewsId") eventNewsId: String
+    ): EventNewsResponse
 }
 

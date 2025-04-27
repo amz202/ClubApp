@@ -1,8 +1,10 @@
 package com.example.clubapp.data.respositories
 
 import com.example.clubapp.network.ApiService
+import com.example.clubapp.network.request.EventNewsRequest
 import com.example.clubapp.network.request.EventRequest
 import com.example.clubapp.network.request.RoleRequest
+import com.example.clubapp.network.response.EventNewsResponse
 import com.example.clubapp.network.response.EventParticipantsResponse
 import com.example.clubapp.network.response.EventResponse
 import com.example.clubapp.network.response.RoleResponse
@@ -21,6 +23,9 @@ interface EventRepository {
     suspend fun changeEventRole(token: String, eventId: String, request: RoleRequest, userId: String, ownRole: String): ResponseBody
     suspend fun getEventRole(token: String, eventId: String): RoleResponse?
     suspend fun getMyEvents(token: String): List<EventResponse>?
+    suspend fun getEventNews(token: String, eventId: String): List<EventNewsResponse>?
+    suspend fun createEventNews(token: String, eventId: String, news: EventNewsRequest): ResponseBody
+    suspend fun getEventNewsById(token: String, eventNewsId: String): EventNewsResponse?
 }
 
 class EventRepositoryImpl(private val apiService: ApiService): EventRepository{
@@ -60,5 +65,21 @@ class EventRepositoryImpl(private val apiService: ApiService): EventRepository{
 
     override suspend fun getEventRole(token: String, eventId: String): RoleResponse? {
         return apiService.getEventRole(token = "Bearer $token", eventId = eventId)
+    }
+
+    override suspend fun getEventNews(token: String, eventId: String): List<EventNewsResponse>? {
+        return apiService.getEventNews(token= "Bearer $token", eventId = eventId)
+    }
+
+    override suspend fun createEventNews(
+        token: String,
+        eventId: String,
+        news: EventNewsRequest
+    ): ResponseBody {
+        return apiService.createEventNews(token = "Bearer $token", eventId = eventId, news = news)
+    }
+
+    override suspend fun getEventNewsById(token: String, eventNewsId: String): EventNewsResponse? {
+        return apiService.getEventNewsById(token = "Bearer $token", eventNewsId = eventNewsId)
     }
 }

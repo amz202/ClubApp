@@ -2,6 +2,7 @@ package com.example.clubapp.ui.dialog
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -14,7 +15,9 @@ fun EventActionMenu(
     expanded:Boolean,
     isMember:Boolean,
     onDismissRequest: () -> Unit,
-    onLeaveEvent:() -> Unit
+    onLeaveEvent:() -> Unit,
+    role:String,
+    onAddNews: () -> Unit
 ){
     DropdownMenu(
         expanded = expanded,
@@ -27,6 +30,18 @@ fun EventActionMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        contentDescription = null
+                    )
+                }
+            )
+        }
+        if (role == "admin" || role == "head") {
+            DropdownMenuItem(
+                text = { Text("Add News") },
+                onClick = onAddNews,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Add,
                         contentDescription = null
                     )
                 }

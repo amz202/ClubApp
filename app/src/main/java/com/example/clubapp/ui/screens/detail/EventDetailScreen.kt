@@ -3,6 +3,7 @@ package com.example.clubapp.ui.screens.detail
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,11 +12,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
@@ -26,6 +31,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -48,10 +54,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.example.clubapp.ui.cards.isEventInPast
+import com.example.clubapp.ui.dialog.AddEventNewsDialog
 import com.example.clubapp.ui.dialog.EventActionMenu
 import com.example.clubapp.ui.viewModels.BaseUiState
 import com.example.clubapp.ui.screens.Common.ErrorScreen
 import com.example.clubapp.ui.screens.Common.LoadingScreen
+import com.example.clubapp.ui.viewModels.NavigationViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -59,7 +67,8 @@ fun EventDetailStateScreen(
     eventId: String,
     modifier: Modifier = Modifier,
     eventViewModel: EventViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    navViewModel: NavigationViewModel
 ) {
     LaunchedEffect(eventId) {
         eventViewModel.getEvent(eventId)
@@ -73,7 +82,8 @@ fun EventDetailStateScreen(
                 eventId = eventId,
                 modifier = modifier,
                 eventViewModel = eventViewModel,
-                navController = navController
+                navController = navController,
+                navViewModel
             )
         }
         is BaseUiState.Loading -> LoadingScreen()
@@ -88,19 +98,25 @@ fun EventDetailScreen(
     eventId: String,
     modifier: Modifier = Modifier,
     eventViewModel: EventViewModel,
-    navController: NavHostController
-) {
+    navController: NavHostController,
+    navViewModel: NavigationViewModel
+){
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     LaunchedEffect(eventId) {
         eventViewModel.getEvent(eventId)
         eventViewModel.getEventRole(eventId)
+        eventViewModel.getEventNews(eventId)
     }
 
     val eventState = eventViewModel.eventOfId.collectAsState()
     val event = eventState.value
     val ownEventRole by eventViewModel.userEventRole.collectAsState(null)
     val isMember = ownEventRole?.role != null
+    val showAddEvent = navViewModel.showAddEventNewsDialog.collectAsState().value
+
+    val eventNewsState = eventViewModel.eventNewsUiState
+
 
     if (event == null) {
         return
@@ -168,6 +184,11 @@ fun EventDetailScreen(
                                 onLeaveEvent = {
                                     eventViewModel.leaveEvent(eventId)
                                     navController.popBackStack()
+                                },
+                                role = ownEventRole?.role ?: "attendee",
+                                onAddNews = {
+                                    navViewModel.showAddEventNewsDialog(eventId)
+                                    showMenu = false
                                 }
                             )
                         }
@@ -186,7 +207,11 @@ fun EventDetailScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            Column {
+            Column (
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ){
                 // Event header with image and name
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
@@ -222,6 +247,85 @@ fun EventDetailScreen(
                     }
                 }
 
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    color = Color(0xFFE3F2FD)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Text(
+                            text = "Event Updates",
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        when (eventNewsState) {
+                            is BaseUiState.Success -> {
+                                val eventNews = eventViewModel.eventNews.collectAsState().value
+                                    ?.sortedByDescending { it.createdOn } // Sort by newest first
+
+                                if (eventNews.isNullOrEmpty()) {
+                                    Text(text = "No updates available")
+                                } else {
+                                    var expandedNews by remember { mutableStateOf(false) }
+                                    val displayedNews = if (expandedNews) eventNews else eventNews.take(1)
+
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        displayedNews.forEach { news ->
+                                            Surface(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                color = Color(0xFFEEEEEE)
+                                            ) {
+                                                Column(
+                                                    modifier = Modifier.padding(12.dp)
+                                                ) {
+                                                    Text(text = news.news)
+                                                    Spacer(modifier = Modifier.height(4.dp))
+                                                    Text(
+                                                        text = formatDateTimeString(news.createdOn),
+                                                        color = Color.Gray
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                        if (eventNews.size > 1) {
+                                            TextButton(
+                                                onClick = { expandedNews = !expandedNews },
+                                                modifier = Modifier.align(Alignment.End)
+                                                    .padding(0.dp)
+                                            ) {
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                                ) {
+                                                    Text(text = if (expandedNews) "Show Less" else "Show More")
+                                                    Icon(
+                                                        imageVector = if (expandedNews)
+                                                            Icons.Default.KeyboardArrowUp
+                                                        else
+                                                            Icons.Default.KeyboardArrowDown,
+                                                        contentDescription = if (expandedNews) "Collapse" else "Expand"
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            is BaseUiState.Loading -> {
+                                Text(text = "Loading news...")
+                            }
+                            is BaseUiState.Error -> {
+                                Text(text = "No news")
+                            }
+                        }
+                    }
+                }
                 // Event details container
                 Surface(
                     modifier = Modifier
@@ -291,6 +395,12 @@ fun EventDetailScreen(
                     }
                 }
             }
+        }
+        if (showAddEvent) {
+            AddEventNewsDialog(
+                navViewModel = navViewModel,
+                eventViewModel = eventViewModel
+            )
         }
     }
 }

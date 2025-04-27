@@ -13,12 +13,25 @@ class NavigationViewModel : ViewModel() {
     private val _eventRoleUser = MutableStateFlow<String>("")
     val eventRoleUser: MutableStateFlow<String> = _eventRoleUser
 
+    private val _showAddEventNewsDialog = MutableStateFlow<Boolean>(false)
+    val showAddEventNewsDialog: MutableStateFlow<Boolean> = _showAddEventNewsDialog
+    private val _eventNewsId = MutableStateFlow<String>("")
+    val eventNewsId: MutableStateFlow<String> = _eventNewsId
+
     fun showEventRoleDialog(userId: String) {
         _showEventRoleDialog.value = true
         _eventRoleUser.value = userId
     }
     fun hideEventRoleDialog() {
         _showEventRoleDialog.value = false
+    }
+    fun showAddEventNewsDialog(eventId:String) {
+        _showAddEventNewsDialog.value = true
+        _eventNewsId.value = eventId
+    }
+    fun hideAddEventNewsDialog(eventId:String) {
+        _showAddEventNewsDialog.value = false
+        _eventNewsId.value = eventId
     }
 
     private val _showClubRoleDialog = MutableStateFlow<Boolean>(false)

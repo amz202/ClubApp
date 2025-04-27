@@ -43,6 +43,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setContentTitle(title)
             .setContentText(body)
             .setAutoCancel(true)
+            .setSmallIcon(R.drawable.ic_launcher_background) // Added notification icon
             .build()
 
         // Show the notification
