@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.verticalScroll
@@ -52,6 +53,7 @@ import com.example.clubapp.ui.viewModels.ClubViewModel
 import com.example.clubapp.ui.viewModels.EventViewModel
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -116,6 +118,13 @@ fun ClubDetailScreen(
     val isMember = ownClubRole?.role != null
 
     val clubEventState = eventViewModel.clubEventsUiState
+    val joinClubState = clubViewModel.joinClubUiState
+
+    LaunchedEffect(joinClubState) {
+        if (joinClubState is BaseUiState.Success) {
+            clubViewModel.getClub(clubId)
+        }
+    }
 
     if (club == null) {
         return
@@ -129,7 +138,17 @@ fun ClubDetailScreen(
                         clubViewModel.joinClub(clubId)
                     }
                 ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
+                    when (joinClubState) {
+                        is BaseUiState.Loading -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 2.dp
+                            )
+                        }
+                        else -> {
+                            Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
+                        }
+                    }
                 }
             }
         },

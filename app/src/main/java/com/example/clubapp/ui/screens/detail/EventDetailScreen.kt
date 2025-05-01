@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -86,6 +88,7 @@ fun EventDetailStateScreen(
                 navViewModel
             )
         }
+
         is BaseUiState.Loading -> LoadingScreen()
         is BaseUiState.Error -> ErrorScreen()
     }
@@ -100,7 +103,7 @@ fun EventDetailScreen(
     eventViewModel: EventViewModel,
     navController: NavHostController,
     navViewModel: NavigationViewModel
-){
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     LaunchedEffect(eventId) {
@@ -116,7 +119,13 @@ fun EventDetailScreen(
     val showAddEvent = navViewModel.showAddEventNewsDialog.collectAsState().value
 
     val eventNewsState = eventViewModel.eventNewsUiState
+    val joinEventState = eventViewModel.joinEventUiState
 
+    LaunchedEffect(joinEventState) {
+        if (joinEventState is BaseUiState.Success) {
+            eventViewModel.getEventRole(eventId)
+        }
+    }
 
     if (event == null) {
         return
@@ -130,7 +139,17 @@ fun EventDetailScreen(
                         eventViewModel.joinEvent(event.id)
                     }
                 ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
+                    when (joinEventState) {
+                        is BaseUiState.Loading -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 2.dp
+                            )
+                        }
+                        else -> {
+                            Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
+                        }
+                    }
                 }
             }
         },
@@ -207,11 +226,11 @@ fun EventDetailScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            Column (
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-            ){
+            ) {
                 // Event header with image and name
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
@@ -270,7 +289,8 @@ fun EventDetailScreen(
                                     Text(text = "No updates available")
                                 } else {
                                     var expandedNews by remember { mutableStateOf(false) }
-                                    val displayedNews = if (expandedNews) eventNews else eventNews.take(1)
+                                    val displayedNews =
+                                        if (expandedNews) eventNews else eventNews.take(1)
 
                                     Column(
                                         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -296,7 +316,8 @@ fun EventDetailScreen(
                                         if (eventNews.size > 1) {
                                             TextButton(
                                                 onClick = { expandedNews = !expandedNews },
-                                                modifier = Modifier.align(Alignment.End)
+                                                modifier = Modifier
+                                                    .align(Alignment.End)
                                                     .padding(0.dp)
                                             ) {
                                                 Row(
@@ -317,9 +338,11 @@ fun EventDetailScreen(
                                     }
                                 }
                             }
+
                             is BaseUiState.Loading -> {
                                 Text(text = "Loading news...")
                             }
+
                             is BaseUiState.Error -> {
                                 Text(text = "No news")
                             }

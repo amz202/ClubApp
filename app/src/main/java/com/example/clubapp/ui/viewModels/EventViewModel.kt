@@ -55,7 +55,7 @@ class EventViewModel(
     var clubEventsUiState: ClubEventsUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
-    var joinEventUiState: EventActionUiState by mutableStateOf(BaseUiState.Loading)
+    var joinEventUiState: EventActionUiState by mutableStateOf(BaseUiState.Success(false))
         private set
 
     var leaveEventUiState: EventActionUiState by mutableStateOf(BaseUiState.Loading)
@@ -295,6 +295,9 @@ class EventViewModel(
                 }
                 userEventsCache.remove(token)
                 participantsCache.remove(eventId)
+                userEventRoleCache.remove(eventId)
+
+                getEventRole(eventId)
 
                 // Set success states
                 joinEventUiState = BaseUiState.Success(true)
@@ -333,6 +336,7 @@ class EventViewModel(
                 val cacheKey = token
                 userEventsCache.remove(cacheKey)
                 participantsCache.remove(eventId)
+                userEventRoleCache.remove(eventId)
 
                 _events.value = updatedEvents
                 uiState = BaseUiState.Success(updatedEvents)
@@ -449,6 +453,9 @@ class EventViewModel(
         }
     }
 
+    fun clearJoinUiState() {
+        joinEventUiState = BaseUiState.Success(true)
+    }
 
     companion object {
         val eventFactory: ViewModelProvider.Factory = viewModelFactory {

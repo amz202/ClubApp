@@ -52,7 +52,7 @@ class ClubViewModel(
     var singleClubUiState: SingleClubUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
-    var joinClubUiState: ClubActionUiState by mutableStateOf(BaseUiState.Loading)
+    var joinClubUiState: ClubActionUiState by mutableStateOf(BaseUiState.Success(false))
         private set
 
     var leaveClubUiState: ClubActionUiState by mutableStateOf(BaseUiState.Loading)
@@ -202,12 +202,13 @@ class ClubViewModel(
                 clubRepository.joinClub(token, clubId)
                 val updatedClubs = clubRepository.getClubs()
                 _clubs.value = updatedClubs
+
+                userClubsCache.remove(token)
+                membersCache.remove(clubId)
+                userClubRoleCache.remove(clubId)
+                getClubRole(clubId)
+
                 joinClubUiState = BaseUiState.Success(true)
-
-                // Clear cache to update user's clubs list
-                val cacheKey = token
-                userClubsCache.remove(cacheKey)
-
             } catch (e: Exception) {
                 joinClubUiState = BaseUiState.Error
                 e.printStackTrace()
@@ -233,6 +234,7 @@ class ClubViewModel(
                 val cacheKey = token
                 userClubsCache.remove(cacheKey)
                 membersCache.remove(clubId)
+                userClubRoleCache.remove(clubId)
 
                 // Update UI state
                 uiState = BaseUiState.Success(updatedClubs)
