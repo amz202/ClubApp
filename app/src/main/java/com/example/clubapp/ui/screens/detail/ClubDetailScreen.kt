@@ -75,6 +75,7 @@ fun ClubDetailStateScreen(
     LaunchedEffect(clubId) {
         clubViewModel.getClub(clubId)
         clubViewModel.getClubRole(clubId)
+        eventViewModel.getClubEvents(clubId)
     }
 
     val clubState = clubViewModel.singleClubUiState
@@ -105,12 +106,6 @@ fun ClubDetailScreen(
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-    LaunchedEffect(clubId) {
-        clubViewModel.getClub(clubId)
-        eventViewModel.getClubEvents(clubId)
-        clubViewModel.getClubRole(clubId)
-    }
 
     val club = clubViewModel.clubOfId.collectAsState().value
     val clubEvents = eventViewModel.clubEvents.collectAsState().value

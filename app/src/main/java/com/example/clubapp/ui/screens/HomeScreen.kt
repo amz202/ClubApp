@@ -50,6 +50,7 @@ import com.example.clubapp.data.Datastore.UserPreferences.UserInfo
 import com.example.clubapp.signin.GoogleAuthClient
 import com.example.clubapp.signin.SignInViewModel
 import com.example.clubapp.ui.dialog.HomeScreenDetail
+import com.example.clubapp.ui.navigation.SignInScreenNav
 import com.example.clubapp.ui.screens.users.HomeScreenProfile
 import com.example.clubapp.ui.viewModels.ClubViewModel
 import com.example.clubapp.ui.viewModels.EventViewModel
@@ -104,14 +105,14 @@ fun HomeScreen(
                 navigationIcon = {
                     IconButton(onClick = {
                         if (isUserSignedIn) {
-                            // Sign out functionality
                             CoroutineScope(Dispatchers.Main).launch {
                                 authClient.signOut()
-                                // Optionally navigate or refresh
+                                userPreferences.clearUserData()
                                 userInfo = null
+                                navController.navigate(SignInScreenNav) {
+                                    popUpTo(0) { inclusive = true }
+                                }
                             }
-                        } else {
-                            // No action or different action when not signed in
                         }
                     }) {
                         if (isUserSignedIn) {
@@ -120,22 +121,6 @@ fun HomeScreen(
                                 contentDescription = "Sign Out"
                             )
                         }
-                    }
-                },
-                actions = {
-                    if (!isUserSignedIn) {
-                        IconButton(onClick = {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                authClient.signIn(signInViewModel)
-                            }
-                        }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Login,
-                                contentDescription = "Sign In"
-                            )
-                        }
-                    }else{
-                        Box(modifier = Modifier.width(32.dp)) { }
                     }
                 },
                 modifier = Modifier
@@ -183,7 +168,7 @@ fun HomeScreen(
         )
         {
             HomeScreenProfile(userInfo?.name.toString(), userInfo?.email.toString())
-            Spacer(modifier= Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             HomeScreenDetail(
                 clubList = clubList, eventList = eventList,
                 navController = navController,

@@ -75,6 +75,7 @@ fun EventDetailStateScreen(
     LaunchedEffect(eventId) {
         eventViewModel.getEvent(eventId)
         eventViewModel.getEventRole(eventId)
+        eventViewModel.getEventNews(eventId)
     }
     val singleEventState = eventViewModel.singleEventUiState
 
@@ -105,12 +106,6 @@ fun EventDetailScreen(
     navViewModel: NavigationViewModel
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-    LaunchedEffect(eventId) {
-        eventViewModel.getEvent(eventId)
-        eventViewModel.getEventRole(eventId)
-        eventViewModel.getEventNews(eventId)
-    }
 
     val eventState = eventViewModel.eventOfId.collectAsState()
     val event = eventState.value

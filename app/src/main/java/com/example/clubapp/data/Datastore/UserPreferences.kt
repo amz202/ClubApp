@@ -42,13 +42,18 @@ class UserPreferences(private val context: Context) {
         }.first()
     }
 
-    suspend fun getUserInfo(): UserInfo {
-        return context.dataStore.data.map { preferences ->
-            UserInfo(
-                name = preferences[NAME_KEY],
-                email = preferences[EMAIL_KEY]
-            )
-        }.first()
+    suspend fun clearUserData() {
+        context.dataStore.edit { preferences ->
+            preferences.clear()
+        }
+    }
+
+    suspend fun getUserInfo(): UserInfo? {
+        val preferences = context.dataStore.data.first()
+
+        val name = preferences[NAME_KEY] ?: return null
+        val email = preferences[EMAIL_KEY] ?: return null
+        return UserInfo(name, email)
     }
 
     data class UserInfo(val name: String?, val email: String?)

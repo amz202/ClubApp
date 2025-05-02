@@ -5,6 +5,9 @@ import com.example.clubapp.network.response.EventResponse
 import kotlinx.serialization.Serializable
 
 @Serializable
+object SignInScreenNav
+
+@Serializable
 object HomeScreenNav
 
 @Serializable

@@ -3,16 +3,23 @@ package com.example.clubapp.ui.navigation
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.clubapp.data.Datastore.UserPreferences
+import com.example.clubapp.data.Datastore.UserPreferences.UserInfo
 import com.example.clubapp.network.response.RoleResponse
 import com.example.clubapp.signin.SignInViewModel
 import com.example.clubapp.ui.screens.ClubListScreen
 import com.example.clubapp.ui.screens.EventListScreen
 import com.example.clubapp.ui.screens.HomeScreen
+import com.example.clubapp.ui.screens.SignInScreen
 import com.example.clubapp.ui.screens.addClub.AddClubScreen
 import com.example.clubapp.ui.screens.addEvent.AddEventScreenA
 import com.example.clubapp.ui.screens.addEvent.AddEventScreenB
@@ -45,11 +52,25 @@ fun AppNavigation(
     signInViewModel: SignInViewModel
 ) {
     val navController = rememberNavController()
+    var userInfo by remember { mutableStateOf<UserInfo?>(null) }
+
+    LaunchedEffect(Unit) {
+        userInfo = userPreferences.getUserInfo()
+    }
+
+    val startDestination = if (userInfo!=null) HomeScreenNav else SignInScreenNav
 
     NavHost(
         navController = navController,
-        startDestination = HomeScreenNav
+        startDestination = startDestination
     ) {
+        composable<SignInScreenNav>{
+            SignInScreen(
+                signInViewModel = signInViewModel,
+                navController = navController
+            )
+        }
+
         composable<HomeScreenNav> {
             HomeScreen(
                 navController = navController,
