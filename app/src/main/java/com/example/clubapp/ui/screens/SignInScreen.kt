@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.navigation.NavHostController
 import com.example.clubapp.ui.navigation.HomeScreenNav
+import com.example.clubapp.ui.viewModels.BaseUiState
 
 @Composable
 fun SignInScreen(
@@ -24,6 +25,15 @@ fun SignInScreen(
 ) {
     val context = LocalContext.current
     val authClient = remember { GoogleAuthClient(context) }
+    val signInUiState = signInViewModel.uiState
+
+    LaunchedEffect(signInUiState) {
+        if (signInUiState is BaseUiState.Success && signInUiState.data != null) {
+            navController.navigate(HomeScreenNav) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -39,19 +49,42 @@ fun SignInScreen(
         Button(
             onClick = {
                 CoroutineScope(Dispatchers.Main).launch {
-                    val signInResult = authClient.signIn(signInViewModel)
-                    if (signInResult) {
-                        navController.navigate(HomeScreenNav) {
-                            popUpTo("signin") { inclusive = true } //user cant go back to this screen using back button
-                        }
-                    }
+                    authClient.signIn(signInViewModel)
                 }
             },
             modifier = Modifier
                 .padding(16.dp)
-                .width(250.dp)
+                .width(250.dp),
+            enabled = signInUiState !is BaseUiState.Loading
         ) {
             Text("Sign in with Google")
+        }
+
+        if (signInUiState is BaseUiState.Loading) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(36.dp),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Signing in...",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+
+        if (signInUiState is BaseUiState.Error) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Try Again",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

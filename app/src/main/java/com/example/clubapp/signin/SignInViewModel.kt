@@ -14,13 +14,13 @@ import com.example.clubapp.network.request.AuthUser
 import com.example.clubapp.ui.viewModels.BaseUiState
 import kotlinx.coroutines.launch
 
-typealias SignInUiState = BaseUiState<AuthUser>
+typealias SignInUiState = BaseUiState<AuthUser?>
 
 class SignInViewModel(
     private val authRepository: AuthRepository,
     private val userPreferences: UserPreferences
 ) : ViewModel() {
-    var uiState: SignInUiState by mutableStateOf(BaseUiState.Loading)
+    var uiState: SignInUiState by mutableStateOf(BaseUiState.Success(null))
         private set
 
     fun login(token: String) {
@@ -28,7 +28,7 @@ class SignInViewModel(
             uiState = BaseUiState.Loading
             try {
                 val userResponse = authRepository.login(token)
-                println("Server response: $userResponse , token: $token") // Log the server response
+                println("Server response: $userResponse , token: $token")
 
                 userPreferences.saveUser(userResponse, token) //saves in the user prefs
 

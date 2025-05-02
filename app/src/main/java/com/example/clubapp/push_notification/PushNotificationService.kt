@@ -38,12 +38,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        // Build the notification (without any click action)
         val notification = NotificationCompat.Builder(this, "event_updates_channel")
             .setContentTitle(title)
             .setContentText(body)
             .setAutoCancel(true)
-            .setSmallIcon(R.drawable.ic_launcher_background) // Added notification icon
+            .setSmallIcon(R.drawable.ic_launcher_background)
             .build()
 
         // Show the notification
@@ -54,6 +53,5 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        // This is only needed if you want to target specific devices rather than topics
     }
 }

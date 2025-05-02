@@ -123,6 +123,9 @@ fun HomeScreen(
                         }
                     }
                 },
+                actions = {
+                    Box(modifier = Modifier.width(32.dp)) { }
+                },
                 modifier = Modifier
                     .windowInsetsPadding(WindowInsets.statusBars),
             )
