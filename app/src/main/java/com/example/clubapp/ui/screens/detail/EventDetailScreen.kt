@@ -207,6 +207,10 @@ fun EventDetailScreen(
                                 onAddNews = {
                                     navViewModel.showAddEventNewsDialog(eventId)
                                     showMenu = false
+                                },
+                                onDeleteEvent = {
+                                    eventViewModel.deleteEvent(eventId)
+                                    navController.popBackStack()
                                 }
                             )
                         }

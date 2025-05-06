@@ -2,6 +2,7 @@ package com.example.clubapp.ui.dialog
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.DropdownMenu
@@ -20,6 +21,7 @@ fun ClubActionMenu(
     canAddEvent: Boolean,
     isMember: Boolean,
     onLeaveClub: () -> Unit,
+    onDeleteClub: () -> Unit,
 ) {
     DropdownMenu(
         expanded = expanded,
@@ -44,6 +46,18 @@ fun ClubActionMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        contentDescription = null
+                    )
+                }
+            )
+        }
+        if (canAddEvent) {
+            DropdownMenuItem(
+                text = { Text("Delete Club") },
+                onClick = onDeleteClub,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.DeleteForever,
                         contentDescription = null
                     )
                 }

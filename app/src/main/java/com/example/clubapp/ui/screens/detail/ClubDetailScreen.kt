@@ -208,6 +208,10 @@ fun ClubDetailScreen(
                                 onLeaveClub = {
                                     clubViewModel.leaveClub(clubId)
                                     navController.popBackStack()
+                                },
+                                onDeleteClub = {
+                                    clubViewModel.deleteClub(clubId)
+                                    navController.popBackStack()
                                 }
                             )
                         }

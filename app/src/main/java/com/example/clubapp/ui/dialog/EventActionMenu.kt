@@ -3,6 +3,7 @@ package com.example.clubapp.ui.dialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -17,7 +18,8 @@ fun EventActionMenu(
     onDismissRequest: () -> Unit,
     onLeaveEvent:() -> Unit,
     role:String,
-    onAddNews: () -> Unit
+    onAddNews: () -> Unit,
+    onDeleteEvent: () -> Unit,
 ){
     DropdownMenu(
         expanded = expanded,
@@ -42,6 +44,18 @@ fun EventActionMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Add,
+                        contentDescription = null
+                    )
+                }
+            )
+        }
+        if (role == "head") {
+            DropdownMenuItem(
+                text = { Text("Delete Event") },
+                onClick = onDeleteEvent,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.DeleteForever,
                         contentDescription = null
                     )
                 }
