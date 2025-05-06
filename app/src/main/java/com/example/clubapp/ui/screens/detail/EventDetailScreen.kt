@@ -112,7 +112,11 @@ fun EventDetailScreen(
     val ownEventRole by eventViewModel.userEventRole.collectAsState(null)
     val isMember = ownEventRole?.role != null
     val showAddEvent = navViewModel.showAddEventNewsDialog.collectAsState().value
-
+    val capacityLimitReached: Boolean? = event?.capacity?.toIntOrNull()?.let { capacity ->
+        event.attendeeCount.let { attendeeCount ->
+            if (capacity > 0) capacity <= attendeeCount else null
+        }
+    }
     val eventNewsState = eventViewModel.eventNewsUiState
     val joinEventState = eventViewModel.joinEventUiState
 
@@ -128,7 +132,7 @@ fun EventDetailScreen(
 
     Scaffold(
         floatingActionButton = {
-            if (!isMember) {
+            if (!isMember && (capacityLimitReached == null || !capacityLimitReached)) {
                 FloatingActionButton(
                     onClick = {
                         eventViewModel.joinEvent(event.id)

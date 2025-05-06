@@ -76,9 +76,7 @@ fun EventParticipantList(
     navViewModel: NavigationViewModel,
     ownEventRole: String?
 ) {
-    LaunchedEffect(eventId) {
-        eventViewModel.getEventParticipants(eventId)
-    }
+
     val members by eventViewModel.eventParticipants.collectAsState(initial = emptyList())
     val showEventRoleDialog by navViewModel.showEventRoleDialog.collectAsState(false)
     val eventRoleUser by navViewModel.eventRoleUser.collectAsState(null)

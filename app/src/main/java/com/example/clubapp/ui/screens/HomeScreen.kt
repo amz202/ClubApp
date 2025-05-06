@@ -108,10 +108,12 @@ fun HomeScreen(
                             CoroutineScope(Dispatchers.Main).launch {
                                 authClient.signOut()
                                 userPreferences.clearUserData()
+                                signInViewModel.resetSignInState()
                                 userInfo = null
-                                navController.navigate(SignInScreenNav) {
-                                    popUpTo(0) { inclusive = true }
-                                }
+                                navController.navigate(SignInScreenNav)
+//                                {
+//                                    popUpTo(0) { inclusive = true }
+//                                }
                             }
                         }
                     }) {

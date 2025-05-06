@@ -40,6 +40,10 @@ class SignInViewModel(
         }
     }
 
+    fun resetSignInState(){
+        uiState = BaseUiState.Success(null)
+    }
+
     companion object {
         val authFactory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

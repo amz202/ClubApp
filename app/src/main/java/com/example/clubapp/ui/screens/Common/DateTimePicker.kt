@@ -40,7 +40,6 @@ fun DateTimePicker(
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
 
-    // Update the combined date time when either changes
     val updateDateTime = {
         val combinedDateTime = LocalDateTime.of(pickedDate, pickedTime)
         onDateTimeSelected(combinedDateTime)

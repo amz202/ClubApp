@@ -29,9 +29,10 @@ fun SignInScreen(
 
     LaunchedEffect(signInUiState) {
         if (signInUiState is BaseUiState.Success && signInUiState.data != null) {
-            navController.navigate(HomeScreenNav) {
-                popUpTo(0) { inclusive = true }
-            }
+            navController.navigate(HomeScreenNav)
+//            {
+//                popUpTo(0) { inclusive = true }
+//            }
         }
     }
 

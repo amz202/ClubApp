@@ -20,6 +20,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -41,6 +42,7 @@ import com.example.clubapp.ui.screens.Common.DateTimePicker
 import com.example.clubapp.ui.viewModels.EventViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import androidx.compose.ui.text.input.KeyboardType
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,15 +50,16 @@ import java.time.format.DateTimeFormatter
 fun AddEventScreenB(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    name:String,
-    description:String,
-    tags:String,
+    name: String,
+    description: String,
+    tags: String,
     eventViewModel: EventViewModel,
-    clubId:String?
+    clubId: String?
 ) {
     var location by remember { mutableStateOf("") }
     var organizedBy by remember { mutableStateOf("") }
     var selectedDateTime by remember { mutableStateOf(LocalDateTime.now()) }
+    var capacity by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -85,9 +88,11 @@ fun AddEventScreenB(
         },
         modifier = Modifier.padding(vertical = 8.dp)
     ) { paddingValues ->
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
             Column(
                 modifier = modifier
                     .fillMaxSize()
@@ -116,12 +121,38 @@ fun AddEventScreenB(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(modifier = Modifier.height(24.dp))
+                OutlinedTextField(
+                    value = capacity,
+                    onValueChange = { newValue ->
+                        if (newValue.isEmpty() || (newValue.all { it.isDigit() } && newValue.toIntOrNull()
+                                ?.let { it > 0 } == true)) {
+                            capacity = newValue
+                        }
+                    },
+                    label = { Text("Capacity (Optional)") },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(modifier = Modifier.height(38.dp))
                 DateTimePicker(
                     initialDateTime = selectedDateTime,
                     onDateTimeSelected = { selectedDateTime = it },
                     modifier = Modifier.fillMaxWidth()
                 )
+                val yesterday =
+                    LocalDateTime.now().minusDays(1).withHour(0).withMinute(0).withSecond(0)
+
+                if (selectedDateTime.isBefore(yesterday)) {
+                    Text(
+                        text = "Please select a future date and time",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.height(48.dp))
                 Row(
                     modifier = Modifier
@@ -139,7 +170,7 @@ fun AddEventScreenB(
                                 tags = tags,
                                 location = location,
                                 dateTime = selectedDateTime.format(DateTimeFormatter.ISO_DATE_TIME),
-                                capacity = null,
+                                capacity = if (capacity.isNotEmpty()) capacity else null,
                                 organizedBy = organizedBy,
                                 clubId = clubId
                             )

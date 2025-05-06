@@ -82,9 +82,6 @@ fun ClubMembersList(
     navViewModel: NavigationViewModel,
     ownClubRole: String?
 ) {
-    LaunchedEffect(clubId) {
-        clubViewModel.getClubMembers(clubId)
-    }
     val members by clubViewModel.clubMembers.collectAsState(initial = emptyList())
     val showClubDialog by navViewModel.showClubRoleDialog.collectAsState(false)
     val clubRoleUser by navViewModel.clubRoleUser.collectAsState(null)
