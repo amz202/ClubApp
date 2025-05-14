@@ -348,7 +348,6 @@ fun ClubDetailScreen(
 
                         when (clubEventState) {
                             is BaseUiState.Success -> {
-                                val clubEvents = eventViewModel.clubEvents.collectAsState().value
                                 Column(
                                     modifier = Modifier.padding(top = 20.dp),
                                     verticalArrangement = Arrangement.spacedBy(8.dp)

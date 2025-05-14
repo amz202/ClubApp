@@ -2,10 +2,12 @@ package com.example.clubapp.ui.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -35,7 +37,24 @@ import com.example.clubapp.ui.navigation.HomeScreenNav
 import com.example.clubapp.ui.navigation.NavBar.bottomNavItems
 import com.example.clubapp.ui.screens.Common.ErrorScreen
 import com.example.clubapp.ui.screens.Common.LoadingScreen
-
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Divider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import com.example.clubapp.ui.cards.isEventInPast
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import com.example.clubapp.ui.viewModels.BaseUiState
 import com.example.clubapp.ui.viewModels.EventUiState
 import com.example.clubapp.ui.viewModels.NavigationViewModel
@@ -60,8 +79,8 @@ fun EventListScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventList(
     modifier: Modifier = Modifier,
@@ -71,9 +90,18 @@ fun EventList(
 ) {
     navigationViewModel.updateSelectedItemIndex(1)
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    var selectedItemIndex = navigationViewModel.selectedItemIndex
+    val selectedItemIndex = navigationViewModel.selectedItemIndex
+    var expanded by remember { mutableStateOf(false) }
+    var selectedFilter by remember { mutableStateOf(EventFilterOption.All) }
 
-    val items = bottomNavItems
+    val filteredEventList = remember(eventList, selectedFilter) {
+        when (selectedFilter) {
+            EventFilterOption.All -> eventList
+            EventFilterOption.Upcoming -> eventList.filterNot { isEventInPast(it.dateTime) }
+            EventFilterOption.Past -> eventList.filter { isEventInPast(it.dateTime) }
+        }
+    }
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -91,12 +119,37 @@ fun EventList(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
-                }
+                },
+                navigationIcon = {
+                    Box(modifier = Modifier.width(52.dp)) { }
+                },
+                actions = {
+                    Box {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(Icons.Default.FilterList, contentDescription = "Filter")
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            EventFilterOption.values().forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(option.displayName) },
+                                    onClick = {
+                                        selectedFilter = option
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                },
+                scrollBehavior = scrollBehavior
             )
         },
         bottomBar = {
             NavigationBar {
-                items.forEachIndexed { index, item ->
+                bottomNavItems.forEachIndexed { index, item ->
                     NavigationBarItem(
                         selected = selectedItemIndex.value == index,
                         onClick = {
@@ -133,20 +186,22 @@ fun EventList(
                     .fillMaxSize()
                     .padding(12.dp)
             ) {
-                items(eventList) { event ->
+                items(filteredEventList) { event ->
                     EventItem(
                         eventResponse = event,
                         modifier = modifier.padding(bottom = 16.dp),
                         onClick = {
-                            navController.navigate(
-                                EventDetailNav(
-                                    eventId = event.id
-                                )
-                            )
+                            navController.navigate(EventDetailNav(event.id))
                         }
                     )
                 }
             }
         }
     }
+}
+
+enum class EventFilterOption(val displayName: String) {
+    All("All Events"),
+    Upcoming("Upcoming"),
+    Past("Past")
 }

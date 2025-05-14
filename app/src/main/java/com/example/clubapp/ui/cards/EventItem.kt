@@ -39,6 +39,11 @@ fun EventItem(
     modifier: Modifier= Modifier,
     onClick: () -> Unit
 ) {
+    val stripColor = if (isEventInPast(eventResponse.dateTime)) {
+        Color.Red
+    } else {
+        Color.Green
+    }
     Card(modifier = modifier, shape = RoundedCornerShape(8.dp), onClick = onClick) {
         Row(
             modifier = Modifier
@@ -47,11 +52,6 @@ fun EventItem(
                 .padding(end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val stripColor = if (isEventInPast(eventResponse.dateTime)) {
-                Color.Red
-            } else {
-                Color.Green
-            }
             Box(
                 modifier = Modifier
                     .width(16.dp)

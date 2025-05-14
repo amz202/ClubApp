@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.clubapp.network.response.EventResponse
 import com.example.clubapp.ui.cards.EventItem
+import com.example.clubapp.ui.cards.isEventInPast
 import com.example.clubapp.ui.navigation.ClubDetailNav
 import com.example.clubapp.ui.navigation.EventDetailNav
 import com.example.clubapp.ui.viewModels.BaseUiState
@@ -230,22 +231,72 @@ fun MyEvents(
                         )
                     }
                 } else {
+                    val (pastEvents, upcomingEvents) = eventList.partition { event ->
+                        isEventInPast(event.dateTime)
+                    }
+
                     LazyColumn(
                         contentPadding = PaddingValues(bottom = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(eventList) { event ->
-                            EventItem(
-                                modifier = Modifier.fillMaxWidth(),
-                                eventResponse = event,
-                                onClick = {
-                                    navController.navigate(
-                                        EventDetailNav(
-                                            eventId = event.id
-                                        )
-                                    )
-                                }
+                        item {
+                            Text(
+                                text = "Upcoming Events",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(vertical = 8.dp)
                             )
+                        }
+
+                        if (upcomingEvents.isEmpty()) {
+                            item {
+                                Text(
+                                    text = "No upcoming events",
+                                    modifier = Modifier.padding(8.dp)
+                                )
+                            }
+                        } else {
+                            items(upcomingEvents) { event ->
+                                EventItem(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    eventResponse = event,
+                                    onClick = {
+                                        navController.navigate(
+                                            EventDetailNav(
+                                                eventId = event.id
+                                            )
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                        item {
+                            Text(
+                                text = "Past Events",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                            )
+                        }
+                        if (pastEvents.isEmpty()) {
+                            item {
+                                Text(
+                                    text = "No past events",
+                                    modifier = Modifier.padding(8.dp)
+                                )
+                            }
+                        } else {
+                            items(pastEvents) { event ->
+                                EventItem(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    eventResponse = event,
+                                    onClick = {
+                                        navController.navigate(
+                                            EventDetailNav(
+                                                eventId = event.id
+                                            )
+                                        )
+                                    }
+                                )
+                            }
                         }
                     }
                 }
