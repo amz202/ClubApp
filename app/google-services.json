@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "290590681565",
+    "project_id": "clubapp-f255a",
+    "storage_bucket": "clubapp-f255a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:290590681565:android:4ab1b0c263da1651162e34",
+        "android_client_info": {
+          "package_name": "com.example.clubapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "290590681565-csa57gqpul1sug46c8dpkp2khlrj2afb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.clubapp",
+            "certificate_hash": "820dc112b28e702839a9a4d22f97a89cbdd52c68"
+          }
+        },
+        {
+          "client_id": "290590681565-vkacsc02u4i10mg5ppmgjlfel6t8i222.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANctsuDh1vRXnWRj-Y1-EoSUq8DxfqGrs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "290590681565-vkacsc02u4i10mg5ppmgjlfel6t8i222.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
