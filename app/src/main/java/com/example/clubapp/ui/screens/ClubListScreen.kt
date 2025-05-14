@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -24,8 +25,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.clubapp.ui.navigation.AddClubNav
 import com.example.clubapp.ui.navigation.ClubDetailNav
@@ -35,6 +38,7 @@ import com.example.clubapp.ui.navigation.HomeScreenNav
 import com.example.clubapp.ui.navigation.NavBar.bottomNavItems
 import com.example.clubapp.ui.screens.Common.ErrorScreen
 import com.example.clubapp.ui.screens.Common.LoadingScreen
+import com.example.clubapp.ui.theme.PlusJakarta
 import com.example.clubapp.ui.viewModels.BaseUiState
 import com.example.clubapp.ui.viewModels.ClubUiState
 import com.example.clubapp.ui.viewModels.NavigationViewModel
@@ -88,7 +92,10 @@ fun ClubList(
                     Text(
                         "Clubs",
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontFamily = PlusJakarta,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
                     )
                 }
             )

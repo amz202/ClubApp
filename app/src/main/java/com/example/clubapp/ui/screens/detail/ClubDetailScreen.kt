@@ -52,16 +52,22 @@ import com.example.clubapp.ui.navigation.EventDetailNav
 import com.example.clubapp.ui.viewModels.ClubViewModel
 import com.example.clubapp.ui.viewModels.EventViewModel
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.example.clubapp.ui.dialog.ClubActionMenu
 import com.example.clubapp.ui.viewModels.BaseUiState
 import com.example.clubapp.ui.screens.Common.ErrorScreen
 import com.example.clubapp.ui.screens.Common.LoadingScreen
+import com.example.clubapp.ui.theme.PlusJakarta
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -121,28 +127,18 @@ fun ClubDetailScreen(
         }
     }
 
-    if (club == null) {
-        return
-    }
+    if (club == null) return
 
     Scaffold(
         floatingActionButton = {
             if (!isMember) {
-                FloatingActionButton(
-                    onClick = {
-                        clubViewModel.joinClub(clubId)
-                    }
-                ) {
+                FloatingActionButton(onClick = { clubViewModel.joinClub(clubId) }) {
                     when (joinClubState) {
-                        is BaseUiState.Loading -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                strokeWidth = 2.dp
-                            )
-                        }
-                        else -> {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
-                        }
+                        is BaseUiState.Loading -> CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
+                        else -> Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
                     }
                 }
             }
@@ -151,15 +147,16 @@ fun ClubDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Club",
+                        text = "Club",
+                        fontFamily = PlusJakarta,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Start
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        navController.popBackStack()
-                    }) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -169,38 +166,23 @@ fun ClubDetailScreen(
                 actions = {
                     IconButton(onClick = {
                         navController.navigate(
-                            ClubMembersNav(
-                                clubId = clubId,
-                                clubName = club.name,
-                                ownRole = ownClubRole?.role
-                            )
+                            ClubMembersNav(clubId, club.name, ownClubRole?.role)
                         )
                     }) {
-                        Icon(
-                            imageVector = Icons.Default.Groups,
-                            contentDescription = "Members"
-                        )
+                        Icon(Icons.Default.Groups, contentDescription = "Members")
                     }
 
                     if (isMember) {
                         var showMenu by remember { mutableStateOf(false) }
-                        Box{
+                        Box {
                             IconButton(onClick = { showMenu = true }) {
-                                Icon(
-                                    imageVector = Icons.Default.MoreVert,
-                                    contentDescription = "More options"
-                                )
+                                Icon(Icons.Default.MoreVert, contentDescription = "More options")
                             }
-
                             ClubActionMenu(
                                 expanded = showMenu,
                                 onDismissRequest = { showMenu = false },
                                 onAddEventClick = {
-                                    navController.navigate(
-                                        AddEventNavA(
-                                            clubId = club?.id ?: ""
-                                        )
-                                    )
+                                    navController.navigate(AddEventNavA(clubId))
                                     showMenu = false
                                 },
                                 canAddEvent = ownClubRole?.role == "admin" || ownClubRole?.role == "creator",
@@ -224,156 +206,140 @@ fun ClubDetailScreen(
             .nestedScroll(scrollBehavior.nestedScrollConnection)
             .padding(vertical = 8.dp)
     ) { paddingValues ->
-        Box(
+
+        Column(
             modifier = modifier
                 .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
                 .fillMaxSize()
         ) {
-            Column(
+            // Header
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())  // Make the column scrollable
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box(
-                        modifier = Modifier
-                            .background(color = Color.DarkGray)
-                            .fillMaxWidth()
-                            .height(96.dp)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = club.name,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = PlusJakarta,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Description
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                shape = RoundedCornerShape(12.dp),
+                tonalElevation = 2.dp,
+                color = MaterialTheme.colorScheme.surfaceVariant
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
                     Text(
-                        text = club.name,
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        "Description",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
+                    Text(club.description, style = MaterialTheme.typography.bodyMedium)
                 }
+            }
 
-                Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = Color(0xFFE3F2FD)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            "Description",
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        Text(club.description)
-                    }
+            // Club Metadata
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                shape = RoundedCornerShape(12.dp),
+                tonalElevation = 2.dp,
+                color = MaterialTheme.colorScheme.surfaceVariant
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    ClubDetailRow(Icons.Default.Tag, "Tags", club.tags)
+                    ClubDetailRow(Icons.Default.Groups, "Members", "${club.memberCount}")
+                    ClubDetailRow(Icons.Default.Person, "Created by", club.createdBy)
+                    ClubDetailRow(Icons.Default.DateRange, "Created on", formatDateTimeString(club.createdOn))
                 }
+            }
 
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    color = Color(0xFFE3F2FD)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Tag,
-                                contentDescription = "Tags",
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text(text = club.tags)
-                        }
+            Spacer(modifier = Modifier.height(16.dp))
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Groups,
-                                contentDescription = "Members",
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text(text = "${club.memberCount} members")
-                        }
+            // Club Events Section
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                tonalElevation = 2.dp,
+                color = MaterialTheme.colorScheme.surfaceVariant
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text(
+                        text = "Club Events",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Created By",
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text(text = "Created by ${club.createdBy}")
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = "Date and Time",
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text(text = formatDateTimeString(club.createdOn))
-                        }
-                    }
-                }
-
-                Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),     color = Color(0xFFE3F2FD)
-                ){
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = "Club Events",
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-
-                        when (clubEventState) {
-                            is BaseUiState.Success -> {
-                                Column(
-                                    modifier = Modifier.padding(top = 20.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    clubEvents?.forEach { event ->
+                    when (clubEventState) {
+                        is BaseUiState.Success -> {
+                            if (clubEvents.isNullOrEmpty()) {
+                                Text("No events scheduled.", style = MaterialTheme.typography.bodyMedium)
+                            } else {
+                                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                    clubEvents.forEach { event ->
                                         EventItem(
                                             eventResponse = event,
                                             onClick = {
-                                                navController.navigate(
-                                                    EventDetailNav(eventId = event.id)
-                                                )
+                                                navController.navigate(EventDetailNav(event.id))
                                             }
                                         )
                                     }
                                 }
                             }
-                            is BaseUiState.Loading -> {
-                                Text(text = "Loading events...")
-                            }
-                            is BaseUiState.Error -> {
-                                Text(text = "No events scheduled")
-                            }
+                        }
+
+                        is BaseUiState.Loading -> {
+                            Text("Loading events...", style = MaterialTheme.typography.bodyMedium)
+                        }
+
+                        is BaseUiState.Error -> {
+                            Text("Error loading events.", style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(32.dp))
         }
+    }
+}
+@Composable
+fun ClubDetailRow(icon: ImageVector, label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            modifier = Modifier.padding(end = 12.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = "$label: $value",
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }

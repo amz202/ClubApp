@@ -23,11 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.clubapp.network.response.ClubMembersResponse
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import com.example.clubapp.network.response.EventParticipantsResponse
 import com.example.clubapp.ui.viewModels.ClubViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.example.clubapp.network.response.RoleResponse
 import com.example.clubapp.ui.dialog.ClubRoleDialog
 import com.example.clubapp.ui.dialog.EventRoleDialog
@@ -36,6 +39,7 @@ import com.example.clubapp.ui.viewModels.NavigationViewModel
 import com.example.clubapp.ui.viewModels.BaseUiState
 import com.example.clubapp.ui.screens.Common.ErrorScreen
 import com.example.clubapp.ui.screens.Common.LoadingScreen
+import com.example.clubapp.ui.theme.PlusJakarta
 
 
 @Composable
@@ -93,7 +97,10 @@ fun ClubMembersList(
                     Text(
                         "Club Members",
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontFamily = PlusJakarta,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
                     )
                 },
                 navigationIcon = {

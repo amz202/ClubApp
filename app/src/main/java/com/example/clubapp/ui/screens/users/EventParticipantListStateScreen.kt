@@ -22,15 +22,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.example.clubapp.ui.dialog.EventRoleDialog
 import com.example.clubapp.ui.viewModels.EventViewModel
 import com.example.clubapp.ui.viewModels.NavigationViewModel
 import com.example.clubapp.ui.viewModels.BaseUiState
 import com.example.clubapp.ui.screens.Common.ErrorScreen
 import com.example.clubapp.ui.screens.Common.LoadingScreen
+import com.example.clubapp.ui.theme.PlusJakarta
 
 @Composable
 fun EventParticipantListStateScreen(
@@ -88,7 +93,10 @@ fun EventParticipantList(
                     Text(
                         "Event Participants",
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontFamily = PlusJakarta,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
                     )
                 },
                 navigationIcon = {

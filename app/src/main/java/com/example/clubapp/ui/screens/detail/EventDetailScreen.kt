@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -30,6 +31,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -55,12 +57,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.example.clubapp.ui.cards.isEventInPast
 import com.example.clubapp.ui.dialog.AddEventNewsDialog
 import com.example.clubapp.ui.dialog.EventActionMenu
 import com.example.clubapp.ui.viewModels.BaseUiState
 import com.example.clubapp.ui.screens.Common.ErrorScreen
 import com.example.clubapp.ui.screens.Common.LoadingScreen
+import com.example.clubapp.ui.theme.PlusJakarta
 import com.example.clubapp.ui.viewModels.NavigationViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -158,7 +164,10 @@ fun EventDetailScreen(
                     Text(
                         "Event",
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontFamily = PlusJakarta,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
                     )
                 },
                 navigationIcon = {
@@ -246,9 +255,13 @@ fun EventDetailScreen(
                     Text(
                         text = event.name,
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 20.dp, vertical = 12.dp)
                             .fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = PlusJakarta,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -258,14 +271,23 @@ fun EventDetailScreen(
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp), color = Color(0xFFE3F2FD)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 1.dp,
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             "Description",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
-                        Text(event.description)
+                        Text(
+                            event.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
 
@@ -273,44 +295,47 @@ fun EventDetailScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = Color(0xFFE3F2FD)
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 1.dp,
+                    shape = RoundedCornerShape(12.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             text = "Event Updates",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
                         when (eventNewsState) {
                             is BaseUiState.Success -> {
                                 val eventNews = eventViewModel.eventNews.collectAsState().value
-                                    ?.sortedByDescending { it.createdOn } // Sort by newest first
+                                    ?.sortedByDescending { it.createdOn }
 
                                 if (eventNews.isNullOrEmpty()) {
-                                    Text(text = "No updates available")
+                                    Text("No updates available")
                                 } else {
                                     var expandedNews by remember { mutableStateOf(false) }
-                                    val displayedNews =
-                                        if (expandedNews) eventNews else eventNews.take(1)
+                                    val displayedNews = if (expandedNews) eventNews else eventNews.take(1)
 
-                                    Column(
-                                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                         displayedNews.forEach { news ->
                                             Surface(
                                                 modifier = Modifier.fillMaxWidth(),
-                                                color = Color(0xFFEEEEEE)
+                                                color = MaterialTheme.colorScheme.primaryContainer,
+                                                shape = RoundedCornerShape(8.dp)
                                             ) {
-                                                Column(
-                                                    modifier = Modifier.padding(12.dp)
-                                                ) {
-                                                    Text(text = news.news)
+                                                Column(modifier = Modifier.padding(12.dp)) {
+                                                    Text(
+                                                        text = news.news,
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                                                    )
                                                     Spacer(modifier = Modifier.height(4.dp))
                                                     Text(
                                                         text = formatDateTimeString(news.createdOn),
-                                                        color = Color.Gray
+                                                        style = MaterialTheme.typography.bodySmall,
+                                                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
                                                     )
                                                 }
                                             }
@@ -319,21 +344,22 @@ fun EventDetailScreen(
                                         if (eventNews.size > 1) {
                                             TextButton(
                                                 onClick = { expandedNews = !expandedNews },
-                                                modifier = Modifier
-                                                    .align(Alignment.End)
-                                                    .padding(0.dp)
+                                                modifier = Modifier.align(Alignment.End)
                                             ) {
                                                 Row(
                                                     verticalAlignment = Alignment.CenterVertically,
                                                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                                                 ) {
-                                                    Text(text = if (expandedNews) "Show Less" else "Show More")
+                                                    Text(
+                                                        text = if (expandedNews) "Show Less" else "Show More",
+                                                        style = MaterialTheme.typography.labelLarge
+                                                    )
                                                     Icon(
                                                         imageVector = if (expandedNews)
                                                             Icons.Default.KeyboardArrowUp
                                                         else
                                                             Icons.Default.KeyboardArrowDown,
-                                                        contentDescription = if (expandedNews) "Collapse" else "Expand"
+                                                        contentDescription = null
                                                     )
                                                 }
                                             }
@@ -343,81 +369,35 @@ fun EventDetailScreen(
                             }
 
                             is BaseUiState.Loading -> {
-                                Text(text = "Loading news...")
+                                Text("Loading news...")
                             }
 
                             is BaseUiState.Error -> {
-                                Text(text = "No news")
+                                Text("No news")
                             }
                         }
                     }
                 }
-                // Event details container
+                // Event Details Section
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp), color = Color(0xFFE3F2FD)
+                        .padding(16.dp),
+                    color = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 1.dp,
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = "Date and Time",
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text(text = formatDateTimeString(event.dateTime))
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.LocationOn,
-                                contentDescription = "Location",
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text(text = event.location)
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Attendees",
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text(
-                                text = "${event.attendeeCount}${
-                                    if (event.capacity != "null") "/${event.capacity}" else ""
-                                } attending"
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Groups,
-                                contentDescription = "Organizer",
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text(text = "Organized by ${event.organizedBy}")
-                        }
+                        EventDetailRow(Icons.Default.DateRange, formatDateTimeString(event.dateTime))
+                        EventDetailRow(Icons.Default.LocationOn, event.location)
+                        EventDetailRow(
+                            Icons.Default.Person,
+                            "${event.attendeeCount}${if (event.capacity != "null") "/${event.capacity}" else ""} attending"
+                        )
+                        EventDetailRow(
+                            Icons.Default.Groups,
+                            "Organized by ${event.organizedBy}"
+                        )
                     }
                 }
             }
@@ -430,7 +410,27 @@ fun EventDetailScreen(
         }
     }
 }
-
+@Composable
+private fun EventDetailRow(icon: ImageVector, text: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.padding(end = 8.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
 @RequiresApi(Build.VERSION_CODES.O)
 fun formatDateTimeString(isoDateString: String): String {
     return try {

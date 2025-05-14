@@ -51,8 +51,11 @@ import androidx.compose.material3.Divider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.clubapp.ui.cards.isEventInPast
+import com.example.clubapp.ui.theme.PlusJakarta
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import com.example.clubapp.ui.viewModels.BaseUiState
@@ -117,7 +120,10 @@ fun EventList(
                     Text(
                         "Events",
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontFamily = PlusJakarta,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
                     )
                 },
                 navigationIcon = {
@@ -144,7 +150,7 @@ fun EventList(
                         }
                     }
                 },
-                scrollBehavior = scrollBehavior
+                scrollBehavior = scrollBehavior,
             )
         },
         bottomBar = {

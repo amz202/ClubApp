@@ -10,12 +10,20 @@ import androidx.compose.ui.unit.sp
 import com.example.clubapp.signin.GoogleAuthClient
 import com.example.clubapp.signin.SignInViewModel
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.navigation.NavHostController
 import com.example.clubapp.ui.navigation.HomeScreenNav
+import com.example.clubapp.ui.theme.Syne
 import com.example.clubapp.ui.viewModels.BaseUiState
+import com.example.clubapp.R
 
 @Composable
 fun SignInScreen(
@@ -30,62 +38,94 @@ fun SignInScreen(
     LaunchedEffect(signInUiState) {
         if (signInUiState is BaseUiState.Success && signInUiState.data != null) {
             navController.navigate(HomeScreenNav)
-//            {
-//                popUpTo(0) { inclusive = true }
-//            }
         }
     }
 
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp)
     ) {
-        Text(
-            text = "Welcome to ClubApp",
-            fontSize = 24.sp,
-            modifier = Modifier.padding(bottom = 32.dp)
-        )
-
-        Button(
-            onClick = {
-                CoroutineScope(Dispatchers.Main).launch {
-                    authClient.signIn(signInViewModel)
-                }
-            },
+        // Top Half - Title + Caption
+        Column(
             modifier = Modifier
-                .padding(16.dp)
-                .width(250.dp),
-            enabled = signInUiState !is BaseUiState.Loading
+                .align(Alignment.TopCenter)
+                .fillMaxWidth()
+                .padding(top = 120.dp) // fine-tuned to mid-upper-half
+                .offset(y = 40.dp),   // slight push down
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Sign in with Google")
+            Text(
+                text = "ClubApp",
+                fontFamily = FontFamily(Font(R.font.syne_medium, FontWeight.Medium)),
+                fontSize = 36.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Your campus, connected.",
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                )
+            )
         }
 
-        if (signInUiState is BaseUiState.Loading) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+        // Button - Just below the center
+        Column(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .offset(y = 80.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Button(
+                onClick = {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        authClient.signIn(signInViewModel)
+                    }
+                },
+                modifier = Modifier
+                    .width(250.dp)
+                    .height(52.dp),
+                enabled = signInUiState !is BaseUiState.Loading
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(36.dp),
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Signing in...",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    text = "Sign in with Google",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.SemiBold
+                    )
+                )
+            }
+
+            // Loading State
+            if (signInUiState is BaseUiState.Loading) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(36.dp),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Signing in...",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+            // Error State
+            if (signInUiState is BaseUiState.Error) {
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(
+                    text = "Try Again",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
-
-        if (signInUiState is BaseUiState.Error) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "Try Again",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
     }
 }
+
+

@@ -40,11 +40,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.clubapp.data.Datastore.UserPreferences
 import com.example.clubapp.data.Datastore.UserPreferences.UserInfo
 import com.example.clubapp.signin.GoogleAuthClient
@@ -52,6 +55,7 @@ import com.example.clubapp.signin.SignInViewModel
 import com.example.clubapp.ui.dialog.HomeScreenDetail
 import com.example.clubapp.ui.navigation.SignInScreenNav
 import com.example.clubapp.ui.screens.users.HomeScreenProfile
+import com.example.clubapp.ui.theme.PlusJakarta
 import com.example.clubapp.ui.viewModels.ClubViewModel
 import com.example.clubapp.ui.viewModels.EventViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -99,7 +103,10 @@ fun HomeScreen(
                     Text(
                         "Home",
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontFamily = PlusJakarta,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
                     )
                 },
                 navigationIcon = {
@@ -130,6 +137,7 @@ fun HomeScreen(
                 },
                 modifier = Modifier
                     .windowInsetsPadding(WindowInsets.statusBars),
+
             )
         },
         bottomBar = {
