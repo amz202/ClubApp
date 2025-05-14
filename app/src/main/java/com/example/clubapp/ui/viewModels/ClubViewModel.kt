@@ -164,6 +164,15 @@ class ClubViewModel(
                 clubRepository.createClub(token, club)
                 val updatedClubs = clubRepository.getClubs()
                 uiState = BaseUiState.Success(updatedClubs)
+                val cacheKey = token
+                val myClubs = clubRepository.getMyClubs(token.toString())
+                if(!myClubs.isNullOrEmpty()){
+                    _usersClub.value = myClubs
+                    userClubsCache[cacheKey] = myClubs
+                    userClubsUiState = BaseUiState.Success(myClubs)
+                } else {
+                    userClubsUiState = BaseUiState.Success(emptyList())
+                }
             } catch (e: Exception) {
                 uiState = BaseUiState.Error
                 e.printStackTrace()
@@ -202,12 +211,18 @@ class ClubViewModel(
                 clubRepository.joinClub(token, clubId)
                 val updatedClubs = clubRepository.getClubs()
                 _clubs.value = updatedClubs
-
                 userClubsCache.remove(token)
                 membersCache.remove(clubId)
                 userClubRoleCache.remove(clubId)
-                getClubRole(clubId)
-
+                val cacheKey = token
+                val myClubs = clubRepository.getMyClubs(token.toString())
+                if(!myClubs.isNullOrEmpty()){
+                    _usersClub.value = myClubs
+                    userClubsCache[cacheKey] = myClubs
+                    userClubsUiState = BaseUiState.Success(myClubs)
+                } else {
+                    userClubsUiState = BaseUiState.Success(emptyList())
+                }
                 joinClubUiState = BaseUiState.Success(true)
             } catch (e: Exception) {
                 joinClubUiState = BaseUiState.Error

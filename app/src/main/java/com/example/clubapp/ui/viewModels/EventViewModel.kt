@@ -138,6 +138,15 @@ class EventViewModel(
                             }
                         }
                 }
+                val cacheKey = token
+                val events = eventRepository.getMyEvents(token)
+                if (!events.isNullOrEmpty()) {
+                    _usersEvents.value = events
+                    userEventsCache[cacheKey] = events
+                    userEventsUiState = BaseUiState.Success(events)
+                } else {
+                    userEventsUiState = BaseUiState.Success(emptyList())
+                }
             } catch (e: Exception) {
                 uiState = BaseUiState.Error
             }
@@ -296,10 +305,15 @@ class EventViewModel(
                 userEventsCache.remove(token)
                 participantsCache.remove(eventId)
                 userEventRoleCache.remove(eventId)
-
-                getEventRole(eventId)
-
-                // Set success states
+                val cacheKey = token
+                val events = eventRepository.getMyEvents(token)
+                if (!events.isNullOrEmpty()) {
+                    _usersEvents.value = events
+                    userEventsCache[cacheKey] = events
+                    userEventsUiState = BaseUiState.Success(events)
+                } else {
+                    userEventsUiState = BaseUiState.Success(emptyList())
+                }
                 joinEventUiState = BaseUiState.Success(true)
 
                 FirebaseMessaging.getInstance().subscribeToTopic("event_${eventId}")

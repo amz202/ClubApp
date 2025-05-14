@@ -124,7 +124,7 @@ fun ClubDetailScreen(
 
     LaunchedEffect(joinClubState) {
         if (joinClubState is BaseUiState.Success) {
-            clubViewModel.getClub(clubId)
+            clubViewModel.getClubRole(clubId)
         }
     }
 
