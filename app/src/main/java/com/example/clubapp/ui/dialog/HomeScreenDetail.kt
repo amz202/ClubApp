@@ -32,13 +32,16 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.clubapp.network.response.EventResponse
 import com.example.clubapp.ui.cards.EventItem
 import com.example.clubapp.ui.cards.isEventInPast
 import com.example.clubapp.ui.navigation.ClubDetailNav
 import com.example.clubapp.ui.navigation.EventDetailNav
+import com.example.clubapp.ui.theme.PlusJakarta
 import com.example.clubapp.ui.viewModels.BaseUiState
 import com.example.clubapp.ui.viewModels.ClubUiState
 import com.example.clubapp.ui.viewModels.EventUiState
@@ -120,7 +123,13 @@ fun MyClubs(
     ) {
         Text(
             text = "Your Clubs",
-            modifier = Modifier.padding(bottom = 8.dp)
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 18.sp,
+                fontFamily = PlusJakarta
+            ),
+            modifier = Modifier
+                .padding(bottom = 8.dp)
         )
         Spacer(
             modifier = Modifier.height(20.dp)
@@ -209,7 +218,13 @@ fun MyEvents(
     ) {
         Text(
             text = "Upcoming Events",
-            modifier = Modifier.padding(bottom = 8.dp)
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 22.sp,
+                fontFamily = PlusJakarta
+            ),
+            modifier = Modifier
+                .padding(bottom = 8.dp)
         )
         Spacer(
             modifier = Modifier.height(20.dp)
