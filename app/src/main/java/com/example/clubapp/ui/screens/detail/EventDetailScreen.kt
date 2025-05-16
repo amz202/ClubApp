@@ -164,7 +164,7 @@ fun EventDetailScreen(
                     Text(
                         "Event",
                         modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
+                        textAlign = TextAlign.Start,
                         fontFamily = PlusJakarta,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 20.sp,
@@ -447,29 +447,3 @@ fun formatDateTimeString(isoDateString: String): String {
     }
 }
 
-//@RequiresApi(Build.VERSION_CODES.O)
-//@Preview(showBackground = true)
-//@Composable
-//fun EventDetailScreenPreview() {
-//    val mockEvent = EventResponse(
-//        name = "Photography Workshop",
-//        description = "Learn the basics of photography and camera settings in this hands-on workshop. Bring your own camera!",
-//        clubId = "club123",
-//        dateTime = "May 15, 2024 | 2:00 PM",
-//        location = "Art Building, Room 302",
-//        capacity = "50",
-//        organizedBy = "Photography Club",
-//        id = "event123",
-//        attendeeCount = 28,
-//        tags = "photography,workshop,learning"
-//    )
-//
-//    // Using a stub ViewModel for previe
-//
-//
-//    MaterialTheme {
-//        EventDetailScreen(
-//            event = mockEvent
-//        )
-//    }
-//}

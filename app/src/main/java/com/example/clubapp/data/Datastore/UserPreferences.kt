@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-// Extension to create DataStore
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_prefs")
 
 class UserPreferences(private val context: Context) {
@@ -37,7 +36,7 @@ class UserPreferences(private val context: Context) {
     }
 
     suspend fun getToken(): String? {
-        return context.dataStore.data.map { preferences ->  //returns a flow
+        return context.dataStore.data.map { preferences ->
             preferences[TOKEN_KEY]
         }.first()
     }

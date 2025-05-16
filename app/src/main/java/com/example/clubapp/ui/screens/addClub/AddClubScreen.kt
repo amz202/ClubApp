@@ -79,7 +79,6 @@ fun AddClubScreen(
                     }
                 },
                 actions = {
-                    // Empty IconButton to balance the layout
                     Box(modifier = Modifier.width(32.dp)) { }
                 }
             )
