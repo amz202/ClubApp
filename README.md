@@ -36,4 +36,3 @@ A modern Android application designed to streamline the management of university
 
 ---
 
-Let me know when you're ready to draft the backend README.
