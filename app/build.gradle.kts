@@ -96,4 +96,10 @@ dependencies {
 
     implementation ("com.google.accompanist:accompanist-flowlayout:0.32.0")
 
+    //Ktor
+    implementation("io.ktor:ktor-client-core:3.1.3")
+    implementation("io.ktor:ktor-client-cio:3.1.3")
+    implementation("io.ktor:ktor-client-websockets:2.3.7")
+    implementation("io.ktor:ktor-client-auth:2.3.9")
+
 }

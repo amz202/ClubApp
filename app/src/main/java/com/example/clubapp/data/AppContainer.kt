@@ -1,5 +1,9 @@
 package com.example.clubapp.data
 
+import com.example.clubapp.data.respositories.ChatRepository
+import com.example.clubapp.data.respositories.ChatRepositoryImpl
+import com.example.clubapp.data.respositories.ChatWSRepository
+import com.example.clubapp.data.respositories.ChatWSRepositoryImpl
 import com.example.clubapp.data.respositories.ClubRepository
 import com.example.clubapp.data.respositories.ClubRepositoryImpl
 import com.example.clubapp.data.respositories.EventRepository
@@ -17,6 +21,8 @@ interface AppContainer{
     val authRepository:AuthRepository
     val eventRepository:EventRepository
     val clubRepository: ClubRepository
+    val chatWSRepository: ChatWSRepository
+    val chatRepository: ChatRepository
 }
 
 class DefaultAppContainer:AppContainer{
@@ -43,5 +49,11 @@ class DefaultAppContainer:AppContainer{
     }
     override val clubRepository: ClubRepository by lazy {
         ClubRepositoryImpl(apiService)
+    }
+    override val chatRepository: ChatRepository by lazy {
+        ChatRepositoryImpl(apiService)
+    }
+    override val chatWSRepository: ChatWSRepository by lazy {
+        ChatWSRepositoryImpl()
     }
 }

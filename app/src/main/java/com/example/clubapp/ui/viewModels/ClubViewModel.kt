@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import android.util.Log
+import com.example.clubapp.network.response.ClubGroupResponse
 import com.example.clubapp.network.response.RoleResponse
 import kotlin.collections.containsKey
 import kotlin.collections.remove
@@ -32,6 +33,7 @@ typealias ClubRoleUiState = BaseUiState<String?>
 typealias UserClubsUiState = BaseUiState<List<ClubResponse>>
 typealias SingleClubUiState = BaseUiState<ClubResponse>
 typealias ClubActionUiState = BaseUiState<Boolean>
+typealias ClubGroupUiState = BaseUiState<ClubGroupResponse>
 
 class ClubViewModel(
     private val clubRepository: ClubRepository,
@@ -58,6 +60,9 @@ class ClubViewModel(
     var leaveClubUiState: ClubActionUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
+    var clubGroupUiState: ClubGroupUiState by mutableStateOf(BaseUiState.Loading)
+        private set
+
     private val _usersClub = MutableStateFlow<List<ClubResponse>?>(emptyList())
     val usersClub: StateFlow<List<ClubResponse>?> = _usersClub
 
@@ -69,6 +74,9 @@ class ClubViewModel(
 
     private val _clubOfId = MutableStateFlow<ClubResponse?>(null)
     val clubOfId: StateFlow<ClubResponse?> = _clubOfId
+
+    private val _clubGroup = MutableStateFlow<ClubGroupResponse?>(null)
+    val clubGroup: StateFlow<ClubGroupResponse?> = _clubGroup
 
     private val _userClubRole = MutableStateFlow<RoleResponse?>(null)
     val userClubRole: StateFlow<RoleResponse?> = _userClubRole
@@ -331,6 +339,34 @@ class ClubViewModel(
             } catch (e: Exception) {
                 _userClubRole.value = null
                 clubRoleUiState = BaseUiState.Error
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun getClubGroup(clubId: String) {
+        viewModelScope.launch {
+            clubGroupUiState = BaseUiState.Loading
+            if (_clubGroup.value != null && _clubGroup.value?.id == clubId) {
+                clubGroupUiState = BaseUiState.Success(_clubGroup.value!!)
+                return@launch
+            }
+            try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    clubGroupUiState = BaseUiState.Error
+                    return@launch
+                }
+                val group = clubRepository.getClubGroup(token, clubId)
+                if (group != null) {
+                    _clubGroup.value = group
+                    clubGroupUiState = BaseUiState.Success(group)
+                } else {
+                    clubGroupUiState = BaseUiState.Error
+                }
+            } catch (e: Exception) {
+                _clubGroup.value = null
+                clubGroupUiState = BaseUiState.Error
                 e.printStackTrace()
             }
         }
