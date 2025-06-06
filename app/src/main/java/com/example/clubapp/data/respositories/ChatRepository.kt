@@ -8,7 +8,7 @@ import okhttp3.ResponseBody
 interface ChatRepository {
     suspend fun editMessage(token: String, body: EditMessageRequest): ResponseBody
     suspend fun deleteMessage(token: String, id: String): ResponseBody
-    suspend fun recentChat(token: String, groupId: String): List<ChatMessageResponse>
+    suspend fun recentChat(token: String, groupId: String): List<ChatMessageResponse>?
 }
 
 class ChatRepositoryImpl(private val apiService: ApiService) : ChatRepository {
@@ -20,7 +20,7 @@ class ChatRepositoryImpl(private val apiService: ApiService) : ChatRepository {
         return apiService.deleteMessage(token = "Bearer $token", id = id)
     }
 
-    override suspend fun recentChat(token: String, groupId: String): List<ChatMessageResponse> {
+    override suspend fun recentChat(token: String, groupId: String): List<ChatMessageResponse>? {
         return apiService.recentChat(token = "Bearer $token", groupId = groupId)
     }
 }

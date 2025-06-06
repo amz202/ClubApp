@@ -190,7 +190,7 @@ interface ApiService {
     suspend fun recentChat(
         @Header("Authorization") token: String,
         @Path("groupId") groupId: String
-    ): List<ChatMessageResponse>
+    ): List<ChatMessageResponse>?
 
 }
 
