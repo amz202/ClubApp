@@ -3,6 +3,7 @@ package com.example.clubapp.data.respositories
 import com.example.clubapp.network.ApiService
 import com.example.clubapp.network.request.ClubRequest
 import com.example.clubapp.network.request.RoleRequest
+import com.example.clubapp.network.response.ClubGroupResponse
 import com.example.clubapp.network.response.ClubMembersResponse
 import com.example.clubapp.network.response.ClubResponse
 import com.example.clubapp.network.response.RoleResponse
@@ -20,6 +21,7 @@ interface ClubRepository {
     suspend fun changeClubMemberRole(token: String, clubId: String, userId: String, request: RoleRequest, ownRole: String): ResponseBody
     suspend fun getClubRole(token:String, clubId:String): RoleResponse?
     suspend fun getMyClubs(token: String):List<ClubResponse>?
+    suspend fun getClubGroup(token: String, clubId: String): ClubGroupResponse?
 }
 
 class ClubRepositoryImpl(private val apiService: ApiService): ClubRepository{
@@ -57,5 +59,9 @@ class ClubRepositoryImpl(private val apiService: ApiService): ClubRepository{
 
     override suspend fun getMyClubs(token: String): List<ClubResponse>? {
         return apiService.getMyClubs(token= "Bearer $token")
+    }
+
+    override suspend fun getClubGroup(token: String, clubId: String): ClubGroupResponse? {
+        return apiService.getClubGroup(token = "Bearer $token", clubId = clubId)
     }
 }

@@ -16,6 +16,7 @@ import com.example.clubapp.data.Datastore.UserPreferences
 import com.example.clubapp.signin.SignInViewModel
 import com.example.clubapp.ui.navigation.AppNavigation
 import com.example.clubapp.ui.theme.ClubAppTheme
+import com.example.clubapp.ui.viewModels.ChatViewModel
 import com.example.clubapp.ui.viewModels.ClubViewModel
 import com.example.clubapp.ui.viewModels.EventViewModel
 import com.example.clubapp.ui.viewModels.NavigationViewModel
@@ -39,6 +40,7 @@ class MainActivity : ComponentActivity() {
         val eventViewModel: EventViewModel = ViewModelProvider(this, EventViewModel.eventFactory)[EventViewModel::class.java]
         val clubViewModel: ClubViewModel = ViewModelProvider(this, ClubViewModel.clubFactory)[ClubViewModel::class.java]
         val navigationViewModel: NavigationViewModel = ViewModelProvider(this)[NavigationViewModel::class.java]
+        val chatViewModel: ChatViewModel = ViewModelProvider(this, ChatViewModel.chatFactory)[ChatViewModel::class.java]
         askNotificationPermission()
 
         enableEdgeToEdge()

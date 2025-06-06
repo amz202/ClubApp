@@ -1,9 +1,12 @@
 package com.example.clubapp.network
 
 import com.example.clubapp.network.request.ClubRequest
+import com.example.clubapp.network.request.EditMessageRequest
 import com.example.clubapp.network.request.EventNewsRequest
 import com.example.clubapp.network.request.EventRequest
 import com.example.clubapp.network.request.RoleRequest
+import com.example.clubapp.network.response.ChatMessageResponse
+import com.example.clubapp.network.response.ClubGroupResponse
 import com.example.clubapp.network.response.ClubMembersResponse
 import com.example.clubapp.network.response.ClubResponse
 import com.example.clubapp.network.response.EventNewsResponse
@@ -164,5 +167,30 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("eventNewsId") eventNewsId: String
     ): EventNewsResponse
+
+    @GET("/{clubId}/group")
+    suspend fun getClubGroup(
+        @Header("Authorization") token: String,
+        @Path("clubId") clubId: String
+    ): ClubGroupResponse?
+
+    @GET("/edit")
+    suspend fun editMessage(
+        @Header("Authorization") token: String,
+        @Body body: EditMessageRequest
+    ): ResponseBody
+
+    @DELETE("/{id}/delete")
+    suspend fun deleteMessage(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): ResponseBody
+
+    @GET("/{groupId}/recentChat")
+    suspend fun recentChat(
+        @Header("Authorization") token: String,
+        @Path("groupId") groupId: String
+    ): List<ChatMessageResponse>?
+
 }
 
