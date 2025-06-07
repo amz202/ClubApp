@@ -2,6 +2,7 @@ package com.example.clubapp.ui.screens.chat
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -67,6 +70,7 @@ import kotlinx.coroutines.launch
 fun ChatStateScreen(
     clubId: String,
     groupId: String,
+    groupName: String,
     userPreferences: UserPreferences,
     chatViewModel: ChatViewModel,
     navController: NavHostController,
@@ -91,7 +95,8 @@ fun ChatStateScreen(
                 userPreferences = userPreferences,
                 chatViewModel = chatViewModel,
                 navController = navController,
-                modifier = modifier
+                modifier = modifier,
+                groupName = groupName
             )
         }
     }
@@ -104,6 +109,7 @@ fun ChatScreen(
     groupId: String,
     userPreferences: UserPreferences,
     chatViewModel: ChatViewModel,
+    groupName: String,
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -113,7 +119,6 @@ fun ChatScreen(
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     var userInfo by remember { mutableStateOf<UserInfo?>(null) }
-
 
     LaunchedEffect(chatMessages.size) {
         coroutineScope.launch {
@@ -131,7 +136,7 @@ fun ChatScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Club Chat",
+                        text = "${groupName} Chat",
                         fontFamily = PlusJakarta,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 20.sp,
@@ -182,7 +187,12 @@ fun ChatScreen(
                         ChatMessageItem(
                             message = message,
                             currentUserId = userInfo?.id ?: "",
-                            name = userInfo?.name ?: "Unknown User"
+                            name = userInfo?.name ?: "Unknown User",
+                            onDeleteMessage = { msg ->
+                                chatViewModel.deleteMessage(
+                                    id = msg.id
+                                )
+                            }
                         )
                     }
                 }
@@ -235,8 +245,14 @@ fun ChatScreen(
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ChatMessageItem(message: ChatMessageResponse, currentUserId: String, name: String) {
+fun ChatMessageItem(
+    message: ChatMessageResponse,
+    currentUserId: String,
+    name: String,
+    onDeleteMessage: (ChatMessageResponse) -> Unit
+) {
     val isCurrentUser = message.sender == currentUserId
+    var isExpanded by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -249,7 +265,9 @@ fun ChatMessageItem(message: ChatMessageResponse, currentUserId: String, name: S
             color = if (isCurrentUser) MaterialTheme.colorScheme.primaryContainer
             else MaterialTheme.colorScheme.surfaceVariant,
             tonalElevation = 2.dp,
-            modifier = Modifier.widthIn(max = 300.dp)
+            modifier = Modifier
+                .widthIn(max = 250.dp)
+                .clickable { isExpanded = !isExpanded }
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 if (!isCurrentUser) {
@@ -265,11 +283,31 @@ fun ChatMessageItem(message: ChatMessageResponse, currentUserId: String, name: S
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = formatDateTimeString(message.timeStamp),
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.align(Alignment.End)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (isExpanded && isCurrentUser) {
+                        IconButton(
+                            onClick = { onDeleteMessage(message) },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete message",
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    Text(
+                        text = formatDateTimeString(message.timeStamp),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.align(Alignment.Bottom)
+                    )
+                }
             }
         }
     }

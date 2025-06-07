@@ -35,16 +35,20 @@ class ChatWSRepositoryImpl : ChatWSRepository {
 
     override suspend fun connect(
         groupId: String,
-        clubId:String,
         token: String,
+        clubId:String,
         onMessage: (ChatMessageResponse) -> Unit
     ) {
-        val client = HttpClient(CIO){
+        // Ensure the token is properly formatted as "Bearer token"
+        val formattedToken = if (token.startsWith("Bearer ")) token else "Bearer $token"
+
+        val client = HttpClient(CIO) {
             install(WebSockets)
             install(Auth) {
                 bearer {
                     loadTokens {
-                        BearerTokens(token.replace("Bearer ", ""), "")
+                        // Extract just the token part without "Bearer "
+                        BearerTokens(formattedToken.replace("Bearer ", ""), "")
                     }
                 }
             }
@@ -52,7 +56,7 @@ class ChatWSRepositoryImpl : ChatWSRepository {
         session = client.webSocketSession {
             url {
                 protocol = URLProtocol.WS
-                host = "192.168.208.28"
+                host = "192.168.0.159"
                 port = 8001
                 encodedPath = "/chat/${clubId}/$groupId"
             }

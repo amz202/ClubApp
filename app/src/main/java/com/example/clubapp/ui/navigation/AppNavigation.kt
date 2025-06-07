@@ -178,6 +178,7 @@ fun AppNavigation(
                 userPreferences = userPreferences,
                 chatViewModel = chatViewModel,
                 navController = navController,
+                groupName = args.groupName
             )
         }
     }
