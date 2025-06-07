@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
 interface ChatWSRepository {
-    suspend fun connect(groupId: String, token: String, onMessage: (ChatMessageResponse) -> Unit)
+    suspend fun connect(groupId: String, token: String, clubId: String, onMessage: (ChatMessageResponse) -> Unit)
     suspend fun sendMessage(message: SentMessage)
     suspend fun disconnect()
 }
@@ -35,23 +35,26 @@ class ChatWSRepositoryImpl : ChatWSRepository {
 
     override suspend fun connect(
         groupId: String,
+        clubId:String,
         token: String,
         onMessage: (ChatMessageResponse) -> Unit
     ) {
         val client = HttpClient(CIO){
             install(WebSockets)
-            install(Auth){
+            install(Auth) {
                 bearer {
-                    loadTokens { BearerTokens(token, token) }
+                    loadTokens {
+                        BearerTokens(token.replace("Bearer ", ""), "")
+                    }
                 }
             }
         }
         session = client.webSocketSession {
             url {
                 protocol = URLProtocol.WS
-                host = "10.0.2.2"
-                port = 8080
-                encodedPath = "/chat/club/$groupId"
+                host = "192.168.208.28"
+                port = 8001
+                encodedPath = "/chat/${clubId}/$groupId"
             }
         }
         receiveJob = CoroutineScope(Dispatchers.IO).launch {

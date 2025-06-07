@@ -52,8 +52,9 @@ class UserPreferences(private val context: Context) {
 
         val name = preferences[NAME_KEY] ?: return null
         val email = preferences[EMAIL_KEY] ?: return null
-        return UserInfo(name, email)
+        val id = preferences[ID_KEY] ?: return null
+        return UserInfo(name, email, id)
     }
 
-    data class UserInfo(val name: String?, val email: String?)
+    data class UserInfo(val name: String?, val email: String?, val id: String?)
 }

@@ -23,6 +23,7 @@ import com.example.clubapp.ui.screens.SignInScreen
 import com.example.clubapp.ui.screens.addClub.AddClubScreen
 import com.example.clubapp.ui.screens.addEvent.AddEventScreenA
 import com.example.clubapp.ui.screens.addEvent.AddEventScreenB
+import com.example.clubapp.ui.screens.chat.ChatStateScreen
 import com.example.clubapp.ui.screens.detail.ClubDetailScreen
 import com.example.clubapp.ui.screens.detail.ClubDetailStateScreen
 import com.example.clubapp.ui.screens.detail.EventDetailScreen
@@ -31,6 +32,7 @@ import com.example.clubapp.ui.screens.users.ClubMembersList
 import com.example.clubapp.ui.screens.users.ClubMembersListStateScreen
 import com.example.clubapp.ui.screens.users.EventParticipantList
 import com.example.clubapp.ui.screens.users.EventParticipantListStateScreen
+import com.example.clubapp.ui.viewModels.ChatViewModel
 import com.example.clubapp.ui.viewModels.ClubMemberUiState
 import com.example.clubapp.ui.viewModels.ClubUiState
 import com.example.clubapp.ui.viewModels.ClubViewModel
@@ -49,6 +51,7 @@ fun AppNavigation(
     clubViewModel: ClubViewModel,
     navigationViewModel: NavigationViewModel,
     userPreferences: UserPreferences,
+    chatViewModel: ChatViewModel,
     signInViewModel: SignInViewModel
 ) {
     val navController = rememberNavController()
@@ -164,6 +167,17 @@ fun AppNavigation(
                 clubViewModel = clubViewModel,
                 navViewModel = navigationViewModel,
                 ownClubRole = args.ownRole
+            )
+        }
+
+        composable<ChatScreenNav>{
+            val args = it.toRoute<ChatScreenNav>()
+            ChatStateScreen(
+                clubId = args.clubId,
+                groupId = args.groupId,
+                userPreferences = userPreferences,
+                chatViewModel = chatViewModel,
+                navController = navController,
             )
         }
     }

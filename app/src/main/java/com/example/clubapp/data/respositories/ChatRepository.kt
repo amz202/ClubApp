@@ -21,6 +21,6 @@ class ChatRepositoryImpl(private val apiService: ApiService) : ChatRepository {
     }
 
     override suspend fun recentChat(token: String, groupId: String): List<ChatMessageResponse>? {
-        return apiService.recentChat(token = "Bearer $token", groupId = groupId)
+        return apiService.recentChat("Bearer $token", groupId) ?: emptyList()
     }
 }

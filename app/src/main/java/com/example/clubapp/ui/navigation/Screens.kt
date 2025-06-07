@@ -55,3 +55,10 @@ data class ClubMembersNav(
     val clubName: String,
     val ownRole:String?
 )
+
+@Serializable
+data class ChatScreenNav(
+    val clubId: String,
+    val groupId: String,
+    val groupName: String
+)

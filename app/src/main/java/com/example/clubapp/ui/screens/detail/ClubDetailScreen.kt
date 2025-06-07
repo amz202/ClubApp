@@ -54,6 +54,8 @@ import com.example.clubapp.ui.viewModels.ClubViewModel
 import com.example.clubapp.ui.viewModels.EventViewModel
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -64,7 +66,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.clubapp.network.response.ClubGroupResponse
 import com.example.clubapp.ui.dialog.ClubActionMenu
+import com.example.clubapp.ui.navigation.ChatScreenNav
 import com.example.clubapp.ui.viewModels.BaseUiState
 import com.example.clubapp.ui.screens.Common.ErrorScreen
 import com.example.clubapp.ui.screens.Common.LoadingScreen
@@ -83,6 +87,7 @@ fun ClubDetailStateScreen(
         clubViewModel.getClub(clubId)
         clubViewModel.getClubRole(clubId)
         eventViewModel.getClubEvents(clubId)
+        clubViewModel.getClubGroup(clubId)
     }
 
     val clubState = clubViewModel.singleClubUiState
@@ -118,6 +123,7 @@ fun ClubDetailScreen(
     val clubEvents = eventViewModel.clubEvents.collectAsState().value
     val ownClubRole by clubViewModel.userClubRole.collectAsState(null)
     val isMember = ownClubRole?.role != null
+    val clubGroup by clubViewModel.clubGroup.collectAsState()
 
     val clubEventState = eventViewModel.clubEventsUiState
     val joinClubState = clubViewModel.joinClubUiState
@@ -128,7 +134,7 @@ fun ClubDetailScreen(
         }
     }
 
-    if (club == null) return
+    if (club == null || clubGroup == null ) return
 
     Scaffold(
         floatingActionButton = {
@@ -141,6 +147,14 @@ fun ClubDetailScreen(
                         )
                         else -> Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
                     }
+                }
+            }else {
+                FloatingActionButton(onClick = { navController.navigate(ChatScreenNav(
+                    clubId = clubGroup!!.clubId,
+                    groupId = clubGroup!!.id,
+                    groupName = clubGroup!!.name
+                )) }) {
+                    Icon(imageVector = Icons.AutoMirrored.Filled.Chat, contentDescription = "Add Event")
                 }
             }
         },
