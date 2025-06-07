@@ -1,5 +1,8 @@
 package com.example.clubapp.ui.viewModels
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -17,28 +20,53 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+typealias ChatUiState = BaseUiState<List<ChatMessageResponse>>
 class ChatViewModel(
     private val chatRepository: ChatRepository,
     private val socketRepository: ChatWSRepository,
     private val userPreferences: UserPreferences
 ) : ViewModel() {
 
+    var chatUiState: ChatUiState by mutableStateOf(BaseUiState.Loading)
+        private set
+
     private val _chatMessages = MutableStateFlow<List<ChatMessageResponse>>(emptyList())
     val chatMessages: StateFlow<List<ChatMessageResponse>> = _chatMessages
 
-    fun initChat(groupId: String) {
+
+    fun initChat(groupId: String, clubId: String) {
         viewModelScope.launch {
-            val token = userPreferences.getToken() ?: return@launch
+            chatUiState = BaseUiState.Loading
+            try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    chatUiState = BaseUiState.Error
+                    return@launch
+                }
 
-            // Fetch recent messages via Retrofit
-            val recentMessages = chatRepository.recentChat(token, groupId)
-            if (recentMessages != null) {
-                _chatMessages.value = recentMessages
-            }
+                try {
+                    val recentMessages = chatRepository.recentChat(token, groupId)
+                    if (recentMessages != null) {
+                        _chatMessages.value = recentMessages
+                        chatUiState = BaseUiState.Success(recentMessages)
+                    } else {
+                        _chatMessages.value = emptyList()
+                        chatUiState = BaseUiState.Success(emptyList())
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    _chatMessages.value = emptyList()
+                    chatUiState = BaseUiState.Success(emptyList())
+                }
 
-            // Start WebSocket
-            socketRepository.connect(groupId, token) { newMessage ->
-                _chatMessages.update { it + newMessage }
+                // Start WebSocket (continue even if message fetch failed)
+                socketRepository.connect(groupId, token, clubId) { newMessage ->
+                    _chatMessages.update { it + newMessage }
+                    chatUiState = BaseUiState.Success(_chatMessages.value)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                chatUiState = BaseUiState.Error
             }
         }
     }
@@ -57,6 +85,11 @@ class ChatViewModel(
         }
     }
 
+    fun closeSocket(){
+        viewModelScope.launch {
+            socketRepository.disconnect()
+        }
+    }
     fun editMessage(body: EditMessageRequest){
         viewModelScope.launch {
             val token = userPreferences.getToken() ?: return@launch

@@ -85,6 +85,7 @@ class ClubViewModel(
     private val membersCache = mutableMapOf<String, List<ClubMembersResponse>>()
     private val userClubsCache = mutableMapOf<String, List<ClubResponse>>()
     private val userClubRoleCache = mutableMapOf<String, RoleResponse?>()
+    private val clubGroupCache = mutableMapOf<String, ClubGroupResponse?>()
 
     init{
         getClubs()
@@ -347,6 +348,11 @@ class ClubViewModel(
     fun getClubGroup(clubId: String) {
         viewModelScope.launch {
             clubGroupUiState = BaseUiState.Loading
+            if(clubGroupCache.containsKey(clubId)){
+                _clubGroup.value = clubGroupCache[clubId]
+                clubGroupUiState = BaseUiState.Success(clubGroupCache[clubId]!!)
+                return@launch
+            }
             if (_clubGroup.value != null && _clubGroup.value?.id == clubId) {
                 clubGroupUiState = BaseUiState.Success(_clubGroup.value!!)
                 return@launch
@@ -360,6 +366,7 @@ class ClubViewModel(
                 val group = clubRepository.getClubGroup(token, clubId)
                 if (group != null) {
                     _clubGroup.value = group
+                    clubGroupCache[clubId] = group
                     clubGroupUiState = BaseUiState.Success(group)
                 } else {
                     clubGroupUiState = BaseUiState.Error
