@@ -126,12 +126,6 @@ fun EventDetailScreen(
     val eventNewsState = eventViewModel.eventNewsUiState
     val joinEventState = eventViewModel.joinEventUiState
 
-    LaunchedEffect(joinEventState) {
-        if (joinEventState is BaseUiState.Success) {
-            eventViewModel.getEventRole(eventId)
-        }
-    }
-
     if (event == null) {
         return
     }

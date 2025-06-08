@@ -128,12 +128,6 @@ fun ClubDetailScreen(
     val clubEventState = eventViewModel.clubEventsUiState
     val joinClubState = clubViewModel.joinClubUiState
 
-    LaunchedEffect(joinClubState) {
-        if (joinClubState is BaseUiState.Success) {
-            clubViewModel.getClubRole(clubId)
-        }
-    }
-
     if (club == null || clubGroup == null ) return
 
     Scaffold(

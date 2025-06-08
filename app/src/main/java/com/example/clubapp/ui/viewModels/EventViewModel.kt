@@ -475,6 +475,7 @@ class EventViewModel(
 
     fun clearEventState(){
         eventCache.clear()
+        userEventRoleCache.clear()
     }
 
     companion object {

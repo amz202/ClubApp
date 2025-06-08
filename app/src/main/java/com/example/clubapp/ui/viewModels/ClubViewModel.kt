@@ -383,7 +383,7 @@ class ClubViewModel(
 
     fun clearClubsState(){
         clubCache.clear()
-
+        userClubRoleCache.clear()
     }
 
     companion object {
