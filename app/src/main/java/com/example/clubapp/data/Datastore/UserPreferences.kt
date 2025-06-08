@@ -22,6 +22,7 @@ class UserPreferences(private val context: Context) {
         private val EMAIL_KEY = stringPreferencesKey("user_email")
         private val TOKEN_KEY = stringPreferencesKey("user_token")
         private val ID_KEY = stringPreferencesKey("id_key")
+        private val PHOTO_KEY = stringPreferencesKey("user_photo")
     }
 
     // Save user data
@@ -32,6 +33,7 @@ class UserPreferences(private val context: Context) {
             preferences[EMAIL_KEY] = user.email
             preferences[TOKEN_KEY] = token
             preferences[ID_KEY] = user.id.toString()
+            preferences[PHOTO_KEY] = user.photoUrl.toString()
         }
     }
 
@@ -53,8 +55,9 @@ class UserPreferences(private val context: Context) {
         val name = preferences[NAME_KEY] ?: return null
         val email = preferences[EMAIL_KEY] ?: return null
         val id = preferences[ID_KEY] ?: return null
-        return UserInfo(name, email, id)
+        val photoUrl = preferences[PHOTO_KEY] ?: return null
+        return UserInfo(name, email, id, photoUrl)
     }
 
-    data class UserInfo(val name: String?, val email: String?, val id: String?)
+    data class UserInfo(val name: String?, val email: String?, val id: String?, val photoUrl:String?)
 }

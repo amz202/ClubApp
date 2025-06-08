@@ -96,12 +96,14 @@ class ClubViewModel(
             try {
                 uiState = BaseUiState.Loading
                 val clubs = clubRepository.getClubs()
-                if (clubs.isEmpty()) {
-                    uiState = BaseUiState.Error
-                } else {
-                    uiState = BaseUiState.Success(clubs)
-                    _clubs.value = clubs
-                }
+//                if (clubs.isEmpty()) {
+//                    uiState = BaseUiState.Error
+//                } else {
+//                    uiState = BaseUiState.Success(clubs)
+//                    _clubs.value = clubs
+//                }
+                uiState = BaseUiState.Success(clubs)
+                _clubs.value = clubs
             } catch (e: Exception) {
                 uiState = BaseUiState.Error
                 e.printStackTrace()
@@ -377,6 +379,11 @@ class ClubViewModel(
                 e.printStackTrace()
             }
         }
+    }
+
+    fun clearClubsState(){
+        clubCache.clear()
+
     }
 
     companion object {

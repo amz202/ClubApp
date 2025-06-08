@@ -116,11 +116,11 @@ fun HomeScreen(
                                 authClient.signOut()
                                 userPreferences.clearUserData()
                                 signInViewModel.resetSignInState()
+                                clubViewModel.clearClubsState()
+                                eventViewModel.clearEventState()
                                 userInfo = null
                                 navController.navigate(SignInScreenNav)
-//                                {
-//                                    popUpTo(0) { inclusive = true }
-//                                }
+
                             }
                         }
                     }) {
@@ -180,7 +180,7 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         )
         {
-            HomeScreenProfile(userInfo?.name.toString(), userInfo?.email.toString())
+            HomeScreenProfile(userInfo?.name.toString(), userInfo?.email.toString(), userInfo?.photoUrl.toString())
             Spacer(modifier = Modifier.height(24.dp))
             HomeScreenDetail(
                 clubList = clubList, eventList = eventList,

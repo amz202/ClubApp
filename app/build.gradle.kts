@@ -102,4 +102,8 @@ dependencies {
     implementation("io.ktor:ktor-client-websockets:2.3.7")
     implementation("io.ktor:ktor-client-auth:2.3.9")
 
+    //Coil
+    implementation("io.coil-kt.coil3:coil-compose:3.2.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
+
 }

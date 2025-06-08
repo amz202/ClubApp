@@ -71,8 +71,8 @@ class ChatViewModel(
         }
     }
 
-    fun sendMessage(text: String, groupId: String, sender: String) {
-        val message = SentMessage(message = text, groupId = groupId, sender = sender)
+    fun sendMessage(text: String, groupId: String, sender: String, senderName: String) {
+        val message = SentMessage(message = text, groupId = groupId, sender = sender, senderName =senderName )
         viewModelScope.launch {
             socketRepository.sendMessage(message)
         }

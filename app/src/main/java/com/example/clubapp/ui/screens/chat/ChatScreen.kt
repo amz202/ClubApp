@@ -187,7 +187,7 @@ fun ChatScreen(
                         ChatMessageItem(
                             message = message,
                             currentUserId = userInfo?.id ?: "",
-                            name = userInfo?.name ?: "Unknown User",
+                            name = message.senderName,
                             onDeleteMessage = { msg ->
                                 chatViewModel.deleteMessage(
                                     id = msg.id
@@ -226,7 +226,8 @@ fun ChatScreen(
                             chatViewModel.sendMessage(
                                 groupId = groupId,
                                 sender = userInfo?.id ?: "",
-                                text = trimmed
+                                text = trimmed,
+                                senderName = userInfo?.name.toString()
                             )
                             messageText.value = ""
                         }

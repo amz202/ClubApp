@@ -27,11 +27,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 
 @Composable
 fun HomeScreenProfile(
     name: String,
     email: String,
+    photoUrl: String? = null,
     modifier: Modifier = Modifier,
     role: String? = null
 ) {
@@ -52,19 +54,34 @@ fun HomeScreenProfile(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Circle profile initial
-            Box(
-                modifier = Modifier
-                    .size(if (role == null) 50.dp else 40.dp)
-                    .clip(CircleShape)
-                    .background(getColorForUser(name)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = name.take(1).uppercase(),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
+            if (photoUrl == null) {
+                Box(
+                    modifier = Modifier
+                        .size(if (role == null) 50.dp else 40.dp)
+                        .clip(CircleShape)
+                        .background(getColorForUser(name)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = name.take(1).uppercase(),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
+                    )
+                }
+            }else{
+                Box(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AsyncImage(
+                        model = photoUrl,
+                        contentDescription = "pfp",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -136,7 +153,8 @@ fun HomeScreenProfilePreview() {
     MaterialTheme {
         HomeScreenProfile(
             name = "John Doe",
-            email = "john.doe@example.com"
+            email = "john.doe@example.com",
+            photoUrl = "https://a1.espncdn.com/combiner/i?img=%2Fphoto%2F2020%2F1115%2Fr775995_1296x729_16%2D9.jpg"
         )
     }
 }
