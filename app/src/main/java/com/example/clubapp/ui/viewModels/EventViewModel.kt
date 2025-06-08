@@ -101,12 +101,14 @@ class EventViewModel(
             try {
                 uiState = BaseUiState.Loading
                 val events = eventRepository.getEvents()
-                if (events.isEmpty()) {
-                    uiState = BaseUiState.Error
-                } else {
-                    _events.value = events
-                    uiState = BaseUiState.Success(events)
-                }
+//                if (events.isEmpty()) {
+//                    uiState = BaseUiState.Error
+//                } else {
+//                    _events.value = events
+//                    uiState = BaseUiState.Success(events)
+//                }
+                _events.value = events
+                uiState = BaseUiState.Success(events)
             } catch (e: Exception) {
                 uiState = BaseUiState.Error
                 e.printStackTrace()
@@ -469,6 +471,10 @@ class EventViewModel(
 
     fun clearJoinUiState() {
         joinEventUiState = BaseUiState.Success(true)
+    }
+
+    fun clearEventState(){
+        eventCache.clear()
     }
 
     companion object {

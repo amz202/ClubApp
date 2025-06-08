@@ -8,5 +8,6 @@ data class ChatMessageResponse(
     val sender: String,
     val message: String,
     val timeStamp: String,
-    val groupId: String
+    val groupId: String,
+    val senderName: String,
 )
