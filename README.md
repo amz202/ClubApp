@@ -69,3 +69,10 @@ A modern Android application designed to streamline the management of university
 
 ---
 
+## License
+
+This project is licensed under the [Apache License 2.0](./LICENSE).
+
+---
+
+
