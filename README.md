@@ -24,7 +24,7 @@ A modern Android application designed to streamline the management of university
 - **Architecture**: MVVM with StateFlows  
 - **Networking**: Retrofit (HTTP) + Ktor WebSocket  
 - **Authentication & Session**: Firebase Authentication + Jetpack DataStore  
-- **Real-time Chat**: WebSocket messaging with MongoDB backend  
+- **Database**: Azure PostgreSQL + MongoDB  
 - **Image Loading**: Coil  
 - **Serialization**: kotlinx.serialization  
 
@@ -36,8 +36,9 @@ A modern Android application designed to streamline the management of university
 - Uses repository pattern for data access  
 - Firebase ID tokens are attached to requests for secure communication  
 - Efficient caching of clubs and events  
-- Built-in support for contacting club admins and event heads via gmail intent  
-- Real-time updates with message observers tied to UI lifecycle  
+- Built-in support for contacting club admins and event heads via gmail intent
+- **Backend**: [Ktor Backend Server](https://github.com/amz202/ktor-clubapp) with Firebase Auth verification, Azure PostgreSQL, and MongoDB
+
 
 ---
 
