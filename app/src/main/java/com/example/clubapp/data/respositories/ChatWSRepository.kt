@@ -55,7 +55,6 @@ class ChatWSRepositoryImpl : ChatWSRepository {
         clubId:String,
         onMessage: (ChatMessageResponse) -> Unit
     ) {
-        // Ensure the token is properly formatted as "Bearer token"
         val formattedToken = if (token.startsWith("Bearer ")) token else "Bearer $token"
 
         val client = HttpClient(CIO) {
@@ -72,7 +71,7 @@ class ChatWSRepositoryImpl : ChatWSRepository {
         session = client.webSocketSession {
             url {
                 protocol = URLProtocol.WS
-                host = "192.168.0.159"
+                host = "192.168.24.222"
                 port = 8001
                 encodedPath = "/chat/${clubId}/$groupId"
             }
