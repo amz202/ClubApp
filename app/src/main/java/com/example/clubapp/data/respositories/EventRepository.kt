@@ -36,7 +36,7 @@ interface EventRepository {
     suspend fun leaveEvent(token: String, eventId: String): ResponseBody
     suspend fun getEventParticipants(token: String, eventId: String): List<EventParticipantsResponse>
     suspend fun getUserEvents(token: String, userId: String): List<EventParticipantsResponse>
-    suspend fun changeEventRole(token: String, eventId: String, request: RoleRequest, userId: String, ownRole: String): ResponseBody
+    suspend fun changeEventRole(token: String, eventId: String, request: RoleRequest, userId: String): ResponseBody
     suspend fun getEventRole(token: String, eventId: String): RoleResponse?
     suspend fun getMyEvents(token: String): List<EventResponse>?
     suspend fun getEventNews(token: String, eventId: String): List<EventNewsResponse>?
@@ -75,8 +75,8 @@ class EventRepositoryImpl(private val apiService: ApiService): EventRepository{
         return apiService.getUserEvents(token = "Bearer $token", userId = userId)
     }
 
-    override suspend fun changeEventRole(token: String, eventId: String, request: RoleRequest, userId: String, ownRole: String): ResponseBody {
-        return apiService.changeEventParticipantRole(token = "Bearer $token", eventId = eventId, request = request, userId = userId, ownRole = ownRole)
+    override suspend fun changeEventRole(token: String, eventId: String, request: RoleRequest, userId: String): ResponseBody {
+        return apiService.changeEventParticipantRole(token = "Bearer $token", eventId = eventId, request = request, userId = userId)
     }
 
     override suspend fun getEventRole(token: String, eventId: String): RoleResponse? {

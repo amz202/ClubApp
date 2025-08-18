@@ -101,13 +101,12 @@ interface ApiService {
         @Path("userId") userId: String
     ): List<ClubMembersResponse>
 
-    @POST("club/{clubId}/{userId}/change-role/{ownRole}")
+    @POST("club/{clubId}/{userId}/change-role")
     suspend fun changeClubMemberRole(
         @Header("Authorization") token: String,
         @Path("clubId") clubId: String,
         @Path("userId") userId: String,
         @Body request: RoleRequest,
-        @Path("ownRole") ownRole: String
     ): ResponseBody
 
     @POST("events/{eventId}/join")
@@ -144,13 +143,12 @@ interface ApiService {
         @Header("Authorization") token: String
     ): List<EventResponse>?
 
-    @POST("/events/{eventId}/{userId}/change-role/{ownRole}")
+    @POST("/events/{eventId}/{userId}/change-role")
     suspend fun changeEventParticipantRole(
         @Header("Authorization") token: String,
         @Path("eventId") eventId: String,
         @Path("userId") userId: String,
         @Body request: RoleRequest,
-        @Path("ownRole") ownRole: String
     ): ResponseBody
 
     @GET("/club/{clubId}/role")

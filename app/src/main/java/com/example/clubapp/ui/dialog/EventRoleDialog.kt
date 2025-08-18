@@ -166,7 +166,7 @@ fun EventRoleDialog(
 
                         Button(
                             onClick = {
-                                eventViewModel.changeEventParticipantRole(eventId = eventId, request = roleRequest, userId = userId, ownRole = ownRole)
+                                eventViewModel.changeEventParticipantRole(eventId = eventId, request = roleRequest, userId = userId)
                                 navViewModel.hideEventRoleDialog()
                             },
                             enabled = selectedRole != currentRole
