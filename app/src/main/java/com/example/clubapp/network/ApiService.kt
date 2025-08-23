@@ -213,5 +213,30 @@ interface ApiService {
         @Path("id") id: String
     ): List<ClubJoinResponse>?
 
+    @POST("/clubs/{id}/approve-member/{userId}")
+    suspend fun approveMember(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+        @Path("userId") userId: String
+    ): ResponseBody
+
+    @POST("/clubs/{id}/reject-member/{userId}")
+    suspend fun rejectMember(
+        @Header("Authorization") token: String,
+        @Path("id") id: String,
+        @Path("userId") userId: String
+    ): ResponseBody
+
+    @POST("/clubs/{id}/open")
+    suspend fun openClub(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): ResponseBody
+
+    @POST("/clubs/{id}/close")
+    suspend fun closeClub(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): ResponseBody
 }
 
