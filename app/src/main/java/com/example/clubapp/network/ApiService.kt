@@ -7,6 +7,7 @@ import com.example.clubapp.network.request.EventRequest
 import com.example.clubapp.network.request.RoleRequest
 import com.example.clubapp.network.response.ChatMessageResponse
 import com.example.clubapp.network.response.ClubGroupResponse
+import com.example.clubapp.network.response.ClubJoinResponse
 import com.example.clubapp.network.response.ClubMembersResponse
 import com.example.clubapp.network.response.ClubResponse
 import com.example.clubapp.network.response.EventNewsResponse
@@ -205,6 +206,12 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("groupId") groupId: String
     ): List<ChatMessageResponse>?
+
+    @GET("/clubs/{id}/pending-members")
+    suspend fun getPendingMembers(
+        @Header("Authorization") token: String,
+        @Path("id") id: String
+    ): List<ClubJoinResponse>?
 
 }
 
