@@ -397,6 +397,44 @@ class ClubViewModel(
         }
     }
 
+    fun openClub(id: String){
+        viewModelScope.launch {
+            uiState = BaseUiState.Loading
+            try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    uiState = BaseUiState.Error
+                    return@launch
+                }
+                clubRepository.openCLub(token, id)
+                val updatedClubs = clubRepository.getClubs()
+                uiState = BaseUiState.Success(updatedClubs)
+            } catch (e: Exception) {
+                uiState = BaseUiState.Error
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun closeClub(id: String){
+        viewModelScope.launch {
+            uiState = BaseUiState.Loading
+            try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    uiState = BaseUiState.Error
+                    return@launch
+                }
+                clubRepository.closeClub(token, id)
+                val updatedClubs = clubRepository.getClubs()
+                uiState = BaseUiState.Success(updatedClubs)
+            } catch (e: Exception) {
+                uiState = BaseUiState.Error
+                e.printStackTrace()
+            }
+        }
+    }
+
     fun clearClubsState(){
         clubCache.clear()
         userClubRoleCache.clear()
