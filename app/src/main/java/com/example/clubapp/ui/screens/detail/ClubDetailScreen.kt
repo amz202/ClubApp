@@ -68,11 +68,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.clubapp.network.response.ClubGroupResponse
 import com.example.clubapp.ui.dialog.ClubActionMenu
+import com.example.clubapp.ui.dialog.ClubOpenDialog
 import com.example.clubapp.ui.navigation.ChatScreenNav
 import com.example.clubapp.ui.viewModels.BaseUiState
 import com.example.clubapp.ui.screens.Common.ErrorScreen
 import com.example.clubapp.ui.screens.Common.LoadingScreen
 import com.example.clubapp.ui.theme.PlusJakarta
+import com.example.clubapp.ui.viewModels.NavigationViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -81,6 +83,7 @@ fun ClubDetailStateScreen(
     clubViewModel: ClubViewModel,
     eventViewModel: EventViewModel,
     navController: NavHostController,
+    navViewModel: NavigationViewModel,
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(clubId) {
@@ -99,7 +102,8 @@ fun ClubDetailStateScreen(
                 clubViewModel = clubViewModel,
                 eventViewModel = eventViewModel,
                 navController = navController,
-                modifier = modifier
+                modifier = modifier,
+                navViewModel = navViewModel
             )
         }
         is BaseUiState.Loading -> LoadingScreen()
@@ -115,6 +119,7 @@ fun ClubDetailScreen(
     clubViewModel: ClubViewModel,
     eventViewModel: EventViewModel,
     navController: NavHostController,
+    navViewModel: NavigationViewModel,
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -124,7 +129,7 @@ fun ClubDetailScreen(
     val ownClubRole by clubViewModel.userClubRole.collectAsState(null)
     val isMember = ownClubRole?.role != null
     val clubGroup by clubViewModel.clubGroup.collectAsState()
-
+    val showOpenClub by navViewModel.showClubOpenDialog.collectAsState()
     val clubEventState = eventViewModel.clubEventsUiState
     val joinClubState = clubViewModel.joinClubUiState
 
@@ -203,7 +208,12 @@ fun ClubDetailScreen(
                                 onDeleteClub = {
                                     clubViewModel.deleteClub(clubId)
                                     navController.popBackStack()
-                                }
+                                },
+                                onOpenClub = {
+                                    navViewModel.showClubOpenDialog()
+                                    showMenu = false
+                                },
+                                canOpenClub = ownClubRole?.role == "admin" || ownClubRole?.role == "creator",
                             )
                         }
                     }
@@ -334,6 +344,19 @@ fun ClubDetailScreen(
             }
 
             Spacer(modifier = Modifier.height(32.dp))
+        }
+        if (showOpenClub) {
+            ClubOpenDialog(
+                clubName = club.name,
+                onDismissRequest = { navViewModel.hideClubOpenDialog() },
+                onConfirmClick = {
+                    navViewModel.hideClubOpenDialog()
+                },
+                onToggleOpen = {
+                    clubViewModel.toggleClubOpen(clubId)
+                },
+                isOpen = club.isOpen
+            )
         }
     }
 }

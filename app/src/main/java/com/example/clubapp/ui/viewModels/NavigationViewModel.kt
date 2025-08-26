@@ -66,4 +66,15 @@ class NavigationViewModel : ViewModel() {
     fun updateSelectedItemIndex(index: Int) {
         selectedItemIndex.value = index
     }
+
+    private val _showClubOpenDialog = MutableStateFlow<Boolean>(false)
+    val showClubOpenDialog: MutableStateFlow<Boolean> = _showClubOpenDialog
+
+    fun showClubOpenDialog(){
+        _showClubOpenDialog.value = true
+    }
+
+    fun hideClubOpenDialog(){
+        _showClubOpenDialog.value = false
+    }
 }

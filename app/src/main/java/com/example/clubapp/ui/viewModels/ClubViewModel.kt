@@ -440,6 +440,15 @@ class ClubViewModel(
         userClubRoleCache.clear()
     }
 
+    fun toggleClubOpen(clubId: String) {
+        val club = clubCache[clubId] ?: return
+        if (club.isOpen) {
+            closeClub(clubId)
+        } else {
+            openClub(clubId)
+        }
+    }
+
     companion object {
         val clubFactory: ViewModelProvider.Factory = viewModelFactory {
             initializer {

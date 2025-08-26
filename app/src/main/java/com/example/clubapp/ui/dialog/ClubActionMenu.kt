@@ -5,12 +5,14 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,6 +22,8 @@ fun ClubActionMenu(
     onAddEventClick: () -> Unit,
     canAddEvent: Boolean,
     isMember: Boolean,
+    canOpenClub: Boolean,
+    onOpenClub: () -> Unit,
     onLeaveClub: () -> Unit,
     onDeleteClub: () -> Unit,
 ) {
@@ -58,6 +62,18 @@ fun ClubActionMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.DeleteForever,
+                        contentDescription = null
+                    )
+                }
+            )
+        }
+        if(canOpenClub){
+            DropdownMenuItem(
+                text = { Text("Open/Close Club") },
+                onClick = onOpenClub,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.VerifiedUser,
                         contentDescription = null
                     )
                 }

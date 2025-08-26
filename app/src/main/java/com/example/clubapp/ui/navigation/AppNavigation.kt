@@ -154,7 +154,8 @@ fun AppNavigation(
                 clubId = args.clubId,
                 clubViewModel = clubViewModel,
                 navController = navController,
-                eventViewModel = eventViewModel
+                eventViewModel = eventViewModel,
+                navViewModel = navigationViewModel
             )
         }
 
