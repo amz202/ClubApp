@@ -97,6 +97,9 @@ class ClubViewModel(
     private val _userClubRole = MutableStateFlow<RoleResponse?>(null)
     val userClubRole: StateFlow<RoleResponse?> = _userClubRole
 
+    private val _clubStatus = MutableStateFlow<String>("")
+    val clubStatus: StateFlow<String> = _clubStatus
+
     private val clubCache = mutableMapOf<String, ClubResponse>()
     private val membersCache = mutableMapOf<String, List<ClubMembersResponse>>()
     private val userClubsCache = mutableMapOf<String, List<ClubResponse>>()
@@ -161,6 +164,7 @@ class ClubViewModel(
         viewModelScope.launch {
             singleClubUiState = BaseUiState.Loading
             if(clubCache.containsKey(id)){
+                Log.d("getClub","club cache found")
                 _clubOfId.value = clubCache[id]
                 singleClubUiState = BaseUiState.Success(clubCache[id]!!)
                 return@launch
@@ -170,6 +174,7 @@ class ClubViewModel(
                 val club = clubRepository.getClub(id)
                 _clubOfId.value = club
                 clubCache[id] = club
+                _clubStatus.value = club.status
                 singleClubUiState = BaseUiState.Success(club)
             } catch (e: Exception) {
                 _clubOfId.value = null
@@ -399,7 +404,7 @@ class ClubViewModel(
 
     fun openClub(id: String){
         viewModelScope.launch {
-            uiState = BaseUiState.Loading
+            singleClubUiState = BaseUiState.Loading
             try {
                 val token = userPreferences.getToken()
                 if (token == null) {
@@ -407,10 +412,11 @@ class ClubViewModel(
                     return@launch
                 }
                 clubRepository.openCLub(token, id)
-                val updatedClubs = clubRepository.getClubs()
-                uiState = BaseUiState.Success(updatedClubs)
+                val updatedClubs = clubRepository.getClub(id)
+                _clubStatus.value = updatedClubs.status
+                singleClubUiState = BaseUiState.Success(updatedClubs)
             } catch (e: Exception) {
-                uiState = BaseUiState.Error
+                singleClubUiState = BaseUiState.Error
                 e.printStackTrace()
             }
         }
@@ -418,7 +424,7 @@ class ClubViewModel(
 
     fun closeClub(id: String){
         viewModelScope.launch {
-            uiState = BaseUiState.Loading
+            singleClubUiState = BaseUiState.Loading
             try {
                 val token = userPreferences.getToken()
                 if (token == null) {
@@ -426,27 +432,20 @@ class ClubViewModel(
                     return@launch
                 }
                 clubRepository.closeClub(token, id)
-                val updatedClubs = clubRepository.getClubs()
-                uiState = BaseUiState.Success(updatedClubs)
+                val updatedClubs = clubRepository.getClub(id)
+                _clubStatus.value = updatedClubs.status
+                singleClubUiState = BaseUiState.Success(updatedClubs)
             } catch (e: Exception) {
-                uiState = BaseUiState.Error
+                singleClubUiState = BaseUiState.Error
                 e.printStackTrace()
             }
         }
     }
 
+
     fun clearClubsState(){
         clubCache.clear()
         userClubRoleCache.clear()
-    }
-
-    fun toggleClubOpen(clubId: String) {
-        val club = clubCache[clubId] ?: return
-        if (club.isOpen) {
-            closeClub(clubId)
-        } else {
-            openClub(clubId)
-        }
     }
 
     companion object {

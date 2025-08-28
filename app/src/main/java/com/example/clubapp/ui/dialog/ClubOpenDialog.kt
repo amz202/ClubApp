@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 @Composable
 fun ClubOpenDialog(
     onDismissRequest: () -> Unit,
-    onConfirmClick: () -> Unit,
     onToggleOpen: () -> Unit,
     modifier: Modifier = Modifier,
     clubName: String,
@@ -18,8 +17,8 @@ fun ClubOpenDialog(
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            Button(onClick = onConfirmClick) {
-                Text("Confirm")
+            Button(onClick = onToggleOpen) {
+                Text(if (isOpen) "Close Club" else "Open Club")
             }
         },
         dismissButton = {
@@ -31,11 +30,6 @@ fun ClubOpenDialog(
         text = {
             Text(text = if (isOpen) "The club is open." else "The club is closed.")
         },
-        modifier = modifier,
-        icon = {
-            Button(onClick = onToggleOpen) {
-                Text(if (isOpen) "Close Club" else "Open Club")
-            }
-        }
+        modifier = modifier
     )
 }

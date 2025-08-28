@@ -1,6 +1,7 @@
 package com.example.clubapp.ui.screens.detail
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -132,19 +133,22 @@ fun ClubDetailScreen(
     val showOpenClub by navViewModel.showClubOpenDialog.collectAsState()
     val clubEventState = eventViewModel.clubEventsUiState
     val joinClubState = clubViewModel.joinClubUiState
+    val clubStatus = clubViewModel.clubStatus.collectAsState().value
 
     if (club == null || clubGroup == null ) return
 
     Scaffold(
         floatingActionButton = {
             if (!isMember) {
-                FloatingActionButton(onClick = { clubViewModel.joinClub(clubId) }) {
-                    when (joinClubState) {
-                        is BaseUiState.Loading -> CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp
-                        )
-                        else -> Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
+                if (clubStatus=="open") {
+                    FloatingActionButton(onClick = { clubViewModel.joinClub(clubId) }) {
+                        when (joinClubState) {
+                            is BaseUiState.Loading -> CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                strokeWidth = 2.dp
+                            )
+                            else -> Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
+                        }
                     }
                 }
             }else {
@@ -349,13 +353,15 @@ fun ClubDetailScreen(
             ClubOpenDialog(
                 clubName = club.name,
                 onDismissRequest = { navViewModel.hideClubOpenDialog() },
-                onConfirmClick = {
+                onToggleOpen = {
+                    if(clubStatus=="open"){
+                        clubViewModel.closeClub(clubId)
+                    }else{
+                        clubViewModel.openClub(clubId)
+                    }
                     navViewModel.hideClubOpenDialog()
                 },
-                onToggleOpen = {
-                    clubViewModel.toggleClubOpen(clubId)
-                },
-                isOpen = club.isOpen
+                isOpen = clubStatus == "open"
             )
         }
     }

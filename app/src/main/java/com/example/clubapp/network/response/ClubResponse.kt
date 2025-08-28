@@ -12,5 +12,5 @@ data class ClubResponse(
     val tags:String,
     val createdOn: String,
     val memberCount: Int,
-    val isOpen: Boolean
+    val status: String
 )
