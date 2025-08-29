@@ -164,7 +164,6 @@ class ClubViewModel(
         viewModelScope.launch {
             singleClubUiState = BaseUiState.Loading
             if(clubCache.containsKey(id)){
-                Log.d("getClub","club cache found")
                 _clubOfId.value = clubCache[id]
                 singleClubUiState = BaseUiState.Success(clubCache[id]!!)
                 return@launch

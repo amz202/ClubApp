@@ -57,6 +57,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.LockClock
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -146,28 +147,58 @@ fun ClubDetailScreen(
 
     Scaffold(
         floatingActionButton = {
-            if (!isMember) {
-                if (clubStatus=="open") {
+            when {
+                //Already a member
+                isMember && ownClubRole!!.role != "pending" -> {
+                    FloatingActionButton(onClick = {
+                        navController.navigate(
+                            ChatScreenNav(
+                                clubId = clubGroup!!.clubId,
+                                groupId = clubGroup!!.id,
+                                groupName = clubGroup!!.name
+                            )
+                        )
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Chat,
+                            contentDescription = "Chat"
+                        )
+                    }
+                }
+
+                //Pending request
+                ownClubRole?.role == "pending" -> {
+                    FloatingActionButton(
+                        onClick = {},
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.LockClock,
+                            contentDescription = "Pending"
+                        )
+                    }
+                }
+
+                //Not a member
+                !isMember && clubStatus == "open" -> {
                     FloatingActionButton(onClick = { clubViewModel.joinClub(clubId) }) {
                         when (joinClubState) {
                             is BaseUiState.Loading -> CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),
                                 strokeWidth = 2.dp
                             )
-                            else -> Icon(imageVector = Icons.Default.Add, contentDescription = "Join")
+                            else -> Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Join"
+                            )
                         }
                     }
                 }
-            }else {
-                FloatingActionButton(onClick = { navController.navigate(ChatScreenNav(
-                    clubId = clubGroup!!.clubId,
-                    groupId = clubGroup!!.id,
-                    groupName = clubGroup!!.name
-                )) }) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.Chat, contentDescription = "Add Event")
-                }
+                else -> {}
             }
-        },
+        }
+,
         topBar = {
             TopAppBar(
                 title = {
@@ -197,7 +228,7 @@ fun ClubDetailScreen(
                         Icon(Icons.Default.Groups, contentDescription = "Members")
                     }
 
-                    if (isMember) {
+                    if (isMember && ownClubRole!!.role != "pending") {
                         var showMenu by remember { mutableStateOf(false) }
                         Box {
                             IconButton(onClick = { showMenu = true }) {

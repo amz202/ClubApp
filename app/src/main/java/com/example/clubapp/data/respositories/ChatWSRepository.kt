@@ -71,7 +71,7 @@ class ChatWSRepositoryImpl : ChatWSRepository {
         session = client.webSocketSession {
             url {
                 protocol = URLProtocol.WS
-                host = "192.168.24.222"
+                host = "10.255.173.160"
                 port = 8001
                 encodedPath = "/chat/${clubId}/$groupId"
             }
