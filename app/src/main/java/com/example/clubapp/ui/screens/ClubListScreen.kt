@@ -41,6 +41,7 @@ import com.example.clubapp.ui.screens.Common.LoadingScreen
 import com.example.clubapp.ui.theme.PlusJakarta
 import com.example.clubapp.ui.viewModels.BaseUiState
 import com.example.clubapp.ui.viewModels.ClubUiState
+import com.example.clubapp.ui.viewModels.ClubViewModel
 import com.example.clubapp.ui.viewModels.NavigationViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -48,7 +49,8 @@ import com.example.clubapp.ui.viewModels.NavigationViewModel
 fun ClubListScreen(
     clubUiState: ClubUiState,
     navController: NavHostController,
-    navigationViewModel: NavigationViewModel
+    navigationViewModel: NavigationViewModel,
+    clubViewModel: ClubViewModel,
 ) {
     when (clubUiState) {
         is BaseUiState.Success -> ClubList(
@@ -59,7 +61,11 @@ fun ClubListScreen(
         )
 
         is BaseUiState.Loading -> LoadingScreen()
-        is BaseUiState.Error -> ErrorScreen()
+        is BaseUiState.Error -> ErrorScreen(
+            onRetry = {
+                clubViewModel.getMyClubs()
+            }
+        )
     }
 }
 

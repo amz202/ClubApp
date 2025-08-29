@@ -66,7 +66,11 @@ fun EventParticipantListStateScreen(
             )
         }
         is BaseUiState.Loading -> LoadingScreen()
-        is BaseUiState.Error -> ErrorScreen()
+        is BaseUiState.Error -> ErrorScreen(
+            onRetry = {
+                eventViewModel.getEventParticipants(eventId)
+            }
+        )
     }
 }
 

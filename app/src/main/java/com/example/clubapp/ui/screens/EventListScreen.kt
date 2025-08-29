@@ -60,6 +60,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import com.example.clubapp.ui.viewModels.BaseUiState
 import com.example.clubapp.ui.viewModels.EventUiState
+import com.example.clubapp.ui.viewModels.EventViewModel
 import com.example.clubapp.ui.viewModels.NavigationViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -67,7 +68,8 @@ import com.example.clubapp.ui.viewModels.NavigationViewModel
 fun EventListScreen(
     eventUiState: EventUiState,
     navController: NavHostController,
-    navigationViewModel: NavigationViewModel
+    navigationViewModel: NavigationViewModel,
+    eventViewModel: EventViewModel
 ) {
     when (eventUiState) {
         is BaseUiState.Success -> EventList(
@@ -78,7 +80,11 @@ fun EventListScreen(
         )
 
         is BaseUiState.Loading -> LoadingScreen()
-        is BaseUiState.Error -> ErrorScreen()
+        is BaseUiState.Error -> ErrorScreen(
+            onRetry = {
+                eventViewModel.getEvents()
+            }
+        )
     }
 }
 

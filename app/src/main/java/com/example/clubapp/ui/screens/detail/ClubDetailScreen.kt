@@ -108,7 +108,14 @@ fun ClubDetailStateScreen(
             )
         }
         is BaseUiState.Loading -> LoadingScreen()
-        is BaseUiState.Error -> ErrorScreen()
+        is BaseUiState.Error -> ErrorScreen(
+            onRetry = {
+                clubViewModel.getClub(clubId)
+                clubViewModel.getClubRole(clubId)
+                eventViewModel.getClubEvents(clubId)
+                clubViewModel.getClubGroup(clubId)
+            }
+        )
     }
 }
 

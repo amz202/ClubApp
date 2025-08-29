@@ -71,7 +71,11 @@ fun ClubMembersListStateScreen(
             )
         }
         is BaseUiState.Loading -> LoadingScreen()
-        is BaseUiState.Error -> ErrorScreen()
+        is BaseUiState.Error -> ErrorScreen(
+            onRetry = {
+                clubViewModel.getClubMembers(clubId)
+            }
+        )
     }
 }
 

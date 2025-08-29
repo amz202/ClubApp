@@ -88,14 +88,16 @@ fun AppNavigation(
         composable<ClubScreenNav> {
             ClubListScreen(
                 clubUiState,
-                navController, navigationViewModel = navigationViewModel
+                navController, navigationViewModel = navigationViewModel,
+                clubViewModel
             )
         }
 
         composable<EventScreenNav> {
             EventListScreen(
                 eventUiState,
-                navController, navigationViewModel = navigationViewModel
+                navController, navigationViewModel = navigationViewModel,
+                eventViewModel
             )
         }
 

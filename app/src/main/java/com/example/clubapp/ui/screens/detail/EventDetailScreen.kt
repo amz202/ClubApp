@@ -97,7 +97,13 @@ fun EventDetailStateScreen(
         }
 
         is BaseUiState.Loading -> LoadingScreen()
-        is BaseUiState.Error -> ErrorScreen()
+        is BaseUiState.Error -> ErrorScreen(
+            onRetry = {
+                eventViewModel.getEvent(eventId)
+                eventViewModel.getEventRole(eventId)
+                eventViewModel.getEventNews(eventId)
+            }
+        )
     }
 }
 

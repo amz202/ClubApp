@@ -90,7 +90,11 @@ fun ChatStateScreen(
 
     when (chatState) {
         is BaseUiState.Loading -> LoadingScreen()
-        is BaseUiState.Error -> ErrorScreen()
+        is BaseUiState.Error -> ErrorScreen(
+            onRetry = {
+                chatViewModel.initChat(groupId, clubId)
+            }
+        )
         is BaseUiState.Success -> {
             ChatScreen(
                 groupId = groupId,
