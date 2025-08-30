@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import android.util.Log
 import com.example.clubapp.network.response.ClubGroupResponse
+import com.example.clubapp.network.response.ClubJoinResponse
 import com.example.clubapp.network.response.RoleResponse
 import kotlin.collections.containsKey
 import kotlin.collections.remove
@@ -50,6 +51,7 @@ typealias UserClubsUiState = BaseUiState<List<ClubResponse>>
 typealias SingleClubUiState = BaseUiState<ClubResponse>
 typealias ClubActionUiState = BaseUiState<Boolean>
 typealias ClubGroupUiState = BaseUiState<ClubGroupResponse>
+typealias ClubPendingMemberUiState = BaseUiState<List<ClubJoinResponse>>
 
 class ClubViewModel(
     private val clubRepository: ClubRepository,
@@ -59,6 +61,9 @@ class ClubViewModel(
         private set
 
     var clubMemberUiState: ClubMemberUiState by mutableStateOf(BaseUiState.Loading)
+        private set
+
+    var clubPendingMemberUiState: ClubPendingMemberUiState by mutableStateOf(BaseUiState.Loading)
         private set
 
     var clubRoleUiState: ClubRoleUiState by mutableStateOf(BaseUiState.Loading)
@@ -99,6 +104,9 @@ class ClubViewModel(
 
     private val _clubStatus = MutableStateFlow<String>("")
     val clubStatus: StateFlow<String> = _clubStatus
+
+    private val _pendingMembers = MutableStateFlow<List<ClubJoinResponse>?>(emptyList())
+    val pendingMembers: StateFlow<List<ClubJoinResponse>?> = _pendingMembers
 
     private val clubCache = mutableMapOf<String, ClubResponse>()
     private val membersCache = mutableMapOf<String, List<ClubMembersResponse>>()
@@ -436,6 +444,78 @@ class ClubViewModel(
                 singleClubUiState = BaseUiState.Success(updatedClubs)
             } catch (e: Exception) {
                 singleClubUiState = BaseUiState.Error
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun getPendingMembers(id: String){
+        viewModelScope.launch {
+            clubPendingMemberUiState = BaseUiState.Loading
+            try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    clubPendingMemberUiState = BaseUiState.Error
+                    return@launch
+                }
+                val pendingMembers = clubRepository.getPendingMembers(token, id)
+                if(!pendingMembers.isNullOrEmpty()){
+                    _pendingMembers.value = pendingMembers
+                    clubPendingMemberUiState = BaseUiState.Success(emptyList())
+                } else {
+                    _pendingMembers.value = emptyList()
+                    clubPendingMemberUiState = BaseUiState.Success(emptyList())
+                }
+            } catch (e: Exception) {
+                clubPendingMemberUiState = BaseUiState.Error
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun approveMember(clubId: String, userId: String){
+        viewModelScope.launch {
+            clubPendingMemberUiState = BaseUiState.Loading
+            try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    clubPendingMemberUiState = BaseUiState.Error
+                    return@launch
+                }
+                clubRepository.approveMember(token, clubId, userId)
+                val updatedMembers = clubRepository.getPendingMembers(token, clubId)
+                _pendingMembers.value = updatedMembers
+                clubPendingMemberUiState = if(!updatedMembers.isNullOrEmpty()){
+                    BaseUiState.Success(updatedMembers)
+                } else {
+                    BaseUiState.Success(emptyList())
+                }
+            } catch (e: Exception) {
+                clubPendingMemberUiState = BaseUiState.Error
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun rejectMember(clubId: String, userId: String){
+        viewModelScope.launch {
+            clubPendingMemberUiState = BaseUiState.Loading
+            try {
+                val token = userPreferences.getToken()
+                if (token == null) {
+                    clubPendingMemberUiState = BaseUiState.Error
+                    return@launch
+                }
+                clubRepository.rejectMember(token, clubId, userId)
+                val updatedMembers = clubRepository.getPendingMembers(token, clubId)
+                _pendingMembers.value = updatedMembers
+                clubPendingMemberUiState = if(!updatedMembers.isNullOrEmpty()){
+                    BaseUiState.Success(updatedMembers)
+                } else {
+                    BaseUiState.Success(emptyList())
+                }
+            } catch (e: Exception) {
+                clubPendingMemberUiState = BaseUiState.Error
                 e.printStackTrace()
             }
         }

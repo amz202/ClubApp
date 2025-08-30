@@ -4,6 +4,7 @@ import com.example.clubapp.network.ApiService
 import com.example.clubapp.network.request.ClubRequest
 import com.example.clubapp.network.request.RoleRequest
 import com.example.clubapp.network.response.ClubGroupResponse
+import com.example.clubapp.network.response.ClubJoinResponse
 import com.example.clubapp.network.response.ClubMembersResponse
 import com.example.clubapp.network.response.ClubResponse
 import com.example.clubapp.network.response.RoleResponse
@@ -40,6 +41,9 @@ interface ClubRepository {
     suspend fun getClubGroup(token: String, clubId: String): ClubGroupResponse?
     suspend fun openCLub(token: String, id: String): ResponseBody
     suspend fun closeClub(token: String, id: String): ResponseBody
+    suspend fun getPendingMembers(token: String, id: String): List<ClubJoinResponse>?
+    suspend fun approveMember(token: String, id: String, userId: String): ResponseBody
+    suspend fun rejectMember(token: String, id: String, userId: String): ResponseBody
 }
 
 class ClubRepositoryImpl(private val apiService: ApiService): ClubRepository{
@@ -89,5 +93,17 @@ class ClubRepositoryImpl(private val apiService: ApiService): ClubRepository{
 
     override suspend fun closeClub(token: String, id:String): ResponseBody {
         return apiService.closeClub(token = "Bearer $token", id = id)
+    }
+
+    override suspend fun getPendingMembers(token: String, id: String): List<ClubJoinResponse>? {
+        return apiService.getPendingMembers(token = "Bearer $token", id = id)
+    }
+
+    override suspend fun approveMember(token: String, id: String, userId: String): ResponseBody {
+        return apiService.approveMember(token = "Bearer $token", id = id, userId = userId)
+    }
+
+    override suspend fun rejectMember(token: String, id: String, userId: String): ResponseBody {
+        return apiService.rejectMember(token = "Bearer $token", id = id, userId = userId)
     }
 }
