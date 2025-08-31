@@ -207,7 +207,7 @@ fun AcceptUserDialog(
 }
 
 @Composable
-fun DeclineUserDialog(
+fun RejectUserDialog(
     modifier: Modifier = Modifier,
     onDecline: () -> Unit = {},
     onDismiss: () -> Unit = {},

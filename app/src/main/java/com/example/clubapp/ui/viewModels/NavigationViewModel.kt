@@ -77,4 +77,33 @@ class NavigationViewModel : ViewModel() {
     fun hideClubOpenDialog(){
         _showClubOpenDialog.value = false
     }
+
+    private val _showAcceptUserDialog = MutableStateFlow<Boolean>(false)
+    val showAcceptUserDialog: MutableStateFlow<Boolean> = _showAcceptUserDialog
+    private val _requestUserName = MutableStateFlow<String>("")
+    val requestUserName: MutableStateFlow<String> = _requestUserName
+    private val _requestUserId = MutableStateFlow<String>("")
+    val requestUserId: MutableStateFlow<String> = _requestUserId
+
+    fun showAcceptUserDialog(userName: String, userId: String) {
+        _showAcceptUserDialog.value = true
+        _requestUserName.value = userName
+        _requestUserId.value = userId
+    }
+    fun hideAcceptUserDialog() {
+        _showAcceptUserDialog.value = false
+    }
+
+    private val _showRejectUserDialog = MutableStateFlow<Boolean>(false)
+    val showRejectUserDialog: MutableStateFlow<Boolean> = _showRejectUserDialog
+
+    fun showRejectUserDialog(userName: String, userId: String) {
+        _showRejectUserDialog.value = true
+        _requestUserName.value = userName
+        _requestUserId.value = userId
+    }
+    fun hideRejectUserDialog() {
+        _showRejectUserDialog.value = false
+    }
+
 }
