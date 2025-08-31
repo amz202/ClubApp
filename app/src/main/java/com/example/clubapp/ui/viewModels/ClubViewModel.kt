@@ -27,6 +27,8 @@ import com.example.clubapp.network.response.RoleResponse
 import kotlin.collections.containsKey
 import kotlin.collections.remove
 import kotlin.text.get
+import kotlin.text.set
+import kotlin.toString
 
 /*
  * Copyright 2025 Abdul Majid
@@ -248,18 +250,23 @@ class ClubViewModel(
                     return@launch
                 }
                 clubRepository.joinClub(token, clubId)
-                val updatedClubs = clubRepository.getClubs()
-                _clubs.value = updatedClubs
-                userClubsCache.remove(token)
-                membersCache.remove(clubId)
+
+                // Clear relevant caches to ensure fresh data
                 userClubRoleCache.remove(clubId)
-                val cacheKey = token
+                userClubsCache.remove(token)
+
+                val updatedRole = clubRepository.getClubRole(token, clubId)
+                _userClubRole.value = updatedRole
+                userClubRoleCache[clubId] = updatedRole
+                clubRoleUiState = BaseUiState.Success(updatedRole?.role)
+
                 val myClubs = clubRepository.getMyClubs(token.toString())
-                if(!myClubs.isNullOrEmpty()){
+                if (!myClubs.isNullOrEmpty()) {
                     _usersClub.value = myClubs
-                    userClubsCache[cacheKey] = myClubs
+                    userClubsCache[token] = myClubs
                     userClubsUiState = BaseUiState.Success(myClubs)
                 } else {
+                    _usersClub.value = emptyList()
                     userClubsUiState = BaseUiState.Success(emptyList())
                 }
                 joinClubUiState = BaseUiState.Success(true)
@@ -483,10 +490,11 @@ class ClubViewModel(
                     return@launch
                 }
                 clubRepository.approveMember(token, clubId, userId)
-                val updatedMembers = clubRepository.getPendingMembers(token, clubId)
-                _pendingMembers.value = updatedMembers
-                clubPendingMemberUiState = if(!updatedMembers.isNullOrEmpty()){
-                    BaseUiState.Success(updatedMembers)
+                val updatedRequests = clubRepository.getPendingMembers(token, clubId)
+                _pendingMembers.value = updatedRequests
+                membersCache.clear()
+                clubPendingMemberUiState = if(!updatedRequests.isNullOrEmpty()){
+                    BaseUiState.Success(updatedRequests)
                 } else {
                     BaseUiState.Success(emptyList())
                 }

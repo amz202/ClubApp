@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.clubapp.network.response.ClubMembersResponse
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.LockClock
+import androidx.compose.material.icons.filled.RequestPage
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.example.clubapp.network.response.RoleResponse
 import com.example.clubapp.ui.dialog.ClubRoleDialog
 import com.example.clubapp.ui.dialog.EventRoleDialog
+import com.example.clubapp.ui.navigation.ClubRequestsNav
 import com.example.clubapp.ui.viewModels.EventViewModel
 import com.example.clubapp.ui.viewModels.NavigationViewModel
 import com.example.clubapp.ui.viewModels.BaseUiState
@@ -70,6 +73,7 @@ fun ClubMembersListStateScreen(
                 ownClubRole = ownClubRole
             )
         }
+
         is BaseUiState.Loading -> LoadingScreen()
         is BaseUiState.Error -> ErrorScreen(
             onRetry = {
@@ -118,7 +122,18 @@ fun ClubMembersList(
                     }
                 },
                 actions = {
-                    Box(modifier = Modifier.width(32.dp)) {}
+                    if (ownClubRole=="creator" || ownClubRole=="admin"){
+                        IconButton(
+                            onClick = { navController.navigate(ClubRequestsNav(clubId = clubId, clubName = clubName)) }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.LockClock,
+                                contentDescription = "Requests"
+                            )
+                        }
+                    }else{
+                        Box(modifier = Modifier.width(32.dp)) {}
+                    }
                 }
             )
         }
@@ -138,11 +153,11 @@ fun ClubMembersList(
                         name = member.name,
                         email = member.email,
                         role = member.clubRole,
-                        modifier = Modifier.clickable{
+                        modifier = Modifier.clickable {
                             navViewModel.showClubRoleDialog(member.id)
                         }
                     )
-                    if(showClubDialog && clubRoleUser == member.id){
+                    if (showClubDialog && clubRoleUser == member.id) {
                         ClubRoleDialog(
                             clubId = clubId,
                             userName = member.name,
@@ -151,7 +166,7 @@ fun ClubMembersList(
                             navViewModel = navViewModel,
                             clubViewModel = clubViewModel,
                             userId = member.id,
-                            ownRole = ownClubRole?: "member"
+                            ownRole = ownClubRole ?: "member"
                         )
                     }
                 }

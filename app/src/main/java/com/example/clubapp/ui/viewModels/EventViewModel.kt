@@ -307,31 +307,31 @@ class EventViewModel(
                 val token = userPreferences.getToken()
                 if (token == null) {
                     joinEventUiState = BaseUiState.Error
-                    uiState = BaseUiState.Error
                     return@launch
                 }
+
                 eventRepository.joinEvent(token, eventId)
 
-                val updatedEvents = eventRepository.getEvents()
-                _events.value = updatedEvents
-
-                val updatedEvent = updatedEvents.find { it.id == eventId }
-                if (updatedEvent != null && eventCache.containsKey(eventId)) {
-                    eventCache[eventId] = updatedEvent
-                    _eventOfId.value = updatedEvent
-                }
+                userEventRoleCache.remove(eventId)
                 userEventsCache.remove(token)
                 participantsCache.remove(eventId)
-                userEventRoleCache.remove(eventId)
-                val cacheKey = token
+
+                // Fetch and update event role immediately
+                val updatedRole = eventRepository.getEventRole(token, eventId)
+                _userEventRole.value = updatedRole
+                userEventRoleCache[eventId] = updatedRole
+                eventRoleUiState = BaseUiState.Success(updatedRole?.role)
+
                 val events = eventRepository.getMyEvents(token)
                 if (!events.isNullOrEmpty()) {
                     _usersEvents.value = events
-                    userEventsCache[cacheKey] = events
+                    userEventsCache[token] = events
                     userEventsUiState = BaseUiState.Success(events)
                 } else {
+                    _usersEvents.value = emptyList()
                     userEventsUiState = BaseUiState.Success(emptyList())
                 }
+
                 joinEventUiState = BaseUiState.Success(true)
 
                 FirebaseMessaging.getInstance().subscribeToTopic("event_${eventId}")

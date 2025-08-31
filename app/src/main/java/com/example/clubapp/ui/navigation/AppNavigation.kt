@@ -30,6 +30,7 @@ import com.example.clubapp.ui.screens.detail.EventDetailScreen
 import com.example.clubapp.ui.screens.detail.EventDetailStateScreen
 import com.example.clubapp.ui.screens.users.ClubMembersList
 import com.example.clubapp.ui.screens.users.ClubMembersListStateScreen
+import com.example.clubapp.ui.screens.users.ClubRequestListStateScreen
 import com.example.clubapp.ui.screens.users.EventParticipantList
 import com.example.clubapp.ui.screens.users.EventParticipantListStateScreen
 import com.example.clubapp.ui.viewModels.ChatViewModel
@@ -182,6 +183,17 @@ fun AppNavigation(
                 chatViewModel = chatViewModel,
                 navController = navController,
                 groupName = args.groupName
+            )
+        }
+
+        composable<ClubRequestsNav>{
+            val args = it.toRoute<ClubRequestsNav>()
+            ClubRequestListStateScreen(
+                clubId = args.clubId,
+                clubName = args.clubName,
+                navController = navController,
+                clubViewModel = clubViewModel,
+                navViewModel = navigationViewModel,
             )
         }
     }

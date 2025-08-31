@@ -62,3 +62,9 @@ data class ChatScreenNav(
     val groupId: String,
     val groupName: String
 )
+
+@Serializable
+data class ClubRequestsNav(
+    val clubId: String,
+    val clubName: String
+)
