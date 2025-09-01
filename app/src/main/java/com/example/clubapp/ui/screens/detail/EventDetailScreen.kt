@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.sp
 import com.example.clubapp.ui.cards.isEventInPast
 import com.example.clubapp.ui.dialog.AddEventNewsDialog
 import com.example.clubapp.ui.dialog.EventActionMenu
+import com.example.clubapp.ui.navigation.ClubDetailNav
 import com.example.clubapp.ui.viewModels.BaseUiState
 import com.example.clubapp.ui.screens.Common.ErrorScreen
 import com.example.clubapp.ui.screens.Common.LoadingScreen
@@ -76,7 +77,9 @@ fun EventDetailStateScreen(
     modifier: Modifier = Modifier,
     eventViewModel: EventViewModel,
     navController: NavHostController,
-    navViewModel: NavigationViewModel
+    navViewModel: NavigationViewModel,
+    clubId: String? = null,
+    clubName: String? = null
 ) {
     LaunchedEffect(eventId) {
         eventViewModel.getEvent(eventId)
@@ -92,7 +95,9 @@ fun EventDetailStateScreen(
                 modifier = modifier,
                 eventViewModel = eventViewModel,
                 navController = navController,
-                navViewModel
+                navViewModel,
+                clubId = clubId,
+                clubName = clubName
             )
         }
 
@@ -115,7 +120,9 @@ fun EventDetailScreen(
     modifier: Modifier = Modifier,
     eventViewModel: EventViewModel,
     navController: NavHostController,
-    navViewModel: NavigationViewModel
+    navViewModel: NavigationViewModel,
+    clubId: String? = null,
+    clubName: String? = null
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -266,6 +273,53 @@ fun EventDetailScreen(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                //Club if exists
+                if(clubId != null && clubName != null){
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        color = MaterialTheme.colorScheme.surface,
+                        tonalElevation = 1.dp,
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                Text(
+                                    "Club",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
+                                Text(
+                                    clubName,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                            TextButton(
+                                onClick = {
+                                    navController.navigate(ClubDetailNav(clubId))
+                                }
+                            ) {
+                                Text(
+                                    text = "View Club",
+                                    style = MaterialTheme.typography.labelLarge.copy(
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontFamily = PlusJakarta
+                                    ),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+                }
 
                 // Event description
                 Surface(

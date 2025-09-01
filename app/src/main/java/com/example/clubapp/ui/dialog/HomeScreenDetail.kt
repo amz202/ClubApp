@@ -276,9 +276,7 @@ fun MyEvents(
                                     eventResponse = event,
                                     onClick = {
                                         navController.navigate(
-                                            EventDetailNav(
-                                                eventId = event.id
-                                            )
+                                            EventDetailNav(eventId = event.id, clubId = event.clubId, clubName = event.clubName)
                                         )
                                     }
                                 )

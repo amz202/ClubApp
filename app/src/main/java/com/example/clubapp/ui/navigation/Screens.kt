@@ -35,6 +35,8 @@ object AddClubNav
 @Serializable
 data class EventDetailNav(
     val eventId: String,
+    val clubId: String? = null,
+    val clubName: String? = null,
 )
 
 @Serializable

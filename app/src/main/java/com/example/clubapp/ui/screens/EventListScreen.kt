@@ -203,7 +203,7 @@ fun EventList(
                         eventResponse = event,
                         modifier = modifier.padding(bottom = 16.dp),
                         onClick = {
-                            navController.navigate(EventDetailNav(event.id))
+                            navController.navigate(EventDetailNav(eventId = event.id, clubId = event.clubId, clubName = event.clubName))
                         }
                     )
                 }

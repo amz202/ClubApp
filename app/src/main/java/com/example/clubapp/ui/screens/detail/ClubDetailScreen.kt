@@ -366,7 +366,7 @@ fun ClubDetailScreen(
                                         EventItem(
                                             eventResponse = event,
                                             onClick = {
-                                                navController.navigate(EventDetailNav(event.id))
+                                                navController.navigate(EventDetailNav(eventId = event.id, clubId = clubId, clubName = club.name))
                                             }
                                         )
                                     }
