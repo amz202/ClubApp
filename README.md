@@ -42,18 +42,18 @@ A modern Android application designed to streamline the management of university
 
 ---
 
-## Version 1.1
+## Version 1.2
 
-> **ClubApp v1.1** adds real-time communication, improves session consistency, and enhances user experience with backend-driven interactions.
+> **ClubApp v1.2** introduces controlled club access, structured membership requests, and direct event–club integration. The update also improves UI responsiveness, error handling, and overall backend stability.  
 
 ### Highlights
 
-- Real-time group chat support using WebSocket for each club  
-- Automatic group creation on club creation (1:1 mapping with backend)  
-- Message history loaded from MongoDB; includes sender and timestamp  
-- Users can delete their own messages from the chat screen  
-- Resolved session cache issues on logout and re-login  
-- Profile picture pulled from Google account and shown on the home screen  
+- **Club access control** – Creators can open or close clubs, controlling whether new requests are allowed  
+- **Join requests** – Users can request to join open clubs; creators and moderators can accept or reject them  
+- **Event–club link** – Events now show their parent club name, with quick navigation back to the club page  
+- **Error handling** – Error screen redesigned with a retry button for faster recovery  
+- **Responsive UI** – Member status updates (club or event) now reflect instantly, with smoother caching and state handling  
+- **Backend** – Database migrated to **Supabase** for improved stability and testing  
 
 ---
 
@@ -66,7 +66,7 @@ A modern Android application designed to streamline the management of university
 ![Slide 2](https://github.com/user-attachments/assets/1574c537-2346-446e-8c9b-cb213121deb0)
 
 ### Club Creation, Club Detail, and Club Chat
-![Slide 3](https://github.com/user-attachments/assets/f0d4b59c-a36a-4c2f-aa53-079209d3bf39)
+![Slide 3](https://github.com/user-attachments/assets/3eb8aee4-5382-402d-ad38-e948d1fd9997)
 
 ---
 
