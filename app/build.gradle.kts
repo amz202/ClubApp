@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
     kotlin("plugin.serialization") version "1.9.23"
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -106,5 +107,9 @@ dependencies {
     //Coil
     implementation("io.coil-kt.coil3:coil-compose:3.2.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
+
+    implementation("androidx.room:room-runtime:2.8.0")
+    implementation("androidx.room:room-ktx:2.8.0")
+    ksp("androidx.room:room-compiler:2.8.0")
 
 }
