@@ -1,5 +1,8 @@
 package com.example.clubapp.data
 
+import android.content.Context
+import androidx.room.Room
+import com.example.clubapp.data.local.ClubAppDatabase
 import com.example.clubapp.data.respositories.ChatRepository
 import com.example.clubapp.data.respositories.ChatRepositoryImpl
 import com.example.clubapp.data.respositories.ChatWSRepository
@@ -41,30 +44,45 @@ interface AppContainer{
     val chatRepository: ChatRepository
 }
 
-class DefaultAppContainer:AppContainer{
-    val BASE_URL = "http://10.255.173.160:8001/"
-    val json = Json{
+class DefaultAppContainer(private val context: Context):AppContainer{
+    private val BASE_URL = "http://10.254.134.160:8001/"
+    private val json = Json{
         this.ignoreUnknownKeys = true
         coerceInputValues = true
     }
-    val retrofit = Retrofit.Builder()
+    private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
         .build()
-    val authService: AuthApiService by lazy{
+    private val authService: AuthApiService by lazy{
         retrofit.create(AuthApiService::class.java)
     }
-    val apiService: ApiService by lazy{
+    private val apiService: ApiService by lazy{
         retrofit.create(ApiService::class.java)
     }
+    private val database: ClubAppDatabase by lazy {
+        Room.databaseBuilder(
+            context,
+            ClubAppDatabase::class.java,
+            "clubapp_database"
+        ).build()
+    }
+
+    private val eventDao by lazy {
+        database.eventDao()
+    }
+    private val clubDao by lazy {
+        database.clubDao()
+    }
+
     override val authRepository: AuthRepository by lazy {
         AuthRepositoryImpl(authService)
     }
     override val eventRepository: EventRepository by lazy {
-        EventRepositoryImpl(apiService)
+        EventRepositoryImpl(apiService, eventDao)
     }
     override val clubRepository: ClubRepository by lazy {
-        ClubRepositoryImpl(apiService)
+        ClubRepositoryImpl(apiService, clubDao)
     }
     override val chatRepository: ChatRepository by lazy {
         ChatRepositoryImpl(apiService)

@@ -29,6 +29,7 @@ import kotlin.collections.remove
 import kotlin.text.get
 import kotlin.text.set
 import kotlin.toString
+import kotlinx.coroutines.flow.first
 
 /*
  * Copyright 2025 Abdul Majid
@@ -124,17 +125,14 @@ class ClubViewModel(
         viewModelScope.launch {
             try {
                 uiState = BaseUiState.Loading
-                val clubs = clubRepository.getClubs()
-//                if (clubs.isEmpty()) {
-//                    uiState = BaseUiState.Error
-//                } else {
-//                    uiState = BaseUiState.Success(clubs)
-//                    _clubs.value = clubs
-//                }
-                uiState = BaseUiState.Success(clubs)
-                _clubs.value = clubs
+                clubRepository.getClubs().collect { clubs ->
+                    uiState = BaseUiState.Success(clubs)
+                    _clubs.value = clubs
+                    Log.d("ClubViewModel", "Updated clubs in ViewModel: ${clubs.size}")
+                }
             } catch (e: Exception) {
                 uiState = BaseUiState.Error
+                Log.e("ClubViewModel", "Error collecting clubs flow", e)
                 e.printStackTrace()
             }
         }
@@ -203,7 +201,9 @@ class ClubViewModel(
                     return@launch
                 }
                 clubRepository.createClub(token, club)
-                val updatedClubs = clubRepository.getClubs()
+                val updatedClubs = clubRepository.getClubs().first()
+                uiState = BaseUiState.Success(updatedClubs)
+                _clubs.value = updatedClubs
                 uiState = BaseUiState.Success(updatedClubs)
                 val cacheKey = token
                 val myClubs = clubRepository.getMyClubs(token.toString())
@@ -231,7 +231,7 @@ class ClubViewModel(
                     return@launch
                 }
                 clubRepository.deleteClub(token, id)
-                val updatedClubs = clubRepository.getClubs()
+                val updatedClubs = clubRepository.getClubs().first()
                 uiState = BaseUiState.Success(updatedClubs)
             } catch (e: Exception) {
                 uiState = BaseUiState.Error
@@ -287,7 +287,7 @@ class ClubViewModel(
                     return@launch
                 }
                 clubRepository.leaveClub(token, clubId)
-                val updatedClubs = clubRepository.getClubs()
+                val updatedClubs = clubRepository.getClubs().first()
                 _clubs.value = updatedClubs
                 leaveClubUiState = BaseUiState.Success(true)
 

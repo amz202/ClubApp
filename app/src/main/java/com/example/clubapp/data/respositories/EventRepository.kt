@@ -1,5 +1,7 @@
 package com.example.clubapp.data.respositories
 
+import android.util.Log
+import com.example.clubapp.data.local.dao.EventDao
 import com.example.clubapp.network.ApiService
 import com.example.clubapp.network.request.EventNewsRequest
 import com.example.clubapp.network.request.EventRequest
@@ -8,6 +10,12 @@ import com.example.clubapp.network.response.EventNewsResponse
 import com.example.clubapp.network.response.EventParticipantsResponse
 import com.example.clubapp.network.response.EventResponse
 import com.example.clubapp.network.response.RoleResponse
+import com.example.clubapp.data.local.entities.toEventEntity
+import com.example.clubapp.data.local.entities.toEventResponse
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import okhttp3.ResponseBody
 
 /*
@@ -28,7 +36,7 @@ import okhttp3.ResponseBody
 
 interface EventRepository {
     suspend fun getEvent(id:String): EventResponse
-    suspend fun getEvents():List<EventResponse>
+    fun getEvents(): Flow<List<EventResponse>>
     suspend fun createEvent(token:String, event: EventRequest): ResponseBody
     suspend fun deleteEvent(token:String, id: String): ResponseBody
     suspend fun getClubEvents(id: String): List<EventResponse>?
@@ -44,10 +52,27 @@ interface EventRepository {
     suspend fun getEventNewsById(token: String, eventNewsId: String): EventNewsResponse?
 }
 
-class EventRepositoryImpl(private val apiService: ApiService): EventRepository{
+class EventRepositoryImpl(
+    private val apiService: ApiService,
+    private val eventDao: EventDao
+): EventRepository{
     override suspend fun getEvent(id: String): EventResponse = apiService.getEvent(id)
 
-    override suspend fun getEvents(): List<EventResponse> = apiService.getEvents()
+    override fun getEvents(): Flow<List<EventResponse>> {
+        return flow {
+            val cachedEvents = eventDao.getAllEvents().first()
+            Log.d("EventRepository", "Loaded cached events: ${cachedEvents.size}")
+            emit(cachedEvents.map { it.toEventResponse() })
+
+            try {
+                val apiEvents = apiService.getEvents()
+                Log.d("EventRepository", "Fetched events from API: ${apiEvents.size}")
+                eventDao.insertEvents(apiEvents.map { it.toEventEntity() })
+            } catch (e: Exception) {
+                Log.e("EventRepository", "API sync failed, using cached data", e)
+            }
+        }.distinctUntilChanged()
+    }
 
     override suspend fun createEvent(token:String, event: EventRequest): ResponseBody = apiService.createEvent(token = "Bearer $token", event = event)
 

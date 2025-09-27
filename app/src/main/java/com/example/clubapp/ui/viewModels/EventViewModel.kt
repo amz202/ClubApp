@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlin.collections.containsKey
 import kotlin.collections.remove
 import kotlin.text.get
+import kotlinx.coroutines.flow.first
 
 /*
  * Copyright 2025 Abdul Majid
@@ -116,21 +117,19 @@ class EventViewModel(
         viewModelScope.launch {
             try {
                 uiState = BaseUiState.Loading
-                val events = eventRepository.getEvents()
-//                if (events.isEmpty()) {
-//                    uiState = BaseUiState.Error
-//                } else {
-//                    _events.value = events
-//                    uiState = BaseUiState.Success(events)
-//                }
-                _events.value = events
-                uiState = BaseUiState.Success(events)
+                eventRepository.getEvents().collect { events ->
+                    _events.value = events
+                    uiState = BaseUiState.Success(events)
+                    Log.d("EventViewModel", "Updated events in ViewModel: ${events.size}")
+                }
             } catch (e: Exception) {
                 uiState = BaseUiState.Error
+                Log.e("EventViewModel", "Error collecting events flow", e)
                 e.printStackTrace()
             }
         }
     }
+
 
     fun createEvent(event: EventRequest) {
         viewModelScope.launch {
@@ -142,7 +141,7 @@ class EventViewModel(
                     return@launch
                 }
                 eventRepository.createEvent(token, event)
-                val updatedEvents = eventRepository.getEvents()
+                val updatedEvents = eventRepository.getEvents().first()
                 uiState = BaseUiState.Success(updatedEvents)
                 val newEvent = updatedEvents.firstOrNull { it.name == event.name }
                 if (newEvent != null) {
@@ -181,7 +180,7 @@ class EventViewModel(
                     return@launch
                 }
                 eventRepository.deleteEvent(token, id)
-                val updatedEvents = eventRepository.getEvents()
+                val updatedEvents = eventRepository.getEvents().first()
                 uiState = BaseUiState.Success(updatedEvents)
             } catch (e: Exception) {
                 uiState = BaseUiState.Error
@@ -217,7 +216,7 @@ class EventViewModel(
                 eventRepository.changeEventRole(token, eventId, request, userId)
                 participantsCache.remove(eventId)
                 getEventParticipants(eventId)
-                val updatedEvents = eventRepository.getEvents()
+                val updatedEvents = eventRepository.getEvents().first()
                 uiState = BaseUiState.Success(updatedEvents)
             } catch (e: Exception) {
                 uiState = BaseUiState.Error
@@ -361,7 +360,7 @@ class EventViewModel(
                     return@launch
                 }
                 eventRepository.leaveEvent(token, eventId)
-                val updatedEvents = eventRepository.getEvents()
+                val updatedEvents = eventRepository.getEvents().first()
                 leaveEventUiState = BaseUiState.Success(true)
 
                 // Clear cache entries

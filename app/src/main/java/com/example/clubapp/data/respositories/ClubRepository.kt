@@ -1,5 +1,7 @@
 package com.example.clubapp.data.respositories
 
+import android.util.Log
+import com.example.clubapp.data.local.dao.ClubDao
 import com.example.clubapp.network.ApiService
 import com.example.clubapp.network.request.ClubRequest
 import com.example.clubapp.network.request.RoleRequest
@@ -8,6 +10,12 @@ import com.example.clubapp.network.response.ClubJoinResponse
 import com.example.clubapp.network.response.ClubMembersResponse
 import com.example.clubapp.network.response.ClubResponse
 import com.example.clubapp.network.response.RoleResponse
+import com.example.clubapp.data.local.entities.toClubEntity
+import com.example.clubapp.data.local.entities.toClubResponse
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import okhttp3.ResponseBody
 
 /*
@@ -28,7 +36,7 @@ import okhttp3.ResponseBody
 
 interface ClubRepository {
     suspend fun getClub(id:String): ClubResponse
-    suspend fun getClubs():List<ClubResponse>
+    fun getClubs(): Flow<List<ClubResponse>>
     suspend fun createClub(token:String, club: ClubRequest): ResponseBody
     suspend fun deleteClub(token:String, id: String): ResponseBody
     suspend fun getClubsMembers(token: String, clubId: String): List<ClubMembersResponse>
@@ -46,10 +54,28 @@ interface ClubRepository {
     suspend fun rejectMember(token: String, id: String, userId: String): ResponseBody
 }
 
-class ClubRepositoryImpl(private val apiService: ApiService): ClubRepository{
+class ClubRepositoryImpl(
+    private val apiService: ApiService,
+    private val clubDao: ClubDao
+): ClubRepository{
     override suspend fun getClub(id: String): ClubResponse = apiService.getClub(id)
 
-    override suspend fun getClubs(): List<ClubResponse> = apiService.getClubs()
+    override fun getClubs(): Flow<List<ClubResponse>> {
+        return flow {
+            val cachedClubs = clubDao.getAllClubs().first()
+            Log.d("ClubRepository", "Loaded cached clubs: ${cachedClubs.size}")
+            emit(cachedClubs.map { it.toClubResponse() })
+
+            try {
+                val apiClubs = apiService.getClubs()
+                Log.d("ClubRepository", "Fetched clubs from API: ${apiClubs.size}")
+                clubDao.insertClubs(apiClubs.map { it.toClubEntity() })
+            } catch (e: Exception) {
+                Log.e("ClubRepository", "API sync failed, using cached data", e)
+            }
+        }.distinctUntilChanged()
+    }
+
 
     override suspend fun createClub(token: String, club: ClubRequest): ResponseBody = apiService.createClub(token = "Bearer $token", club = club)
 
