@@ -63,7 +63,7 @@ fun ClubListScreen(
         is BaseUiState.Loading -> LoadingScreen()
         is BaseUiState.Error -> ErrorScreen(
             onRetry = {
-                clubViewModel.getMyClubs()
+                clubViewModel.getClubs()
             }
         )
     }

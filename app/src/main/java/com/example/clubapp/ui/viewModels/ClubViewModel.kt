@@ -138,6 +138,19 @@ class ClubViewModel(
         }
     }
 
+    fun refreshClubs() {
+        viewModelScope.launch {
+            try {
+                uiState = BaseUiState.Loading
+                clubRepository.refreshClubs()
+                // After refreshing, the flow collector in getClubs() will automatically update the UI state
+            } catch (e: Exception) {
+                uiState = BaseUiState.Error
+                e.printStackTrace()
+            }
+        }
+    }
+
     fun getMyClubs(){
         viewModelScope.launch {
             try {
