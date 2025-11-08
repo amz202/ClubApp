@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import okhttp3.ResponseBody
 
 /*
@@ -37,6 +38,8 @@ import okhttp3.ResponseBody
 interface EventRepository {
     suspend fun getEvent(id:String): EventResponse
     fun getEvents(): Flow<List<EventResponse>>
+
+    suspend fun refreshEvents()
     suspend fun createEvent(token:String, event: EventRequest): ResponseBody
     suspend fun deleteEvent(token:String, id: String): ResponseBody
     suspend fun getClubEvents(id: String): List<EventResponse>?
@@ -59,19 +62,19 @@ class EventRepositoryImpl(
     override suspend fun getEvent(id: String): EventResponse = apiService.getEvent(id)
 
     override fun getEvents(): Flow<List<EventResponse>> {
-        return flow {
-            val cachedEvents = eventDao.getAllEvents().first()
-            Log.d("EventRepository", "Loaded cached events: ${cachedEvents.size}")
-            emit(cachedEvents.map { it.toEventResponse() })
+        return eventDao.getAllEvents()
+            .map { it.map { it.toEventResponse() } }
+            .distinctUntilChanged()
+    }
 
-            try {
-                val apiEvents = apiService.getEvents()
-                Log.d("EventRepository", "Fetched events from API: ${apiEvents.size}")
-                eventDao.insertEvents(apiEvents.map { it.toEventEntity() })
-            } catch (e: Exception) {
-                Log.e("EventRepository", "API sync failed, using cached data", e)
-            }
-        }.distinctUntilChanged()
+    override suspend fun refreshEvents() {
+        try {
+            val apiEvents = apiService.getEvents()
+            eventDao.insertEvents(apiEvents.map { it.toEventEntity() })
+            Log.d("EventRepository", "Events refreshed successfully, size : ${apiEvents.size}")
+        }catch (e: Exception){
+            Log.e("EventRepository", "Error refreshing events: ${e.message}")
+        }
     }
 
     override suspend fun createEvent(token:String, event: EventRequest): ResponseBody = apiService.createEvent(token = "Bearer $token", event = event)

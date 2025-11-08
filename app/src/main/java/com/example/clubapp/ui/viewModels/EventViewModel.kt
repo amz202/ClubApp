@@ -130,6 +130,15 @@ class EventViewModel(
         }
     }
 
+    fun refreshEvents(){
+        viewModelScope.launch {
+            try{
+                eventRepository.refreshEvents()
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+        }
+    }
 
     fun createEvent(event: EventRequest) {
         viewModelScope.launch {
