@@ -111,6 +111,7 @@ class EventViewModel(
 
     init {
         getEvents()
+        refreshEvents()
     }
 
     fun getEvents() {
