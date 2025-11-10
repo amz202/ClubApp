@@ -7,13 +7,13 @@ A modern Android application designed to streamline the management of university
 ## Features
 
 - Google Sign-In with Firebase Authentication  
-- Club management: browse, join, and explore university clubs  
-- Event system: view, participate in, and track club events  
+- **Club management:** Browse, join, and explore university clubs  
+- **Event system:** View, participate in, and track club events  
 - Real-time group chat for each club using WebSockets  
 - Push notifications via Firebase Cloud Messaging  
-- Persistent login via Jetpack DataStore  
+- Offline mode for clubs and events list using Room Database
 - Role-based access control for administrative actions  
-- UI state consistency on session change  
+- Persistent login via Jetpack DataStore
 
 ---
 
@@ -24,7 +24,7 @@ A modern Android application designed to streamline the management of university
 - **Architecture**: MVVM with StateFlows  
 - **Networking**: Retrofit (HTTP) + Ktor WebSocket  
 - **Authentication & Session**: Firebase Authentication + Jetpack DataStore  
-- **Database**: Azure PostgreSQL + MongoDB  
+- **Database**: Azure PostgreSQL and MongoDB (cloud) + Room (local caching)
 - **Image Loading**: Coil  
 - **Serialization**: kotlinx.serialization  
 
@@ -36,6 +36,7 @@ A modern Android application designed to streamline the management of university
 - Uses repository pattern for data access  
 - Firebase ID tokens are attached to requests for secure communication  
 - Efficient caching of clubs and events  
+- **Offline-first design** (for clubs and events): Loads instantly from Room cache and syncs fresh data from the server in the background.
 - Built-in support for contacting club admins and event heads via gmail intent
 - **Backend**: [Ktor Backend Server](https://github.com/amz202/ktor-clubapp) with Firebase Auth verification, Azure PostgreSQL, and MongoDB
 
@@ -50,10 +51,11 @@ A modern Android application designed to streamline the management of university
 
 - **Club access control** – Creators can open or close clubs, controlling whether new requests are allowed  
 - **Join requests** – Users can request to join open clubs; creators and moderators can accept or reject them  
+- **Offline Mode** – Clubs and Events lists are available even without internet connectivity, thanks to local caching via Room
 - **Event–club link** – Events now show their parent club name, with quick navigation back to the club page  
 - **Error handling** – Error screen redesigned with a retry button for faster recovery  
 - **Responsive UI** – Member status updates (club or event) now reflect instantly, with smoother caching and state handling  
-- **Backend** – Database migrated to **Supabase** for improved stability and testing  
+- **Backend** – Database migrated to **Supabase** for improved testing  
 
 ---
 
