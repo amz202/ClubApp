@@ -36,7 +36,7 @@ A modern Android application designed to streamline the management of university
 - Uses repository pattern for data access  
 - Firebase ID tokens are attached to requests for secure communication  
 - Efficient caching of clubs and events  
-- **Offline-first design** (for clubs and events): Loads instantly from Room cache and syncs fresh data from the server in the background.
+- Offline-first design (currently for clubs and events lists): Loads instantly from Room cache and syncs fresh data from the server in the background.
 - Built-in support for contacting club admins and event heads via gmail intent
 - **Backend**: [Ktor Backend Server](https://github.com/amz202/ktor-clubapp) with Firebase Auth verification, Azure PostgreSQL, and MongoDB
 
@@ -45,7 +45,7 @@ A modern Android application designed to streamline the management of university
 
 ## Version 1.2
 
-> **ClubApp v1.2** introduces controlled club access, structured membership requests, and direct event–club integration. The update also improves UI responsiveness, error handling, and overall backend stability.  
+> **ClubApp v1.2** introduces controlled club access, structured membership requests and offline-first support for clubs and events lists using Room. The update also improves UI responsiveness, error handling, and overall backend stability.  
 
 ### Highlights
 
